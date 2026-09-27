@@ -770,24 +770,52 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 CREATE OR REPLACE FUNCTION recalculate_customer_balance_trigger()
 RETURNS TRIGGER AS $$
 DECLARE
-    v_opening NUMERIC := 0;
-    v_customer_id UUID;
+    v_party UUID;
 BEGIN
-    -- Works for INSERT, UPDATE and DELETE.
-    v_customer_id := COALESCE(NEW.customer_id, OLD.customer_id);
+    -- A running total must be seeded from every preceding row, so a partial
+    -- recalculation starting at the changed row would report wrong balances.
+    -- The previous version compared a 2-column row against a 1-column
+    -- subquery (a hard error) and started the running total at zero.
+    --
+    -- Two corrections over that version:
+    --   1. `NEW` is an unassigned record on DELETE, so `COALESCE(NEW.x, OLD.x)`
+    --      raised "record new is not assigned yet". Branch on TG_OP instead.
+    --   2. Reassigning a row to a different customer left the OLD customer's
+    --      running balances stale, because only one party was recalculated.
+    --      Walk the distinct set of affected parties so both are fixed.
+    FOREACH v_party IN ARRAY COALESCE((
+        SELECT ARRAY_AGG(DISTINCT p)
+        FROM (
+            SELECT CASE WHEN TG_OP <> 'INSERT' THEN OLD.customer_id END AS p
+            UNION
+            SELECT CASE WHEN TG_OP <> 'DELETE' THEN NEW.customer_id END
+        ) ids
+        WHERE p IS NOT NULL
+    ), ARRAY[]::UUID[]) LOOP
+        PERFORM refresh_customer_running_balance(v_party);
+    END LOOP;
 
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- ============================================================
+-- 15b. refresh_customer_running_balance
+--     Recomputes the whole running balance for one customer.
+-- ============================================================
+CREATE OR REPLACE FUNCTION refresh_customer_running_balance(p_customer_id UUID)
+RETURNS VOID AS $$
+DECLARE
+    v_opening NUMERIC := 0;
+BEGIN
     SELECT CASE WHEN COALESCE(opening_balance_type, 'debit') = 'credit'
                 THEN -COALESCE(opening_balance, 0)
                 ELSE COALESCE(opening_balance, 0) END
     INTO v_opening
-    FROM customers WHERE id = v_customer_id;
+    FROM customers WHERE id = p_customer_id;
 
-    -- Recalculate the customer's whole ledger in one pass.
-    -- A running total must be seeded from every preceding row, so a
-    -- partial recalculation starting at the changed row would report
-    -- wrong balances. The previous version compared a 2-column row
-    -- against a 1-column subquery (a hard error) and started the running
-    -- total at zero.
+    v_opening := COALESCE(v_opening, 0);
+
     WITH ordered AS (
         SELECT id,
                SUM(COALESCE(debit, 0) - COALESCE(credit, 0)) OVER (
@@ -796,14 +824,12 @@ BEGIN
                    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                ) AS running
         FROM customer_ledger
-        WHERE customer_id = v_customer_id
+        WHERE customer_id = p_customer_id
     )
     UPDATE customer_ledger cl
     SET balance = v_opening + ordered.running
     FROM ordered
     WHERE cl.id = ordered.id;
-
-    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
@@ -832,16 +858,41 @@ CREATE TRIGGER trg_customer_ledger_balance_update
 CREATE OR REPLACE FUNCTION recalculate_supplier_balance_trigger()
 RETURNS TRIGGER AS $$
 DECLARE
-    v_opening NUMERIC := 0;
-    v_supplier_id UUID;
+    v_party UUID;
 BEGIN
-    v_supplier_id := COALESCE(NEW.supplier_id, OLD.supplier_id);
+    -- Same two corrections as the customer trigger: `NEW` is unassigned on
+    -- DELETE, and reassigning a row must refresh the old supplier too.
+    FOREACH v_party IN ARRAY COALESCE((
+        SELECT ARRAY_AGG(DISTINCT p)
+        FROM (
+            SELECT CASE WHEN TG_OP <> 'INSERT' THEN OLD.supplier_id END AS p
+            UNION
+            SELECT CASE WHEN TG_OP <> 'DELETE' THEN NEW.supplier_id END
+        ) ids
+        WHERE p IS NOT NULL
+    ), ARRAY[]::UUID[]) LOOP
+        PERFORM refresh_supplier_running_balance(v_party);
+    END LOOP;
 
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- ============================================================
+-- 17b. refresh_supplier_running_balance
+-- ============================================================
+CREATE OR REPLACE FUNCTION refresh_supplier_running_balance(p_supplier_id UUID)
+RETURNS VOID AS $$
+DECLARE
+    v_opening NUMERIC := 0;
+BEGIN
     SELECT CASE WHEN COALESCE(opening_balance_type, 'credit') = 'debit'
                 THEN -COALESCE(opening_balance, 0)
                 ELSE COALESCE(opening_balance, 0) END
     INTO v_opening
-    FROM suppliers WHERE id = v_supplier_id;
+    FROM suppliers WHERE id = p_supplier_id;
+
+    v_opening := COALESCE(v_opening, 0);
 
     -- Supplier balances run credit-minus-debit (what we owe).
     WITH ordered AS (
@@ -852,14 +903,12 @@ BEGIN
                    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
                ) AS running
         FROM supplier_ledger
-        WHERE supplier_id = v_supplier_id
+        WHERE supplier_id = p_supplier_id
     )
     UPDATE supplier_ledger sl
     SET balance = v_opening + ordered.running
     FROM ordered
     WHERE sl.id = ordered.id;
-
-    RETURN NULL;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
