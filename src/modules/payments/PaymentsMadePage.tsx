@@ -1,0 +1,554 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  Plus,
+  Search,
+  Download,
+  FileText,
+  Edit2,
+  Trash2,
+  Banknote,
+  Smartphone,
+  Building2,
+  CreditCard,
+  Filter,
+  RefreshCw,
+  ArrowUpCircle,
+  TrendingDown,
+  Wallet,
+} from 'lucide-react';
+import { PageHeader } from '@/components/ui/page-header';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { DatePicker } from '@/components/ui/date-picker';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { EmptyState } from '@/components/ui/empty-state';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { useToast } from '@/components/ui/use-toast';
+import { cn, formatCurrency, formatDate } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCompany } from '@/contexts/CompanyContext';
+import {
+  getPaymentsMade,
+  createPaymentMade,
+  updatePaymentMade,
+  deletePayment,
+  getSupplierPaymentSummary,
+  type PaymentFilters,
+  type PaymentSummary,
+} from '@/services/payment.service';
+import { getSuppliers } from '@/services/supplier.service';
+import type { PaymentMade } from '@/types/database.types';
+import type { SupplierWithRelations } from '@/types/supplier.types';
+import { PAYMENT_MODES } from '@/config/app.config';
+
+interface PaymentFormData {
+  supplier_id: string;
+  date: string;
+  amount: number;
+  mode: string;
+  reference_number: string;
+  bank_name: string;
+  notes: string;
+}
+
+const emptyForm: PaymentFormData = {
+  supplier_id: '',
+  date: new Date().toISOString().split('T')[0],
+  amount: 0,
+  mode: 'cash',
+  reference_number: '',
+  bank_name: '',
+  notes: '',
+};
+
+const modeIcons: Record<string, React.ReactNode> = {
+  cash: <Banknote className="h-4 w-4" />,
+  bank: <Building2 className="h-4 w-4" />,
+  upi: <Smartphone className="h-4 w-4" />,
+  cheque: <FileText className="h-4 w-4" />,
+  other: <CreditCard className="h-4 w-4" />,
+};
+
+export default function PaymentsMadePage() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const { company } = useCompany();
+
+  const [payments, setPayments] = useState<PaymentMade[]>([]);
+  const [suppliers, setSuppliers] = useState<SupplierWithRelations[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [dateFrom, setDateFrom] = useState<Date | null>(null);
+  const [dateTo, setDateTo] = useState<Date | null>(null);
+  const [modeFilter, setModeFilter] = useState('all');
+  const [summary, setSummary] = useState<PaymentSummary | null>(null);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingPayment, setEditingPayment] = useState<PaymentMade | null>(null);
+  const [formData, setFormData] = useState<PaymentFormData>(emptyForm);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingPayment, setDeletingPayment] = useState<PaymentMade | null>(null);
+
+  const fetchPayments = useCallback(async () => {
+    try {
+      setLoading(true);
+      const filters: PaymentFilters = {};
+      if (search) filters.search = search;
+      if (dateFrom) filters.date_from = dateFrom.toISOString().split('T')[0];
+      if (dateTo) filters.date_to = dateTo.toISOString().split('T')[0];
+      if (modeFilter !== 'all') filters.mode = modeFilter;
+
+      const response = await getPaymentsMade(filters);
+      setPayments(response.payments);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to fetch payments',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [search, dateFrom, dateTo, modeFilter, toast]);
+
+  const fetchSuppliers = useCallback(async () => {
+    try {
+      const response = await getSuppliers({ is_active: true }, 1, 500);
+      setSuppliers(response.suppliers);
+    } catch {
+      // silent
+    }
+  }, []);
+
+  const fetchSummary = useCallback(async () => {
+    try {
+      const summaryData = await getSupplierPaymentSummary('all');
+      setSummary(summaryData);
+    } catch {
+      // silent
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
+
+  useEffect(() => {
+    fetchSuppliers();
+    fetchSummary();
+  }, [fetchSuppliers, fetchSummary]);
+
+  const openCreateDialog = () => {
+    setEditingPayment(null);
+    setFormData(emptyForm);
+    setFormErrors({});
+    setDialogOpen(true);
+  };
+
+  const openEditDialog = (payment: PaymentMade) => {
+    setEditingPayment(payment);
+    setFormData({
+      supplier_id: payment.supplier_id,
+      date: payment.date,
+      amount: payment.amount,
+      mode: payment.mode,
+      reference_number: payment.reference_number || '',
+      bank_name: payment.bank_name || '',
+      notes: payment.notes || '',
+    });
+    setFormErrors({});
+    setDialogOpen(true);
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!formData.supplier_id) errors.supplier_id = 'Supplier is required';
+    if (!formData.date) errors.date = 'Date is required';
+    if (!formData.amount || formData.amount <= 0) errors.amount = 'Amount must be greater than 0';
+    if (!formData.mode) errors.mode = 'Payment mode is required';
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      setSubmitting(true);
+      if (editingPayment) {
+        await updatePaymentMade(editingPayment.id, {
+          date: formData.date,
+          amount: formData.amount,
+          mode: formData.mode,
+          reference_number: formData.reference_number,
+          bank_name: formData.bank_name,
+          notes: formData.notes,
+        });
+        toast({ title: 'Payment updated successfully', variant: 'success' });
+      } else {
+        await createPaymentMade({
+          supplier_id: formData.supplier_id,
+          date: formData.date,
+          amount: formData.amount,
+          mode: formData.mode,
+          reference_number: formData.reference_number,
+          bank_name: formData.bank_name,
+          notes: formData.notes,
+        });
+        toast({ title: 'Payment recorded successfully', variant: 'success' });
+      }
+      setDialogOpen(false);
+      fetchPayments();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to save payment',
+        variant: 'destructive',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingPayment) return;
+    try {
+      await deletePayment(deletingPayment.id, 'made');
+      toast({ title: 'Payment deleted successfully', variant: 'success' });
+      setDeleteDialogOpen(false);
+      setDeletingPayment(null);
+      fetchPayments();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to delete payment',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleExport = () => {
+    const headers = ['Date', 'Supplier', 'Mode', 'Reference', 'Amount', 'Notes'];
+    const rows = payments.map((p) => [
+      p.date,
+      suppliers.find((s) => s.id === p.supplier_id)?.name || '',
+      p.mode,
+      p.reference_number || '',
+      String(p.amount),
+      p.notes || '',
+    ]);
+    const csv = [headers, ...rows].map((r) => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `payments-made-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const todayTotal = payments
+    .filter((p) => p.date === new Date().toISOString().split('T')[0])
+    .reduce((sum, p) => sum + p.amount, 0);
+
+  const monthTotal = payments
+    .filter((p) => p.date.startsWith(new Date().toISOString().substring(0, 7)))
+    .reduce((sum, p) => sum + p.amount, 0);
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Payments Made"
+        description="Track and manage supplier payments"
+        breadcrumbs={[
+          { label: 'Dashboard', onClick: () => navigate('/') },
+          { label: 'Payments' },
+          { label: 'Made' },
+        ]}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleExport}>
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Button onClick={openCreateDialog}>
+              <Plus className="mr-2 h-4 w-4" />
+              Make Payment
+            </Button>
+          </div>
+        }
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
+          <Card className="border-danger/20 bg-danger/5">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Today's Paid</p>
+                  <p className="text-2xl font-bold text-danger">{formatCurrency(todayTotal)}</p>
+                </div>
+                <div className="rounded-xl bg-danger/10 p-3">
+                  <ArrowUpCircle className="h-6 w-6 text-danger" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">This Month</p>
+                  <p className="text-2xl font-bold text-primary">{formatCurrency(monthTotal)}</p>
+                </div>
+                <div className="rounded-xl bg-primary/10 p-3">
+                  <TrendingDown className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="border-warning/20 bg-warning/5">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Outstanding</p>
+                  <p className="text-2xl font-bold text-warning">{formatCurrency(summary?.pending_amount || 0)}</p>
+                </div>
+                <div className="rounded-xl bg-warning/10 p-3">
+                  <Wallet className="h-6 w-6 text-warning" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search by reference, notes..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <DatePicker value={dateFrom} onChange={(d) => setDateFrom(d)} placeholder="From Date" className="w-full sm:w-[150px]" />
+            <DatePicker value={dateTo} onChange={(d) => setDateTo(d)} placeholder="To Date" className="w-full sm:w-[150px]" />
+            <Select value={modeFilter} onValueChange={setModeFilter}>
+              <SelectTrigger className="w-full sm:w-[150px]">
+                <Filter className="mr-2 h-4 w-4" />
+                <SelectValue placeholder="All Modes" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Modes</SelectItem>
+                {PAYMENT_MODES.map((mode) => (
+                  <SelectItem key={mode.id} value={mode.id}>{mode.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="icon" onClick={fetchPayments}>
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-0">
+          {payments.length === 0 && !loading ? (
+            <EmptyState
+              icon={<Banknote className="h-8 w-8 text-muted-foreground/60" />}
+              title="No payments found"
+              description="Record your first supplier payment to get started"
+              action={{ label: 'Make Payment', onClick: openCreateDialog }}
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Supplier</TableHead>
+                  <TableHead>Mode</TableHead>
+                  <TableHead>Reference</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {payments.map((payment, index) => {
+                  const supplier = suppliers.find((s) => s.id === payment.supplier_id);
+                  return (
+                    <motion.tr
+                      key={payment.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                      className="border-b border-border hover:bg-muted/50"
+                    >
+                      <TableCell>{formatDate(payment.date)}</TableCell>
+                      <TableCell className="font-medium">{supplier?.name || 'Unknown'}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize gap-1">
+                          {modeIcons[payment.mode] || <CreditCard className="h-3 w-3" />}
+                          {payment.mode}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{payment.reference_number || '-'}</TableCell>
+                      <TableCell className="text-right font-semibold text-danger">
+                        {formatCurrency(payment.amount)}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground max-w-[200px] truncate">{payment.notes || '-'}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditDialog(payment)}>
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-danger hover:text-danger"
+                            onClick={() => { setDeletingPayment(payment); setDeleteDialogOpen(true); }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </motion.tr>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingPayment ? 'Edit Payment' : 'Make Payment'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Supplier *</label>
+              <Select
+                value={formData.supplier_id}
+                onValueChange={(v) => setFormData((p) => ({ ...p, supplier_id: v }))}
+              >
+                <SelectTrigger className={cn(formErrors.supplier_id && 'border-danger')}>
+                  <SelectValue placeholder="Select supplier" />
+                </SelectTrigger>
+                <SelectContent>
+                  {suppliers.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formErrors.supplier_id && <p className="text-xs text-danger">{formErrors.supplier_id}</p>}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Date *</label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
+                  className={cn(formErrors.date && 'border-danger')}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Amount *</label>
+                <Input
+                  type="number"
+                  value={formData.amount || ''}
+                  onChange={(e) => setFormData((p) => ({ ...p, amount: parseFloat(e.target.value) || 0 }))}
+                  placeholder="0.00"
+                  className={cn(formErrors.amount && 'border-danger')}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Payment Mode *</label>
+                <Select value={formData.mode} onValueChange={(v) => setFormData((p) => ({ ...p, mode: v }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAYMENT_MODES.map((mode) => (
+                      <SelectItem key={mode.id} value={mode.id}>{mode.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Bank Name</label>
+                <Input value={formData.bank_name} onChange={(e) => setFormData((p) => ({ ...p, bank_name: e.target.value }))} placeholder="Bank name" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Reference Number</label>
+              <Input value={formData.reference_number} onChange={(e) => setFormData((p) => ({ ...p, reference_number: e.target.value }))} placeholder="Cheque/UPI/Transaction reference" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Notes</label>
+              <Input value={formData.notes} onChange={(e) => setFormData((p) => ({ ...p, notes: e.target.value }))} placeholder="Additional notes" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={submitting}>Cancel</Button>
+            <Button onClick={handleSubmit} disabled={submitting}>
+              {submitting ? 'Saving...' : editingPayment ? 'Update Payment' : 'Record Payment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Payment"
+        description={`Are you sure you want to delete this payment of ${deletingPayment ? formatCurrency(deletingPayment.amount) : ''}? This action cannot be undone.`}
+        confirmLabel="Delete"
+        variant="danger"
+        onConfirm={handleDelete}
+      />
+    </div>
+  );
+}
