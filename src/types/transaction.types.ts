@@ -5,6 +5,8 @@ import {
   TransactionStatus,
   Address,
   PaymentMode,
+  CompanySnapshot,
+  DocumentPaymentAllocation,
 } from './database.types';
 
 export interface TransactionWithRelations extends Transaction {
@@ -68,6 +70,10 @@ export interface TransactionFormData {
   validity_date?: string;
   expected_delivery?: string;
   salesperson?: string;
+  /** Company identity captured when the document is issued. */
+  company_snapshot?: CompanySnapshot | null;
+  /** Payment rows shown on the document and posted on approval. */
+  payment_allocations?: DocumentPaymentAllocation[];
 }
 
 export interface TransactionItemFormData {

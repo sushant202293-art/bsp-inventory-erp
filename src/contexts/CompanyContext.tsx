@@ -28,6 +28,10 @@ export interface CompanySettings {
   payment_settings?: Record<string, unknown>;
   bank_accounts?: BankAccount[];
   general_settings?: Record<string, unknown>;
+  /** Default terms per document type (Settings -> Terms). */
+  document_terms?: Record<string, string>;
+  /** Enabled payment methods (Settings -> Payment Methods). */
+  payment_methods?: Array<Record<string, unknown>>;
   theme_id?: string;
 }
 
@@ -163,6 +167,8 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
           payment_settings: s.payment_settings,
           bank_accounts: s.bank_accounts,
           general_settings: s.general_settings,
+          document_terms: s.document_terms,
+          payment_methods: s.payment_methods,
           theme_id: s.theme_id,
         });
       }

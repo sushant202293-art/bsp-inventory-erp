@@ -1,0 +1,114 @@
+/* A4 print preview + print isolation.
+ *
+ * The preview is portalled straight onto <body> as a sibling of #root, so
+ * hiding #root in print media hides the whole application shell while the
+ * document itself prints on a clean white page.
+ */
+
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+.billing-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  overflow: auto;
+  background: rgba(15, 15, 15, 0.72);
+  padding: 1rem;
+}
+
+.billing-preview-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  max-width: 210mm;
+  margin: 0 auto 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.875rem;
+}
+
+.billing-print-doc {
+  width: 210mm;
+  min-height: 296mm;
+  margin: 0 auto;
+  padding: 10mm;
+  background: #ffffff;
+  color: #111827;
+  font-size: 11px;
+  line-height: 1.45;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.billing-print-doc table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.billing-print-doc th,
+.billing-print-doc td {
+  padding: 4px 6px;
+  vertical-align: top;
+}
+
+.billing-print-doc .doc-table thead th {
+  border-top: 1px solid #111827;
+  border-bottom: 1px solid #111827;
+  background: #f3f4f6;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.billing-print-doc .doc-table tbody td {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.billing-print-doc .box {
+  border: 1px solid #d1d5db;
+  padding: 8px;
+}
+
+.billing-print-doc .muted {
+  color: #4b5563;
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  #root {
+    display: none !important;
+  }
+
+  .billing-preview-backdrop {
+    position: static !important;
+    overflow: visible !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .billing-preview-toolbar {
+    display: none !important;
+  }
+
+  .billing-print-doc {
+    width: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+}

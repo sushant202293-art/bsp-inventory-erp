@@ -1,5 +1,13 @@
 import { supabase } from '@/lib/supabase';
-import type { Transaction, TransactionItem, TransactionType, TransactionStatus, Address } from '@/types/database.types';
+import type {
+  Transaction,
+  TransactionItem,
+  TransactionType,
+  TransactionStatus,
+  Address,
+  CompanySnapshot,
+  DocumentPaymentAllocation,
+} from '@/types/database.types';
 import type {
   TransactionWithRelations,
   TransactionFormData,
@@ -11,6 +19,7 @@ import type {
 import { amountInWords, isSameState, roundTo2 } from '@/lib/utils';
 import { calculateGSTBreakdown } from '@/lib/calculations';
 import { getCompanyId, getCurrentUserId, getDefaultWarehouseId } from '@/lib/tenant';
+import { previewDocumentNumber } from '@/billing/document-number.service';
 
 let companyStateCache: { companyId: string; state: string } | null = null;
 
@@ -247,7 +256,11 @@ export async function createTransaction(data: TransactionFormData): Promise<Tran
     const companyId = await getCompanyId();
     const userId = await getCurrentUserId();
 
-    const docNumber = data.document_number || (await getNextDocumentNumber(data.type));
+    // Numbers come from the configured series in the database. The form only
+    // ever displays a *preview*, so whatever number it sends is ignored:
+    // allocating here means two users saving at the same instant still get
+    // 0001 and 0002, and reopening the form never burns a number.
+    const docNumber = await allocateDocumentNumber(data.type, data.document_date);
 
     // Resolve the party so the CGST/SGST vs IGST split is correct.
     // Previously this compared the company UUID against an empty
@@ -289,6 +302,8 @@ export async function createTransaction(data: TransactionFormData): Promise<Tran
       validity_date: data.validity_date || null,
       expected_delivery: data.expected_delivery || null,
       salesperson: data.salesperson || null,
+      company_snapshot: data.company_snapshot ?? null,
+      payment_allocations: data.payment_allocations ?? [],
       created_by: userId,
     };
 
@@ -337,7 +352,9 @@ export async function updateTransaction(id: string, data: Partial<TransactionFor
     if (existing.status === 'cancelled') throw new Error('Cannot edit a cancelled transaction');
 
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
-    if (data.document_number !== undefined) updateData.document_number = data.document_number;
+    // document_number is deliberately not writable here. A saved document
+    // keeps the number it was issued when it was first created - editing a
+    // draft must never renumber an existing invoice.
     if (data.document_date !== undefined) updateData.document_date = data.document_date;
     if (data.reference_number !== undefined) updateData.reference_number = data.reference_number || null;
     if (data.reference_date !== undefined) updateData.reference_date = data.reference_date || null;
@@ -351,6 +368,10 @@ export async function updateTransaction(id: string, data: Partial<TransactionFor
     if (data.validity_date !== undefined) updateData.validity_date = data.validity_date || null;
     if (data.expected_delivery !== undefined) updateData.expected_delivery = data.expected_delivery || null;
     if (data.salesperson !== undefined) updateData.salesperson = data.salesperson || null;
+    if (data.payment_allocations !== undefined) {
+      updateData.payment_allocations = data.payment_allocations || [];
+    }
+    if (data.company_snapshot !== undefined) updateData.company_snapshot = data.company_snapshot;
     if (data.status !== undefined) updateData.status = data.status;
 
     let lines: ComputedLine[] = [];
@@ -508,11 +529,11 @@ export async function convertTransaction(
     if (fetchErr || !original) throw new Error('Source transaction not found');
 
     const items = (original.items as unknown as TransactionItem[]) || [];
-    const newDocNumber = await getNextDocumentNumber(toType);
 
     const newTransaction: TransactionFormData = {
       type: toType,
-      document_number: newDocNumber,
+      // Left blank on purpose: createTransaction allocates from the series.
+      document_number: '',
       document_date: new Date().toISOString().split('T')[0],
       reference_number: original.document_number,
       reference_date: original.document_date,
@@ -548,24 +569,51 @@ export async function convertTransaction(
 }
 
 /**
- * Allocates the next document number inside a database advisory lock.
- * The previous version read the last number and incremented it in the
- * browser, so two users saving at the same time minted the same number.
+ * Preview of the number the *next* document of this type would receive.
+ *
+ * Read-only: it never increments the series, so opening a form, refreshing,
+ * or opening Print Preview repeatedly cannot burn a number. The real number
+ * is minted by {@link allocateDocumentNumber} at the moment a new document is
+ * inserted.
  */
-export async function getNextDocumentNumber(type: TransactionType): Promise<string> {
+export async function getNextDocumentNumber(
+  type: TransactionType,
+  docDate?: string
+): Promise<string> {
+  try {
+    return await previewDocumentNumber(type, docDate);
+  } catch (error) {
+    throw new Error(
+      `Failed to preview document number: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+/**
+ * Atomically reserves the next number of a series inside the database
+ * (`allocate_document_number` takes a row lock on the series, so concurrent
+ * callers are serialised and never receive the same number).
+ */
+export async function allocateDocumentNumber(
+  type: TransactionType,
+  docDate?: string
+): Promise<string> {
   try {
     const companyId = await getCompanyId();
 
-    const { data, error } = await supabase.rpc('next_document_number', {
+    const { data, error } = await supabase.rpc('allocate_document_number', {
       p_company_id: companyId,
-      p_type: type,
+      p_doc_type: type,
+      p_doc_date: docDate || null,
     });
 
     if (error) throw error;
     if (!data) throw new Error('Could not allocate a document number');
     return String(data);
   } catch (error) {
-    throw new Error(`Failed to generate document number: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate document number: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -687,5 +735,5 @@ export async function printTransaction(id: string): Promise<TransactionPrintData
 export const transactionService = {
   getTransactions, getTransaction, createTransaction, updateTransaction, deleteTransaction,
   postTransaction, cancelTransaction, convertTransaction, getNextDocumentNumber,
-  duplicateTransaction, printTransaction,
+  allocateDocumentNumber, duplicateTransaction, printTransaction,
 };

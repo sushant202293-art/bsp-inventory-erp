@@ -267,6 +267,65 @@ export interface BankDetails {
   branch: string | null;
 }
 
+/**
+ * Company identity as it stood when a document was issued. Stored on the
+ * document so later edits to the company profile never rewrite history.
+ */
+export interface CompanySnapshot {
+  name: string;
+  logo_url: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  pin: string | null;
+  country: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  gstin: string | null;
+  pan: string | null;
+  cin?: string | null;
+}
+
+/**
+ * One row of the payment section of a document. On a proforma or quotation
+ * this is a payment intention; on a posted sales/purchase invoice it mirrors
+ * the rows written to payments_received / payments_made.
+ */
+export interface DocumentPaymentAllocation {
+  method_key: string;
+  method_label: string;
+  bank_account_id: string | null;
+  bank_label: string | null;
+  reference: string | null;
+  amount: number;
+}
+
+/** Payment method configured under Settings -> Payment Methods. */
+export interface PaymentMethodConfig {
+  key: string;
+  label: string;
+  enabled: boolean;
+  requires_bank: boolean;
+  requires_reference: boolean;
+  sort_order: number;
+}
+
+/** Bank account configured under Settings -> Payment Methods. */
+export interface ConfiguredBankAccount {
+  id: string;
+  display_name: string;
+  bank_name: string;
+  account_holder: string;
+  account_number: string;
+  ifsc: string;
+  branch: string;
+  account_type: string;
+  upi_id: string;
+  is_active: boolean;
+  is_default: boolean;
+}
+
 export interface Transaction {
   id: string;
   company_id: string;
@@ -293,6 +352,8 @@ export interface Transaction {
   expected_delivery: string | null;
   salesperson: string | null;
   warehouse_id: string | null;
+  company_snapshot: CompanySnapshot | null;
+  payment_allocations: DocumentPaymentAllocation[];
   created_by: string | null;
   approved_by: string | null;
   approved_at: string | null;

@@ -9,20 +9,18 @@ import { toast } from '@/components/ui/use-toast';
 import { useCompany } from '@/contexts/CompanyContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { DocumentNumberingSettings } from '@/billing/settings/DocumentNumberingSettings';
+import { PaymentMethodsSettings } from '@/billing/settings/PaymentMethodsSettings';
+import { DocumentTermsSettings } from '@/billing/settings/DocumentTermsSettings';
 import { Settings, Building, FileText, CreditCard, Landmark, Globe, KeyRound } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { company, settings, updateCompany, updateSettings } = useCompany();
+  const { company, updateCompany } = useCompany();
   const { user, profile, updatePassword, updateProfile } = useAuth();
   const [companyData, setCompanyData] = useState({
     name: '', tagline: '', address: '', city: '', state: '', pin: '', country: 'India',
     phone: '', email: '', website: '', gstin: '', pan: '',
   });
-  const [docSettings, setDocSettings] = useState({
-    quotation_prefix: 'QT-', po_prefix: 'PO-', pi_prefix: 'PI-', sales_prefix: 'INV-',
-    number_padding: 5, financial_year: new Date().getFullYear().toString(),
-  });
-  const [bankData, setBankData] = useState({ bank_name: '', account_name: '', account_number: '', ifsc: '', branch: '', upi: '' });
 
   // Account / credential fields. Kept separate from the company data above
   // because they write to auth.users and public.profiles, not to companies.
@@ -35,8 +33,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (company) setCompanyData({ name: company.name || '', tagline: company.tagline || '', address: company.address || '', city: company.city || '', state: company.state || '', pin: company.pin || '', country: company.country || 'India', phone: company.phone || '', email: company.email || '', website: company.website || '', gstin: company.gstin || '', pan: company.pan || '' });
-    if (settings?.bank_accounts?.[0]) setBankData(settings.bank_accounts[0]);
-  }, [company, settings]);
+  }, [company]);
 
   useEffect(() => {
     setFullName(profile?.full_name || '');
@@ -47,20 +44,6 @@ export default function SettingsPage() {
     try {
       await updateCompany(companyData);
       toast({ title: 'Saved', description: 'Company settings updated' });
-    } catch (e: any) { toast({ title: 'Error', description: e.message, variant: 'destructive' }); }
-  }
-
-  async function saveDocSettings() {
-    try {
-      await updateSettings({ document_settings: docSettings });
-      toast({ title: 'Saved', description: 'Document settings updated' });
-    } catch (e: any) { toast({ title: 'Error', description: e.message, variant: 'destructive' }); }
-  }
-
-  async function saveBank() {
-    try {
-      await updateSettings({ bank_accounts: [bankData] });
-      toast({ title: 'Saved', description: 'Bank details updated' });
     } catch (e: any) { toast({ title: 'Error', description: e.message, variant: 'destructive' }); }
   }
 
@@ -112,11 +95,12 @@ export default function SettingsPage() {
       <div><h1 className="text-2xl font-bold flex items-center gap-2"><Settings className="h-6 w-6" /> Application Settings</h1><p className="text-sm text-muted-foreground">Configure your application preferences</p></div>
 
       <Tabs defaultValue="company">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-7">
           <TabsTrigger value="company"><Building className="mr-1 h-4 w-4" /> Company</TabsTrigger>
-          <TabsTrigger value="documents"><FileText className="mr-1 h-4 w-4" /> Documents</TabsTrigger>
-          <TabsTrigger value="bank"><Landmark className="mr-1 h-4 w-4" /> Bank</TabsTrigger>
-          <TabsTrigger value="tax"><CreditCard className="mr-1 h-4 w-4" /> Tax</TabsTrigger>
+          <TabsTrigger value="numbering"><FileText className="mr-1 h-4 w-4" /> Numbering</TabsTrigger>
+          <TabsTrigger value="payments"><Landmark className="mr-1 h-4 w-4" /> Payments</TabsTrigger>
+          <TabsTrigger value="terms"><CreditCard className="mr-1 h-4 w-4" /> Terms</TabsTrigger>
+          <TabsTrigger value="tax"><Settings className="mr-1 h-4 w-4" /> Tax</TabsTrigger>
           <TabsTrigger value="general"><Globe className="mr-1 h-4 w-4" /> General</TabsTrigger>
           <TabsTrigger value="account"><KeyRound className="mr-1 h-4 w-4" /> Account</TabsTrigger>
         </TabsList>
@@ -140,32 +124,16 @@ export default function SettingsPage() {
           </CardContent></Card>
         </TabsContent>
 
-        <TabsContent value="documents">
-          <Card><CardHeader><CardTitle>Document Numbering</CardTitle></CardHeader><CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="space-y-2"><Label>Quotation Prefix</Label><Input value={docSettings.quotation_prefix} onChange={(e) => setDocSettings({ ...docSettings, quotation_prefix: e.target.value })} /></div>
-              <div className="space-y-2"><Label>PO Prefix</Label><Input value={docSettings.po_prefix} onChange={(e) => setDocSettings({ ...docSettings, po_prefix: e.target.value })} /></div>
-              <div className="space-y-2"><Label>PI Prefix</Label><Input value={docSettings.pi_prefix} onChange={(e) => setDocSettings({ ...docSettings, pi_prefix: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Sales Invoice Prefix</Label><Input value={docSettings.sales_prefix} onChange={(e) => setDocSettings({ ...docSettings, sales_prefix: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Number Padding</Label><Input type="number" value={docSettings.number_padding} onChange={(e) => setDocSettings({ ...docSettings, number_padding: Number(e.target.value) })} /></div>
-              <div className="space-y-2"><Label>Financial Year</Label><Input value={docSettings.financial_year} onChange={(e) => setDocSettings({ ...docSettings, financial_year: e.target.value })} /></div>
-            </div>
-            <Button onClick={saveDocSettings}>Save Document Settings</Button>
-          </CardContent></Card>
+        <TabsContent value="numbering">
+          <DocumentNumberingSettings />
         </TabsContent>
 
-        <TabsContent value="bank">
-          <Card><CardHeader><CardTitle>Bank Details</CardTitle></CardHeader><CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2"><Label>Bank Name</Label><Input value={bankData.bank_name} onChange={(e) => setBankData({ ...bankData, bank_name: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Account Name</Label><Input value={bankData.account_name} onChange={(e) => setBankData({ ...bankData, account_name: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Account Number</Label><Input value={bankData.account_number} onChange={(e) => setBankData({ ...bankData, account_number: e.target.value })} /></div>
-              <div className="space-y-2"><Label>IFSC</Label><Input value={bankData.ifsc} onChange={(e) => setBankData({ ...bankData, ifsc: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Branch</Label><Input value={bankData.branch} onChange={(e) => setBankData({ ...bankData, branch: e.target.value })} /></div>
-              <div className="space-y-2"><Label>UPI ID</Label><Input value={bankData.upi} onChange={(e) => setBankData({ ...bankData, upi: e.target.value })} /></div>
-            </div>
-            <Button onClick={saveBank}>Save Bank Details</Button>
-          </CardContent></Card>
+        <TabsContent value="payments">
+          <PaymentMethodsSettings />
+        </TabsContent>
+
+        <TabsContent value="terms">
+          <DocumentTermsSettings />
         </TabsContent>
 
         <TabsContent value="tax">
