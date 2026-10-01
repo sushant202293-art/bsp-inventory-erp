@@ -141,7 +141,7 @@ export default function QuotationListPage() {
       setActionLoading(true);
       await convertTransaction(id, 'sale');
       toast({ title: 'Converted', description: 'Quotation converted to Sales Invoice', variant: 'success' });
-      navigate('/sales');
+      navigate('/transactions/sales');
     } catch (error) {
       toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to convert', variant: 'destructive' });
     } finally {

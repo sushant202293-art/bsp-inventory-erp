@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -81,6 +81,7 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
   const docConfig = BILLING_DOC_CONFIG[docType];
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const companyView = useCompanyView();
 
   const [loading, setLoading] = useState(Boolean(id));
@@ -223,6 +224,12 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
   useEffect(() => {
     setItems((prev) => prev.map((row) => computeItemRow(row, interState)));
   }, [interState]);
+
+  // The list pages link to `<doc>?print=true` from the printer icon: the
+  // document is loaded first, then its print preview opens directly.
+  useEffect(() => {
+    if (searchParams.get('print') === 'true' && !loading) setShowPreview(true);
+  }, [searchParams, loading]);
 
   /* ---------------- validation ---------------- */
 

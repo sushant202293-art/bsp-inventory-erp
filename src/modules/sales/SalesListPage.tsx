@@ -232,7 +232,7 @@ export default function SalesListPage() {
               Export
             </Button>
             {canCreate('sales') && (
-              <Button size="sm" onClick={() => navigate('/sales/new')}>
+              <Button size="sm" onClick={() => navigate('/transactions/sales/new')}>
                 <Plus className="h-4 w-4 mr-2" />
                 New Sale
               </Button>
@@ -332,7 +332,7 @@ export default function SalesListPage() {
               description="Create your first sales invoice to get started"
               action={
                 canCreate('sales')
-                  ? { label: 'New Sale', onClick: () => navigate('/sales/new') }
+                  ? { label: 'New Sale', onClick: () => navigate('/transactions/sales/new') }
                   : undefined
               }
             />
@@ -393,7 +393,7 @@ export default function SalesListPage() {
                                 size="icon"
                                 className="h-8 w-8"
                                 title="View"
-                                onClick={() => navigate(`/sales/${sale.id}`)}
+                                onClick={() => navigate(`/transactions/sales/${sale.id}`)}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -403,7 +403,7 @@ export default function SalesListPage() {
                                   size="icon"
                                   className="h-8 w-8"
                                   title="Edit"
-                                  onClick={() => navigate(`/sales/${sale.id}/edit`)}
+                                  onClick={() => navigate(`/transactions/sales/${sale.id}/edit`)}
                                 >
                                   <Pencil className="h-4 w-4" />
                                 </Button>
@@ -413,7 +413,7 @@ export default function SalesListPage() {
                                 size="icon"
                                 className="h-8 w-8"
                                 title="Print"
-                                onClick={() => navigate(`/sales/${sale.id}?print=true`)}
+                                onClick={() => navigate(`/transactions/sales/${sale.id}?print=true`)}
                               >
                                 <Printer className="h-4 w-4" />
                               </Button>

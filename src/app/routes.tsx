@@ -126,17 +126,27 @@ export default function AppRoutes() {
           <Route path="transactions/sales" element={<SalesListPage />} />
           <Route path="transactions/sales/new" element={<SalesFormPage />} />
           <Route path="transactions/sales/:id/edit" element={<SalesFormPage />} />
+          {/* Legacy sales paths used by the sales list and older bookmarks.
+              Row clicks open the shared billing form (there is no separate
+              detail page for a document). */}
+          <Route path="sales" element={<SalesListPage />} />
+          <Route path="sales/new" element={<SalesFormPage />} />
+          <Route path="sales/:id" element={<SalesFormPage />} />
+          <Route path="sales/:id/edit" element={<SalesFormPage />} />
           <Route path="quotations" element={<QuotationListPage />} />
           <Route path="quotations/new" element={<QuotationFormPage />} />
+          <Route path="quotations/:id" element={<QuotationFormPage />} />
           <Route path="quotations/:id/edit" element={<QuotationFormPage />} />
           <Route path="purchase-orders" element={<PurchaseOrderListPage />} />
           <Route path="purchase-orders/new" element={<PurchaseOrderFormPage />} />
           <Route path="purchase-orders/:id/edit" element={<PurchaseOrderFormPage />} />
           <Route path="purchase" element={<PurchaseListPage />} />
           <Route path="purchase/new" element={<PurchaseFormPage />} />
+          <Route path="purchase/:id" element={<PurchaseFormPage />} />
           <Route path="purchase/:id/edit" element={<PurchaseFormPage />} />
           <Route path="proforma-invoices" element={<ProformaInvoiceListPage />} />
           <Route path="proforma-invoices/new" element={<ProformaInvoiceFormPage />} />
+          <Route path="proforma-invoices/:id" element={<ProformaInvoiceFormPage />} />
           <Route path="proforma-invoices/:id/edit" element={<ProformaInvoiceFormPage />} />
 
           <Route path="stock" element={<StockOverviewPage />} />
