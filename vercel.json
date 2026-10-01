@@ -49,10 +49,5 @@
   ],
   "trailingSlash": false,
   "cleanUrls": true,
-  "outputDirectory": "dist",
-  "regions": ["sin1"],
-  "env": {
-    "VITE_SUPABASE_URL": "@supabase-url",
-    "VITE_SUPABASE_ANON_KEY": "@supabase-anon-key"
-  }
+  "regions": ["sin1"]
 }
