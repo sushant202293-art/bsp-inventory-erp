@@ -1,9 +1,7 @@
 import {
   LayoutDashboard,
   Package,
-  Tags,
   Building2,
-  Ruler,
   Users,
   Truck,
   ShoppingCart,
@@ -30,7 +28,7 @@ import {
   Settings,
   Palette,
   Database,
-  ChevronRight,
+  ClipboardList,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -68,41 +66,15 @@ export const menuConfig: MenuSection[] = [
     title: 'Catalog',
     items: [
       {
+        /*
+         * Single catalog entry point. Categories, Brands and Units live as tabs
+         * inside this screen rather than as nested sidebar items.
+         */
         id: 'products',
         label: 'Products',
         icon: Package,
         path: '/products',
         module: 'products',
-        children: [
-          {
-            id: 'products-all',
-            label: 'All Products',
-            icon: ChevronRight,
-            path: '/products',
-            module: 'products',
-          },
-          {
-            id: 'categories',
-            label: 'Categories',
-            icon: Tags,
-            path: '/categories',
-            module: 'categories',
-          },
-          {
-            id: 'brands',
-            label: 'Brands',
-            icon: Building2,
-            path: '/brands',
-            module: 'brands',
-          },
-          {
-            id: 'units',
-            label: 'Units',
-            icon: Ruler,
-            path: '/products',
-            module: 'products',
-          },
-        ],
       },
       {
         id: 'customers',
@@ -143,6 +115,13 @@ export const menuConfig: MenuSection[] = [
         icon: FileOutput,
         path: '/purchase-orders',
         module: 'purchase_orders',
+      },
+      {
+        id: 'purchases',
+        label: 'Purchase Invoices',
+        icon: ClipboardList,
+        path: '/purchase',
+        module: 'purchases',
       },
       {
         id: 'proforma-invoices',

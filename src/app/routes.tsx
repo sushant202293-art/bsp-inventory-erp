@@ -1,13 +1,17 @@
 import React, { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAdminRole } from '@/lib/permissions';
 import AppLayout from '@/layouts/AppLayout';
 import AuthLayout from '@/layouts/AuthLayout';
 import LoadingSpinner from '@/components/ui/loading-spinner';
+import UnitsListPage from '@/modules/units/UnitsListPage';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
+const SignupPage = React.lazy(() => import('@/pages/SignupPage'));
 const ForgotPasswordPage = React.lazy(() => import('@/pages/ForgotPasswordPage'));
 const DashboardPage = React.lazy(() => import('@/modules/dashboard/DashboardPage'));
+const ProductWorkspacePage = React.lazy(() => import('@/modules/products/ProductWorkspacePage'));
 const ProductListPage = React.lazy(() => import('@/modules/products/ProductListPage'));
 const ProductFormPage = React.lazy(() => import('@/modules/products/ProductFormPage'));
 const ProductDetailPage = React.lazy(() => import('@/modules/products/ProductDetailPage'));
@@ -27,6 +31,8 @@ const QuotationListPage = React.lazy(() => import('@/modules/quotations/Quotatio
 const QuotationFormPage = React.lazy(() => import('@/modules/quotations/QuotationFormPage'));
 const PurchaseOrderListPage = React.lazy(() => import('@/modules/purchase-orders/PurchaseOrderListPage'));
 const PurchaseOrderFormPage = React.lazy(() => import('@/modules/purchase-orders/PurchaseOrderFormPage'));
+const PurchaseListPage = React.lazy(() => import('@/modules/purchase/PurchaseListPage'));
+const PurchaseFormPage = React.lazy(() => import('@/modules/purchase/PurchaseFormPage'));
 const ProformaInvoiceListPage = React.lazy(() => import('@/modules/proforma-invoices/ProformaInvoiceListPage'));
 const ProformaInvoiceFormPage = React.lazy(() => import('@/modules/proforma-invoices/ProformaInvoiceFormPage'));
 const StockOverviewPage = React.lazy(() => import('@/modules/stock/StockOverviewPage'));
@@ -72,7 +78,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { profile, loading } = useAuth();
   if (loading) return <Loader />;
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+  if (!isAdminRole(profile?.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
   return <>{children}</>;
@@ -84,6 +90,7 @@ export default function AppRoutes() {
     <Suspense fallback={<Loader />}>
       <Routes>
         <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
+        <Route path="/signup" element={<AuthLayout><SignupPage /></AuthLayout>} />
         <Route path="/forgot-password" element={<AuthLayout><ForgotPasswordPage /></AuthLayout>} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
@@ -91,12 +98,18 @@ export default function AppRoutes() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
 
-          <Route path="products" element={<ProductListPage />} />
+          {/* Product Management workspace: the single catalog entry point.
+              `?tab=products|categories|brands|units` selects the active tab. */}
+          <Route path="products" element={<ProductWorkspacePage />} />
           <Route path="products/new" element={<ProductFormPage />} />
           <Route path="products/:id" element={<ProductDetailPage />} />
           <Route path="products/:id/edit" element={<ProductFormPage />} />
+          {/* Standalone master-data pages, kept so existing deep links keep
+              working. They render the same panels embedded in the workspace. */}
+          <Route path="products/list" element={<ProductListPage />} />
           <Route path="categories" element={<CategoryListPage />} />
           <Route path="brands" element={<BrandListPage />} />
+          <Route path="units" element={<UnitsListPage />} />
 
           <Route path="customers" element={<CustomerListPage />} />
           <Route path="customers/new" element={<CustomerFormPage />} />
@@ -119,6 +132,9 @@ export default function AppRoutes() {
           <Route path="purchase-orders" element={<PurchaseOrderListPage />} />
           <Route path="purchase-orders/new" element={<PurchaseOrderFormPage />} />
           <Route path="purchase-orders/:id/edit" element={<PurchaseOrderFormPage />} />
+          <Route path="purchase" element={<PurchaseListPage />} />
+          <Route path="purchase/new" element={<PurchaseFormPage />} />
+          <Route path="purchase/:id/edit" element={<PurchaseFormPage />} />
           <Route path="proforma-invoices" element={<ProformaInvoiceListPage />} />
           <Route path="proforma-invoices/new" element={<ProformaInvoiceFormPage />} />
           <Route path="proforma-invoices/:id/edit" element={<ProformaInvoiceFormPage />} />

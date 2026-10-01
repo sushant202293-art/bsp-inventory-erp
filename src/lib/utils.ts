@@ -4,22 +4,36 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-export function formatCurrency(amount: number, currency = 'INR'): string {
+export function formatCurrency(amount: number | null | undefined, currency = 'INR'): string {
   const formatter = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
-  return formatter.format(amount);
+  return formatter.format(typeof amount === 'number' && Number.isFinite(amount) ? amount : 0);
 }
 
-export function formatNumber(num: number): string {
-  return new Intl.NumberFormat('en-IN').format(num);
+export function formatNumber(num: number | null | undefined): string {
+  return new Intl.NumberFormat('en-IN').format(
+    typeof num === 'number' && Number.isFinite(num) ? num : 0
+  );
 }
 
-export function formatDate(date: Date | string, format = 'DD-MM-YYYY'): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+/** Normalises anything date-like into a valid Date, or null when unusable. */
+function toValidDate(date: Date | string | null | undefined): Date | null {
+  if (date === null || date === undefined || date === '') return null;
+  const d = date instanceof Date ? date : new Date(date);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+export function formatDate(
+  date: Date | string | null | undefined,
+  format = 'DD-MM-YYYY'
+): string {
+  const parsed = toValidDate(date);
+  if (!parsed) return '-';
+  const d = parsed;
   const day = String(d.getDate()).padStart(2, '0');
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const year = d.getFullYear();
@@ -38,8 +52,9 @@ export function formatDate(date: Date | string, format = 'DD-MM-YYYY'): string {
   }
 }
 
-export function formatTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function formatTime(date: Date | string | null | undefined): string {
+  const d = toValidDate(date);
+  if (!d) return '-';
   return d.toLocaleTimeString('en-IN', {
     hour: '2-digit',
     minute: '2-digit',
@@ -47,8 +62,9 @@ export function formatTime(date: Date | string): string {
   });
 }
 
-export function formatDateTime(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
+export function formatDateTime(date: Date | string | null | undefined): string {
+  const d = toValidDate(date);
+  if (!d) return '-';
   return `${formatDate(d)} ${formatTime(d)}`;
 }
 

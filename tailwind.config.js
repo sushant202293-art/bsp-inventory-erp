@@ -63,6 +63,25 @@ export default {
         foreground: "rgb(var(--color-text) / <alpha-value>)",
         text: "rgb(var(--color-text) / <alpha-value>)",
         muted: "rgb(var(--color-muted) / <alpha-value>)",
+        // Secondary text. The app used `text-muted-foreground` in 459 places
+        // across 77 files, but the scale above only defined `muted`, so the
+        // class was never emitted and all that text inherited its parent's
+        // colour - unreadable inside the dark auth card.
+        "muted-foreground": "rgb(var(--color-muted-foreground) / <alpha-value>)",
+        // shadcn-style aliases. The app uses `destructive` in 150 places while
+        // the token is named `danger`; without this alias every error message
+        // and invalid-field border rendered with no colour at all.
+        destructive: {
+          DEFAULT: "rgb(var(--color-danger) / <alpha-value>)",
+          foreground: "rgb(var(--color-destructive-foreground) / <alpha-value>)",
+        },
+        "destructive-foreground": "rgb(var(--color-destructive-foreground) / <alpha-value>)",
+        "primary-foreground": "rgb(var(--color-primary-foreground) / <alpha-value>)",
+        "secondary-foreground": "rgb(var(--color-secondary-foreground) / <alpha-value>)",
+        "accent-foreground": "rgb(var(--color-accent-foreground) / <alpha-value>)",
+        "card-foreground": "rgb(var(--color-text) / <alpha-value>)",
+        input: "rgb(var(--color-input) / <alpha-value>)",
+        ring: "rgb(var(--color-primary) / <alpha-value>)",
         success: "rgb(var(--color-success) / <alpha-value>)",
         warning: "rgb(var(--color-warning) / <alpha-value>)",
         danger: "rgb(var(--color-danger) / <alpha-value>)",

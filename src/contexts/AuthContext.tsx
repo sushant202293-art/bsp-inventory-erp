@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef, type ReactNode } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { clearCompanyIdCache } from '@/lib/tenant';
@@ -26,12 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [company, setCompany] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+  // Tracks which user the current profile/company belong to, so a background
+  // token refresh can update the session without re-fetching (or blanking the
+  // UI) when nothing has actually changed.
+  const profileUserIdRef = useRef<string | null>(null);
 
   const loadProfile = useCallback(async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*, companies(*)')
+        .select('*, company:companies!profiles_company_id_fkey(*)')
         .eq('id', userId)
         .single();
 
@@ -41,9 +45,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data) {
-        const { companies, ...profileData } = data as unknown as Profile & { companies: Company | null };
+        // The `company` alias pins the embed to `profiles_company_id_fkey`. A bare
+        // `companies(*)` is ambiguous here: the live schema also exposes a
+        // many-to-many path between the two tables, and PostgREST rejects that
+        // embed with PGRST201 "more than one relationship was found".
+        const { company, ...profileData } = data as unknown as Profile & { company: Company | null };
         setProfile(profileData as Profile);
-        setCompany((companies as Company) ?? null);
+        setCompany((company as Company) ?? null);
+        profileUserIdRef.current = userId;
 
         if (!profileData.last_login) {
           await supabase
@@ -87,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setProfile(null);
         setCompany(null);
+        profileUserIdRef.current = null;
         // Drop the cached company id so a later sign-in as a different user
         // in the same tab cannot resolve to the previous tenant.
         clearCompanyIdCache();
@@ -94,11 +104,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
+      if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'USER_UPDATED') {
         setUser(session.user);
         setLoading(true);
         await loadProfile(session.user.id);
-        setLoading(false);
+        if (mounted) setLoading(false);
+        return;
+      }
+
+      if (event === 'TOKEN_REFRESHED') {
+        // supabase-js revalidates the session when the tab regains visibility,
+        // so this fires every time the user switches away and comes back.
+        // Flipping `loading` here would make ProtectedRoute swap the whole app
+        // for a full-screen loader, remount every component and re-run every
+        // page's queries - which looked exactly like the app reloading itself.
+        // Keep the existing session in place and only refresh what is stale.
+        setUser(session.user);
+        if (profileUserIdRef.current !== session.user.id) {
+          setLoading(true);
+          await loadProfile(session.user.id);
+          if (mounted) setLoading(false);
+        }
       }
     });
 

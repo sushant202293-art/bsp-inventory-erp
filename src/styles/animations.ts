@@ -529,11 +529,11 @@ export const glowVariants: Variants = {
   },
   animate: {
     boxShadow: [
-      "0 0 5px var(--color-primary)",
-      "0 0 10px var(--color-primary)",
-      "0 0 20px var(--color-primary)",
-      "0 0 10px var(--color-primary)",
-      "0 0 5px var(--color-primary)",
+      "0 0 5px rgb(var(--color-primary))",
+      "0 0 10px rgb(var(--color-primary))",
+      "0 0 20px rgb(var(--color-primary))",
+      "0 0 10px rgb(var(--color-primary))",
+      "0 0 5px rgb(var(--color-primary))",
     ],
     transition: {
       duration: 2,

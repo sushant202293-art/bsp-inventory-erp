@@ -14,20 +14,20 @@ const variantConfig = {
   danger: {
     icon: AlertTriangle,
     iconBg: 'rgba(239, 68, 68, 0.1)',
-    iconColor: 'var(--color-error)',
-    buttonBg: 'var(--color-error)',
+    iconColor: 'rgb(var(--color-error))',
+    buttonBg: 'rgb(var(--color-error))',
   },
   warning: {
     icon: AlertCircle,
     iconBg: 'rgba(245, 158, 11, 0.1)',
-    iconColor: 'var(--color-warning)',
-    buttonBg: 'var(--color-warning)',
+    iconColor: 'rgb(var(--color-warning))',
+    buttonBg: 'rgb(var(--color-warning))',
   },
   info: {
     icon: Info,
     iconBg: 'rgba(59, 130, 246, 0.1)',
-    iconColor: 'var(--color-info)',
-    buttonBg: 'var(--color-info)',
+    iconColor: 'rgb(var(--color-info))',
+    buttonBg: 'rgb(var(--color-info))',
   },
 };
 
@@ -63,14 +63,14 @@ export default function ConfirmDialog({ isOpen, options }: ConfirmDialogProps) {
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="relative z-10 mx-4 w-full max-w-md rounded-2xl border p-6 shadow-2xl"
             style={{
-              background: 'var(--color-card)',
-              borderColor: 'var(--color-border)',
+              background: 'rgb(var(--color-card))',
+              borderColor: 'rgb(var(--color-border))',
             }}
           >
             <button
               onClick={onCancel}
-              className="absolute right-4 top-4 rounded-lg p-1 transition-colors hover:bg-[var(--color-backgroundAlt)]"
-              style={{ color: 'var(--color-textMuted)' }}
+              className="absolute right-4 top-4 rounded-lg p-1 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+              style={{ color: 'rgb(var(--color-muted))' }}
             >
               <X size={18} />
             </button>
@@ -85,13 +85,13 @@ export default function ConfirmDialog({ isOpen, options }: ConfirmDialogProps) {
               <div className="min-w-0 flex-1">
                 <h3
                   className="text-lg font-semibold"
-                  style={{ color: 'var(--color-text)' }}
+                  style={{ color: 'rgb(var(--color-text))' }}
                 >
                   {title}
                 </h3>
                 <p
                   className="mt-2 text-sm leading-relaxed"
-                  style={{ color: 'var(--color-textSecondary)' }}
+                  style={{ color: 'rgb(var(--color-text-secondary))' }}
                 >
                   {message}
                 </p>
@@ -101,10 +101,10 @@ export default function ConfirmDialog({ isOpen, options }: ConfirmDialogProps) {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={onCancel}
-                className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[var(--color-backgroundAlt)]"
+                className="rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-[rgb(var(--color-sidebar))]"
                 style={{
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-textSecondary)',
+                  borderColor: 'rgb(var(--color-border))',
+                  color: 'rgb(var(--color-text-secondary))',
                 }}
               >
                 {cancelText}

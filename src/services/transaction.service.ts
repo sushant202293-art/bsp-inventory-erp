@@ -53,7 +53,15 @@ async function loadPartyState(data: Partial<TransactionFormData>) {
   return { supplier: (row as { state?: string | null } | null) ?? null };
 }
 
-const PARTY_ADDRESS_FIELDS = 'id, name, code, phone, email, gstin, state, billing_address, shipping_address';
+const PARTY_BASE_FIELDS = 'id, name, code, phone, email, gstin, state, billing_address, shipping_address';
+
+/**
+ * `payment_terms` exists on `suppliers` only -- `customers` has no such column,
+ * and PostgREST rejects the whole embedded query with a 400 if you ask for it.
+ * So the two parties get separate field lists.
+ */
+const CUSTOMER_ADDRESS_FIELDS = PARTY_BASE_FIELDS;
+const SUPPLIER_ADDRESS_FIELDS = `id, name, code, phone, email, gstin, state, payment_terms, billing_address, shipping_address`;
 
 function isSale(type: TransactionType): boolean {
   return type === 'sale';
@@ -145,8 +153,8 @@ export async function getTransactions(
       .from('transactions')
       .select(`
         *,
-        customer:customers(${PARTY_ADDRESS_FIELDS}),
-        supplier:suppliers(${PARTY_ADDRESS_FIELDS}),
+        customer:customers(${CUSTOMER_ADDRESS_FIELDS}),
+        supplier:suppliers(${SUPPLIER_ADDRESS_FIELDS}),
         created_by_user:profiles!transactions_created_by_fkey(id, full_name, email),
         approved_by_user:profiles!transactions_approved_by_fkey(id, full_name, email)
       `, { count: 'exact' })
@@ -205,8 +213,8 @@ export async function getTransaction(id: string): Promise<TransactionWithRelatio
       .from('transactions')
       .select(`
         *,
-        customer:customers(${PARTY_ADDRESS_FIELDS}),
-        supplier:suppliers(${PARTY_ADDRESS_FIELDS}),
+        customer:customers(${CUSTOMER_ADDRESS_FIELDS}),
+        supplier:suppliers(${SUPPLIER_ADDRESS_FIELDS}),
         created_by_user:profiles!transactions_created_by_fkey(id, full_name, email),
         approved_by_user:profiles!transactions_approved_by_fkey(id, full_name, email)
       `)

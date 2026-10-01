@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -11,8 +11,9 @@ import {
 import { cn } from '@/lib/utils';
 import { menuConfig, type MenuItem } from '@/config/menu.config';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCompanyView } from '@/contexts/CompanyContext';
+import { useCompany, useCompanyView } from '@/contexts/CompanyContext';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { isAdminRole } from '@/lib/permissions';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -141,6 +142,59 @@ function NavItem({
   );
 }
 
+/**
+ * Circular company logo for the sidebar brand area.
+ *
+ * The frame is always a perfect circle and never changes size with the image:
+ * the image fills it with `object-cover`, so square, landscape and portrait logos
+ * all fit (cropping rather than distorting). Falls back to the company initial
+ * when no logo has been uploaded, and to a skeleton while the company is still
+ * loading so the wrong initial is never flashed.
+ */
+function CompanyLogo({ className }: { className?: string }) {
+  const { company, loading } = useCompany();
+  const [failed, setFailed] = useState(false);
+  const logoUrl = company?.logo_url ?? null;
+  const initial = company?.name?.trim()?.charAt(0).toUpperCase() || 'B';
+
+  useEffect(() => {
+    setFailed(false);
+  }, [logoUrl]);
+
+  const base =
+    'flex shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-white';
+
+  if (loading) {
+    return <div className={cn(base, 'bg-muted', className)} aria-hidden="true" />;
+  }
+
+  if (logoUrl && !failed) {
+    return (
+      <div
+        className={cn(base, 'ring-1 ring-border', className)}
+        style={{ background: 'rgb(var(--color-muted))' }}
+      >
+        <img
+          src={logoUrl}
+          alt={`${company?.name || 'Company'} logo`}
+          className="h-full w-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(base, className)}
+      style={{ background: 'rgb(var(--color-primary))' }}
+      aria-label={`${company?.name || 'Company'} logo`}
+    >
+      {initial}
+    </div>
+  );
+}
+
 export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: SidebarProps) {
   const { profile, user, signOut } = useAuth();
   const company = useCompanyView();
@@ -154,7 +208,7 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
 
   // A parent with no visible children is hidden so the sidebar never shows
   // an expandable group that expands to nothing.
-  const isSuperAdmin = profile?.role === 'owner' || profile?.role === 'admin';
+  const isSuperAdmin = isAdminRole(profile?.role);
 
   const hasPermission = useCallback(
     (item: MenuItem): boolean => {
@@ -187,27 +241,22 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
           'flex h-16 shrink-0 items-center border-b px-4',
           collapsed && 'justify-center px-2'
         )}
-        style={{ borderColor: 'var(--color-border)' }}
+        style={{ borderColor: 'rgb(var(--color-border))' }}
       >
         {(!collapsed || isMobile) && (
           <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
-              style={{ background: 'var(--color-primary)' }}
-            >
-              {company.name ? company.name.charAt(0) : 'B'}
-            </div>
+            <CompanyLogo className="h-10 w-10 text-sm" />
             <div className="min-w-0">
               <h1
                 className="truncate text-sm font-bold"
-                style={{ color: 'var(--color-text)' }}
+                style={{ color: 'rgb(var(--color-text))' }}
               >
                 {company.name || 'BSP Inventory'}
               </h1>
               {company.tagline && (
                 <p
                   className="truncate text-xs"
-                  style={{ color: 'var(--color-textMuted)' }}
+                  style={{ color: 'rgb(var(--color-muted))' }}
                 >
                   {company.tagline}
                 </p>
@@ -216,12 +265,7 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
           </div>
         )}
         {collapsed && !isMobile && (
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold text-white"
-            style={{ background: 'var(--color-primary)' }}
-          >
-            {company.name ? company.name.charAt(0) : 'B'}
-          </div>
+          <CompanyLogo className="h-10 w-10 text-sm" />
         )}
 
         {isMobile && (
@@ -241,7 +285,7 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
             {section.title && !collapsed && (
               <h3
                 className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider"
-                style={{ color: 'var(--color-textMuted)' }}
+                style={{ color: 'rgb(var(--color-muted))' }}
               >
                 {section.title}
               </h3>
@@ -249,7 +293,7 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
             {section.title && collapsed && (
               <div
                 className="mx-auto mb-2 h-px w-6"
-                style={{ background: 'var(--color-border)' }}
+                style={{ background: 'rgb(var(--color-border))' }}
               />
             )}
             <div className="space-y-1">
@@ -271,7 +315,7 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
           'shrink-0 border-t px-3 py-3',
           collapsed && 'px-2'
         )}
-        style={{ borderColor: 'var(--color-border)' }}
+        style={{ borderColor: 'rgb(var(--color-border))' }}
       >
         {!collapsed && (
           <button
@@ -301,10 +345,10 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
             collapsed && 'justify-center px-2',
             'text-[var(--color-sidebarText)] hover:text-red-400 hover:bg-red-500/10'
           )}
-          title={collapsed ? 'signOut' : undefined}
+          title={collapsed ? 'Log Out' : undefined}
         >
           <LogOut size={20} />
-          {!collapsed && <span>signOut</span>}
+          {!collapsed && <span>Log Out</span>}
         </button>
       </div>
     </div>

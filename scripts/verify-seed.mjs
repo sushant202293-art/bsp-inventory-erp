@@ -2,6 +2,7 @@
 // database, by parsing the transaction_items and transactions VALUES blocks.
 // Run: node scripts/verify-seed.mjs
 import { readFileSync } from 'node:fs';
+import { checkInsertArity } from './check-insert-arity.mjs';
 
 const sql = readFileSync('supabase/seed/demo_data.sql', 'utf8');
 const r2 = (n) => Math.round(n * 100) / 100;
@@ -168,6 +169,80 @@ check('document numbers use fiscal year 2026-27 and dates fall in 2026', () => {
   for (const h of headers) {
     if (!/\/2026-27\/\d{4}$/.test(h.doc)) fail(`${h.doc}: not in fiscal year 2026-27`);
     if (h.date < '2026-01-01' || h.date > '2026-12-31') fail(`${h.doc}: date ${h.date} outside 2026`);
+  }
+});
+
+// ---- structure --------------------------------------------------------
+console.log('\nfile structure:');
+check('$$ delimiters balanced', () => {
+  const n = (sql.match(/\$\$/g) || []).length;
+  if (n === 0) fail('no $$ delimiters found, expected DO blocks');
+  if (n % 2 !== 0) fail(`${n} occurrences of $$ - unbalanced (must be even)`);
+});
+
+check('parentheses balanced outside strings and comments', () => {
+  // strip single-quoted strings (handling '' escapes) and -- comments
+  let src = sql.replace(/''/g, '\u0000');
+  src = src.replace(/'(?:[^'\n]|\u0000)*'/g, "''");
+  src = src.replace(/--[^\n]*/g, '');
+  let depth = 0, line = 1, minLine = 0;
+  for (const ch of src) {
+    if (ch === '\n') line++;
+    else if (ch === '(') depth++;
+    else if (ch === ')') { depth--; if (depth < 0 && !minLine) minLine = line; }
+  }
+  if (depth !== 0) fail(`unbalanced parentheses: ${depth > 0 ? depth + ' unclosed' : -depth + ' extra'} (first stray ")" near line ${minLine})`);
+});
+
+check('no unguarded INSERT INTO warehouses (migration 005 trigger owns that row)', () => {
+  // A top-level insert is the dangerous shape. An INSERT nested inside a
+  // DO $$ block is fine, because there it is guarded by an existence check.
+  const top = /^INSERT\s+INTO\s+warehouses\b/im;
+  if (top.test(sql))
+    fail('seed INSERTs a warehouse at top level; handle_new_company() already creates one and idx_warehouses_company_default permits only one is_default row per company');
+  if (!/DO\s+\$\$[\s\S]*INSERT\s+INTO\s+warehouses/i.test(sql))
+    fail('expected the warehouse to be adopted via a guarded DO block, but neither shape was found');
+});
+
+check('deterministic id families match their tables', () => {
+  const known = new Map([
+    ['11111111', 'company'],
+    ['20000000', 'company_settings'],
+    ['30000000', 'units/categories/brands'],
+    ['40000000', 'products'],
+    ['50000000', 'warehouse'],
+    ['60000000', 'product_stock'],
+    ['70000000', 'customers'],
+    ['80000000', 'suppliers'],
+    ['90000000', 'transactions/transaction_items'],
+    ['a0000000', 'payments_received'],
+    ['b0000000', 'payments_made'],
+    ['c0000000', 'customer_ledger'],
+    ['d0000000', 'supplier_ledger'],
+  ]);
+  const seen = new Set(
+    [...sql.matchAll(/'([0-9a-f]{8})-0000-0000-0000-00000000000\d'/g)].map((x) => x[1])
+  );
+  if (seen.size === 0) fail('no deterministic ids found at all');
+  for (const pre of seen) {
+    if (!known.has(pre)) fail(`unknown uuid family "${pre}xxxx-..."`);
+  }
+  if (!failures) ok(`${seen.size} id families all mapped to a known table`);
+});
+
+// Postgres only rejects a bad VALUES arity at run time
+// ("VALUES lists must all be the same length"), which is how the products
+// insert shipped with 7 rows missing unit_id. Check it offline instead.
+check('every VALUES row matches its column list', () => {
+  const bad = checkInsertArity(sql);
+  if (bad.length) {
+    for (const b of bad) {
+      const delta = b.columns - b.rows[0].values;
+      fail(
+        `${b.table}: ${b.rows.length} row(s) do not match its ${b.columns} columns ` +
+          `(e.g. row ${b.rows[0].row} has ${b.rows[0].values}, ${delta > 0 ? `short by ${delta}` : `${-delta} too many`})`,
+      );
+    }
   }
 });
 

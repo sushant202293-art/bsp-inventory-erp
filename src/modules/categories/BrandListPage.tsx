@@ -22,8 +22,11 @@ import { supabase } from '@/lib/supabase';
 import type { Brand } from '@/types/database.types';
 import type { BrandWithStats } from '@/types/product.types';
 
-export default function BrandListPage() {
-  const navigate = useNavigate();
+/**
+ * Embeddable brand management panel, rendered as a tab inside the Product
+ * workspace and reused by the standalone `/brands` route wrapper below.
+ */
+export function BrandPanel() {
   const { toast } = useToast();
 
   const [brands, setBrands] = useState<BrandWithStats[]>([]);
@@ -158,22 +161,6 @@ export default function BrandListPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Brands"
-        description="Manage product brands"
-        breadcrumbs={[
-          { label: 'Dashboard', onClick: () => navigate('/dashboard') },
-          { label: 'Products', onClick: () => navigate('/products') },
-          { label: 'Brands' },
-        ]}
-        actions={
-          <Button onClick={openCreateDialog} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Brand
-          </Button>
-        }
-      />
-
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -186,7 +173,11 @@ export default function BrandListPage() {
                 className="pl-10"
               />
             </div>
-            <div className="flex items-center gap-1 rounded-lg border border-border p-1">
+            <Button onClick={openCreateDialog} className="gap-2 sm:shrink-0">
+              <Plus className="h-4 w-4" />
+              Add Brand
+            </Button>
+            <div className="flex items-center gap-1 rounded-lg border border-border p-1 sm:shrink-0">
               <Button
                 variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                 size="icon"
@@ -411,6 +402,28 @@ export default function BrandListPage() {
         variant="danger"
         onConfirm={handleDelete}
       />
+    </div>
+  );
+}
+
+/**
+ * Standalone `/brands` route. Kept so existing bookmarks and deep links keep
+ * working; the add action lives inside the panel itself.
+ */
+export default function BrandListPage() {
+  const navigate = useNavigate();
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Brands"
+        description="Manage product brands"
+        breadcrumbs={[
+          { label: 'Dashboard', onClick: () => navigate('/dashboard') },
+          { label: 'Products', onClick: () => navigate('/products') },
+          { label: 'Brands' },
+        ]}
+      />
+      <BrandPanel />
     </div>
   );
 }

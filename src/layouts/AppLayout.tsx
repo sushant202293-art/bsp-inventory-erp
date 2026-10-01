@@ -42,7 +42,7 @@ export default function AppLayout() {
   return (
     <div
       className="flex h-screen overflow-hidden"
-      style={{ background: 'var(--color-background)' }}
+      style={{ background: 'rgb(var(--color-background))' }}
     >
       {isMobile && mobileMenuOpen && (
         <div
@@ -62,8 +62,8 @@ export default function AppLayout() {
         style={{
           width: isMobile ? 260 : sidebarWidth,
           minWidth: isMobile ? 260 : sidebarWidth,
-          background: 'var(--color-sidebar)',
-          borderRight: `1px solid var(--color-border)`,
+          background: 'rgb(var(--color-sidebar))',
+          borderRight: `1px solid rgb(var(--color-border))`,
         }}
       >
         <Sidebar
@@ -78,8 +78,8 @@ export default function AppLayout() {
         <header
           className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b"
           style={{
-            background: 'var(--color-header)',
-            borderColor: 'var(--color-border)',
+            background: 'rgb(var(--color-header))',
+            borderColor: 'rgb(var(--color-border))',
           }}
         >
           <TopHeader
@@ -90,7 +90,7 @@ export default function AppLayout() {
 
         <main
           className="flex-1 overflow-y-auto p-4 md:p-6"
-          style={{ background: 'var(--color-backgroundAlt)' }}
+          style={{ background: 'rgb(var(--color-sidebar))' }}
         >
           <Outlet />
         </main>

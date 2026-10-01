@@ -67,21 +67,33 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
 -- 3. WAREHOUSE
---    (Migration 005 normally creates this via trigger; created here
---     explicitly so the seed works on a database where the company
---     row already existed before 005 ran.)
+--    handle_new_company() in migration 005 already creates one default
+--    warehouse when the company row above is inserted, and
+--    idx_warehouses_company_default allows only one is_default row per
+--    company. A plain INSERT here would therefore violate that index, and
+--    ON CONFLICT (id) DO NOTHING would not help because the collision is on
+--    the partial index, not the primary key. So adopt the trigger-created
+--    row: give it the deterministic id the rest of this seed relies on, and
+--    point it at the Odisha address. The fallback INSERT keeps this file
+--    usable on a database where migration 005 has not run yet.
 -- ============================================================
-INSERT INTO warehouses (id, company_id, name, code, address, is_active, is_default)
-VALUES (
-    '50000000-0000-0000-0000-000000000001',
-    '11111111-1111-1111-1111-111111111111',
-    'Main Warehouse',
-    'MAIN',
-    'Plot 42, Nayapalli, Bhubaneswar, Odisha 751012',
-    true,
-    true
-)
-ON CONFLICT (id) DO NOTHING;
+DO $$
+DECLARE
+    v_company CONSTANT uuid := '11111111-1111-1111-1111-111111111111';
+    v_wh     CONSTANT uuid := '50000000-0000-0000-0000-000000000001';
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM warehouses WHERE company_id = v_company AND is_default) THEN
+        INSERT INTO warehouses (id, company_id, name, code, address, is_active, is_default)
+        VALUES (v_wh, v_company, 'Main Warehouse', 'MAIN',
+                'Plot 42, Nayapalli, Bhubaneswar, Odisha 751012', true, true);
+    ELSE
+        UPDATE warehouses
+           SET id      = v_wh,
+               code    = 'MAIN',
+               address = 'Plot 42, Nayapalli, Bhubaneswar, Odisha 751012'
+         WHERE company_id = v_company AND is_default;
+    END IF;
+END $$;
 
 -- ============================================================
 -- 4. PRODUCTS
@@ -92,13 +104,13 @@ INSERT INTO products (
     purchase_price, selling_price, low_stock_level, reorder_level, is_active
 ) VALUES
     ('60000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'USB-C Charging Cable 1m',   'CAB-USB-C-1M',  '30000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 18,   '8544', 'Braided cable, 60W',                    65.00,  120.00, 40, 100, true),
-    ('60000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '65W GaN Fast Charger',      'CHG-GAN-65W',   '30000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000001', 18,   '8504', 'Dual port GaN charger',                 540.00,  950.00, 20,  50, true),
-    ('60000000-0000-0000-0000-000000000003', '11111111-1111-1111-1111-111111111111', 'Samsung 128GB microSD',     'MEM-SD-128',    '30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000002', 18,   '8523', 'Class 10, with adapter',                 620.00, 1050.00, 15,  40, true),
-    ('60000000-0000-0000-0000-000000000004', '11111111-1111-1111-1111-111111111111', 'D-Link CAT6 Patch Cable 3m','NET-CAT6-3M',   '30000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000004', 18,   '8544', 'Snagless, 3 metre',                     150.00,  290.00, 30,  80, true),
-    ('60000000-0000-0000-0000-000000000005', '11111111-1111-1111-1111-111111111111', 'A4 Copy Paper 500 sheets',  'PPR-A4-500',    '30000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000001', 12,   '4802', '80 GSM white',                          210.00,  340.00, 60, 150, true),
-    ('60000000-0000-0000-0000-000000000006', '11111111-1111-1111-1111-111111111111', 'Gel Pen Box of 12',         'PEN-GEL-12',    '30000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000001', 18,   '9608', 'Assorted colours',                       90.00,  165.00, 50, 120, true),
-    ('60000000-0000-0000-0000-000000000007', '11111111-1111-1111-1111-111111111111', 'Corrugated Box Medium',     'BOX-CRM-M',     '30000000-0000-0000-0000-000000000004', '40000000-0000-0000-0000-000000000001', 18,   '4819', '12x9x9 inch, 3 ply',                     18.00,   32.00, 200, 500, true),
-    ('60000000-0000-0000-0000-000000000008', '11111111-1111-1111-1111-111111111111', 'BOPP Packing Tape 2in',      'TAP-BOPP-2',    '30000000-0000-0000-0000-000000000004', '40000000-0000-0000-0000-000000000001', 18,   '3919', '50 micron, transparent',                32.00,   58.00,  80, 200, true)
+    ('60000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '65W GaN Fast Charger',      'CHG-GAN-65W',   '30000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 18,   '8504', 'Dual port GaN charger',                 540.00,  950.00, 20,  50, true),
+    ('60000000-0000-0000-0000-000000000003', '11111111-1111-1111-1111-111111111111', 'Samsung 128GB microSD',     'MEM-SD-128',    '30000000-0000-0000-0000-000000000001', '40000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001', 18,   '8523', 'Class 10, with adapter',                 620.00, 1050.00, 15,  40, true),
+    ('60000000-0000-0000-0000-000000000004', '11111111-1111-1111-1111-111111111111', 'D-Link CAT6 Patch Cable 3m','NET-CAT6-3M',   '30000000-0000-0000-0000-000000000002', '40000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000001', 18,   '8544', 'Snagless, 3 metre',                     150.00,  290.00, 30,  80, true),
+    ('60000000-0000-0000-0000-000000000005', '11111111-1111-1111-1111-111111111111', 'A4 Copy Paper 500 sheets',  'PPR-A4-500',    '30000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 12,   '4802', '80 GSM white',                          210.00,  340.00, 60, 150, true),
+    ('60000000-0000-0000-0000-000000000006', '11111111-1111-1111-1111-111111111111', 'Gel Pen Box of 12',         'PEN-GEL-12',    '30000000-0000-0000-0000-000000000003', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000005', 18,   '9608', 'Assorted colours',                       90.00,  165.00, 50, 120, true),
+    ('60000000-0000-0000-0000-000000000007', '11111111-1111-1111-1111-111111111111', 'Corrugated Box Medium',     'BOX-CRM-M',     '30000000-0000-0000-0000-000000000004', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 18,   '4819', '12x9x9 inch, 3 ply',                     18.00,   32.00, 200, 500, true),
+    ('60000000-0000-0000-0000-000000000008', '11111111-1111-1111-1111-111111111111', 'BOPP Packing Tape 2in',      'TAP-BOPP-2',    '30000000-0000-0000-0000-000000000004', '40000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 18,   '3919', '50 micron, transparent',                32.00,   58.00,  80, 200, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================
@@ -181,29 +193,32 @@ ON CONFLICT (id) DO NOTHING;
 --   inter-state  -> igst = taxable * rate
 -- Header totals always equal the sum of their line items.
 -- ============================================================
+-- supplier_id must be carried here, not defaulted: post_purchase_transaction
+-- only writes supplier_ledger rows when it is set, so omitting the column
+-- silently produces purchase documents with no supplier attribution.
 INSERT INTO transactions (
     id, company_id, type, document_number, document_date,
-    customer_id, billing_address, shipping_address,
+    customer_id, supplier_id, billing_address, shipping_address,
     subtotal, discount_amount, tax_amount, round_off, grand_total, amount_paid,
     status, notes, terms, gstin, salesperson, expected_delivery
 ) VALUES
     -- INV-0001 : Bhubaneswar customer -> intra-state (CGST 108 + SGST 108 + 72 + 72 = 360)
     ('90000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'sale', 'INV/2026-27/0001', '2026-08-08',
-     '70000000-0000-0000-0000-000000000001',
+     '70000000-0000-0000-0000-000000000001', NULL,
      '{"line1":"Unit 4, Sunrise Plaza","line2":null,"city":"Bhubaneswar","state":"Odisha","pin":"751012","country":"India"}'::jsonb,
      '{"line1":"Unit 4, Sunrise Plaza","line2":null,"city":"Bhubaneswar","state":"Odisha","pin":"751012","country":"India"}'::jsonb,
      2000.00, 0, 360.00, 0, 2360.00, 2360.00, 'paid',
      'Delivered in one lot.', 'Payment received in full.', '21AABCS1234D1ZP', 'Neha Kar', '2026-08-15'),
     -- INV-0002 : Kolkata customer -> inter-state (IGST 900 on 5000 taxable)
     ('90000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'sale', 'INV/2026-27/0002', '2026-08-12',
-     '70000000-0000-0000-0000-000000000003',
+     '70000000-0000-0000-0000-000000000003', NULL,
      '{"line1":"No. 22, Park Street","line2":null,"city":"Kolkata","state":"West Bengal","pin":"700016","country":"India"}'::jsonb,
      '{"line1":"No. 22, Park Street","line2":null,"city":"Kolkata","state":"West Bengal","pin":"700016","country":"India"}'::jsonb,
      5200.00, 200.00, 900.00, 0, 5900.00, 3000.00, 'partial',
      'Split shipment; balance on second lot.', 'Balance due in 15 days.', '19AABCK9012F1ZR', 'Neha Kar', '2026-08-26'),
     -- INV-0003 : sales return to Bhubaneswar customer -> intra-state
     ('90000000-0000-0000-0000-000000000003', '11111111-1111-1111-1111-111111111111', 'sale', 'INV/2026-27/0003', '2026-08-18',
-     '70000000-0000-0000-0000-000000000001',
+     '70000000-0000-0000-0000-000000000001', NULL,
      '{"line1":"Unit 4, Sunrise Plaza","line2":null,"city":"Bhubaneswar","state":"Odisha","pin":"751012","country":"India"}'::jsonb,
      '{"line1":"Unit 4, Sunrise Plaza","line2":null,"city":"Bhubaneswar","state":"Odisha","pin":"751012","country":"India"}'::jsonb,
      120.00, 0, 21.60, 0, 141.60, 0, 'confirmed',
@@ -211,20 +226,21 @@ INSERT INTO transactions (
     -- PUR-0001 : Bhubaneswar supplier -> intra-state purchase
     ('90000000-0000-0000-0000-000000000004', '11111111-1111-1111-1111-111111111111', 'purchase', 'PUR/2026-27/0001', '2026-08-05',
      NULL,
+     '80000000-0000-0000-0000-000000000001',
      '{"line1":"Shop 88, Machhua Bazaar","line2":null,"city":"Bhubaneswar","state":"Odisha","pin":"751001","country":"India"}'::jsonb,
      '{"line1":"Shop 88, Machhua Bazaar","line2":null,"city":"Bhubaneswar","state":"Odisha","pin":"751001","country":"India"}'::jsonb,
      15000.00, 0, 2700.00, 0, 17700.00, 17700.00, 'paid',
      'Monthly restock.', 'Net 30 from invoice date.', NULL, 'Vikram Sahu', NULL),
-    -- QUO-0001 : Puri customer -> intra-state, still valid
-    ('90000000-0000-0000-0000-000000000005', '11111111-1111-1111-1111-111111111111', 'quotation', 'QUO/2026-27/0001', '2026-08-20',
-     '70000000-0000-0000-0000-000000000002',
+-- QUO-0001 : Puri customer -> intra-state, still valid
+    ('90000000-0000-0000-0000-000000000005', '11111111-1111-1111-1111-111111111111', 'quotation', 'QU/2026-27/0001', '2026-08-20',
+     '70000000-0000-0000-0000-000000000002', NULL,
      '{"line1":"3rd Floor, Sterling Centre","line2":null,"city":"Puri","state":"Odisha","pin":"752001","country":"India"}'::jsonb,
      '{"line1":"3rd Floor, Sterling Centre","line2":null,"city":"Puri","state":"Odisha","pin":"752001","country":"India"}'::jsonb,
      8420.00, 0, 1515.60, 0, 9935.60, 0, 'approved',
      'Submitted as part of the Q2 tender.', 'Quotation valid for 15 days.', '21AAECP5678E1ZQ', 'Neha Kar', NULL),
     -- QUO-0002 : validity already lapsed, so the list page shows Expired
-    ('90000000-0000-0000-0000-000000000006', '11111111-1111-1111-1111-111111111111', 'quotation', 'QUO/2026-27/0002', '2026-07-01',
-     '70000000-0000-0000-0000-000000000004',
+    ('90000000-0000-0000-0000-000000000006', '11111111-1111-1111-1111-111111111111', 'quotation', 'QU/2026-27/0002', '2026-07-01',
+     '70000000-0000-0000-0000-000000000004', NULL,
      '{"line1":"Bungalow 7, Green Park","line2":null,"city":"Cuttack","state":"Odisha","pin":"753001","country":"India"}'::jsonb,
      '{"line1":"Bungalow 7, Green Park","line2":null,"city":"Cuttack","state":"Odisha","pin":"753001","country":"India"}'::jsonb,
      680.00, 0, 81.60, 0, 761.60, 0, 'draft',
@@ -232,13 +248,14 @@ INSERT INTO transactions (
     -- PO-0001 : Kolkata supplier -> inter-state
     ('90000000-0000-0000-0000-000000000007', '11111111-1111-1111-1111-111111111111', 'purchase_order', 'PO/2026-27/0001', '2026-08-22',
      NULL,
+     '80000000-0000-0000-0000-000000000003',
      '{"line1":"Plot 31, Belghoria Industrial Area","line2":null,"city":"Kolkata","state":"West Bengal","pin":"700056","country":"India"}'::jsonb,
      '{"line1":"Plot 31, Belghoria Industrial Area","line2":null,"city":"Kolkata","state":"West Bengal","pin":"700056","country":"India"}'::jsonb,
      9000.00, 0, 1620.00, 0, 10620.00, 0, 'draft',
      'Packaging reorder for Q3.', 'Supply in two lots.', NULL, 'Dhiraj Ghosh', '2026-09-15'),
     -- PI-0001 : Kolkata customer -> inter-state
     ('90000000-0000-0000-0000-000000000008', '11111111-1111-1111-1111-111111111111', 'proforma_invoice', 'PI/2026-27/0001', '2026-08-25',
-     '70000000-0000-0000-0000-000000000003',
+     '70000000-0000-0000-0000-000000000003', NULL,
      '{"line1":"No. 22, Park Street","line2":null,"city":"Kolkata","state":"West Bengal","pin":"700016","country":"India"}'::jsonb,
      '{"line1":"No. 22, Park Street","line2":null,"city":"Kolkata","state":"West Bengal","pin":"700016","country":"India"}'::jsonb,
      9500.00, 0, 1710.00, 0, 11210.00, 0, 'approved',

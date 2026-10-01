@@ -8,16 +8,25 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { dashboardService } from '@/services/dashboard.service';
+import type {
+  SalesSummary,
+  PurchaseSummary,
+  StockSummary,
+  LowStockProduct,
+  FastMovingProduct,
+  CustomerOutstanding,
+  RecentTransaction,
+} from '@/types/dashboard.types';
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
-  const [salesSummary, setSalesSummary] = useState<any>(null);
-  const [purchaseSummary, setPurchaseSummary] = useState<any>(null);
-  const [stockSummary, setStockSummary] = useState<any>(null);
-  const [lowStockItems, setLowStockItems] = useState<any[]>([]);
-  const [fastMoving, setFastMoving] = useState<any[]>([]);
-  const [customerOutstanding, setCustomerOutstanding] = useState<any>(null);
-  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  const [salesSummary, setSalesSummary] = useState<SalesSummary | null>(null);
+  const [purchaseSummary, setPurchaseSummary] = useState<PurchaseSummary | null>(null);
+  const [stockSummary, setStockSummary] = useState<StockSummary | null>(null);
+  const [lowStockItems, setLowStockItems] = useState<LowStockProduct[]>([]);
+  const [fastMoving, setFastMoving] = useState<FastMovingProduct[]>([]);
+  const [customerOutstanding, setCustomerOutstanding] = useState<CustomerOutstanding[]>([]);
+  const [recentActivity, setRecentActivity] = useState<RecentTransaction[]>([]);
   const [dateRange, setDateRange] = useState<'today' | 'week' | 'month' | 'quarter' | 'year'>('month');
 
   useEffect(() => {
@@ -79,35 +88,43 @@ export default function DashboardPage() {
     );
   }
 
+  // getCustomerOutstandingDashboard returns a list, so the KPI totals are
+  // derived here rather than read off a single object.
+  const totalReceivables = customerOutstanding.reduce(
+    (sum, c) => sum + (c.outstanding_balance || 0),
+    0
+  );
+  const overLimitCount = customerOutstanding.filter((c) => c.over_limit).length;
+
   const kpiCards = [
     {
       title: "Today's Sales",
-      value: formatCurrency(salesSummary?.today_value || 0),
-      sub: `${salesSummary?.today_qty || 0} items`,
+      value: formatCurrency(salesSummary?.today_sales),
+      sub: `${salesSummary?.total_invoices ?? 0} invoices`,
       icon: TrendingUp,
       color: 'from-blue-500 to-cyan-400',
       link: '/reports/sales',
     },
     {
       title: 'Purchases',
-      value: formatCurrency(purchaseSummary?.period_value || 0),
-      sub: `${purchaseSummary?.period_qty || 0} items`,
+      value: formatCurrency(purchaseSummary?.total_purchases),
+      sub: `${purchaseSummary?.total_invoices ?? 0} invoices`,
       icon: ShoppingCart,
       color: 'from-purple-500 to-pink-400',
       link: '/reports/purchases',
     },
     {
       title: 'Stock Value',
-      value: formatCurrency(stockSummary?.total_value || 0),
-      sub: `${stockSummary?.total_qty || 0} units`,
+      value: formatCurrency(stockSummary?.total_stock_value),
+      sub: `${stockSummary?.total_stock_quantity ?? 0} units`,
       icon: Package,
       color: 'from-green-500 to-emerald-400',
       link: '/stock',
     },
     {
       title: 'Receivables',
-      value: formatCurrency(customerOutstanding?.total_outstanding || 0),
-      sub: `${customerOutstanding?.overdue_count || 0} overdue`,
+      value: formatCurrency(totalReceivables),
+      sub: `${overLimitCount} over limit`,
       icon: DollarSign,
       color: 'from-amber-500 to-orange-400',
       link: '/ledgers/customer',
@@ -183,17 +200,20 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">All products are well stocked.</p>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {lowStockItems.map((item: any) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg border p-3">
+                {lowStockItems.map((item) => (
+                  <div key={item.product_id} className="flex items-center justify-between rounded-lg border p-3">
                     <div>
-                      <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.code}</p>
+                      <p className="text-sm font-medium">{item.product_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.product_code}
+                        {item.category_name ? ` · ${item.category_name}` : ''}
+                      </p>
                     </div>
                     <div className="text-right">
                       <Badge variant={item.current_stock === 0 ? 'destructive' : 'warning'}>
                         {item.current_stock} left
                       </Badge>
-                      <p className="mt-1 text-xs text-muted-foreground">Reorder: {item.reorder_level}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">Reorder: {item.low_stock_level}</p>
                     </div>
                   </div>
                 ))}
@@ -214,18 +234,18 @@ export default function DashboardPage() {
               <p className="text-sm text-muted-foreground">No sales data available for this period.</p>
             ) : (
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {fastMoving.map((item: any, idx: number) => (
-                  <div key={item.id} className="flex items-center gap-3 rounded-lg border p-3">
+                {fastMoving.map((item, idx) => (
+                  <div key={item.product_id} className="flex items-center gap-3 rounded-lg border p-3">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                       {idx + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.code}</p>
+                      <p className="text-sm font-medium truncate">{item.product_name}</p>
+                      <p className="text-xs text-muted-foreground">{item.product_code}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-semibold">{item.quantity_sold} sold</p>
-                      <p className="text-xs text-muted-foreground">{formatCurrency(item.sales_value)}</p>
+                      <p className="text-sm font-semibold">{item.total_quantity} sold</p>
+                      <p className="text-xs text-muted-foreground">{formatCurrency(item.total_revenue)}</p>
                     </div>
                   </div>
                 ))}
@@ -245,16 +265,22 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-72 overflow-y-auto">
-              {recentActivity.map((act: any, idx: number) => (
-                <div key={idx} className="flex items-center gap-3 rounded-lg border p-3">
+              {recentActivity.map((act) => (
+                <div key={act.id} className="flex items-center gap-3 rounded-lg border p-3">
                   <Badge variant={act.type === 'sale' ? 'success' : act.type === 'purchase' ? 'info' : 'secondary'}>
                     {act.type}
                   </Badge>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{act.description}</p>
-                    <p className="text-xs text-muted-foreground">{formatDate(act.date)}</p>
+                    <p className="text-sm font-medium truncate">
+                      {act.document_number}
+                      {act.party_name ? ` · ${act.party_name}` : ''}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(act.document_date)}
+                      {act.status ? ` · ${act.status}` : ''}
+                    </p>
                   </div>
-                  <p className="text-sm font-semibold">{formatCurrency(act.amount)}</p>
+                  <p className="text-sm font-semibold">{formatCurrency(act.grand_total)}</p>
                 </div>
               ))}
             </div>

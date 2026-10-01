@@ -29,7 +29,12 @@
     "declaration": false,
     "declarationMap": false,
     "composite": false,
-    "incremental": false
+    "incremental": false,
+    // Test files under src/**/__tests__ run in Node (they read source from
+    // disk), so they need Node's module declarations. Application code must
+    // still stay browser-safe; tsconfig.app.json is the browser config and
+    // deliberately restricts types to "vite/client".
+    "types": ["node"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "build"]

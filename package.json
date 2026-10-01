@@ -10,6 +10,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verify:seed": "node scripts/verify-seed.mjs",
+    "verify:arity": "node scripts/check-insert-arity.mjs",
+    "verify:live": "node scripts/verify-live.mjs",
+    "verify:schema": "node scripts/probe-schema.mjs",
+    "verify:permissions": "node scripts/probe-permissions.mjs",
+    "verify:dashboard": "node scripts/probe-dashboard.mjs",
+    "verify:product-workspace": "node scripts/verify-product-workspace.mjs",
+    "build:install-sql": "node scripts/build-install-sql.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

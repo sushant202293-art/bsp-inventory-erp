@@ -2,7 +2,76 @@
 // Role-Based Access Control (RBAC)
 // ==========================================
 
-export type UserRole = "owner" | "admin" | "manager" | "accountant" | "viewer";
+/**
+ * Canonical roles plus the legacy labels the admin UI still offers
+ * (`src/modules/users/UserListPage.tsx`) and the ones historical databases may
+ * already contain in `profiles.role`. Every label below has a real entry in
+ * `rolePermissions`, so assigning any of them grants a usable permission set
+ * instead of silently emptying the sidebar.
+ */
+export type UserRole =
+  | "owner"
+  | "super_admin"
+  | "admin"
+  | "manager"
+  | "sales"
+  | "purchase"
+  | "inventory"
+  | "accounts"
+  | "accountant"
+  | "viewer";
+
+export const USER_ROLES: readonly UserRole[] = [
+  "owner",
+  "super_admin",
+  "admin",
+  "manager",
+  "sales",
+  "purchase",
+  "inventory",
+  "accounts",
+  "accountant",
+  "viewer",
+];
+
+export function isUserRole(value: string | null | undefined): value is UserRole {
+  return !!value && (USER_ROLES as readonly string[]).includes(value);
+}
+
+/**
+ * Coerces an untrusted `profiles.role` string into a `UserRole`. Anything
+ * unrecognised becomes `viewer` so an unknown label can never widen access.
+ */
+export function normalizeRole(value: string | null | undefined): UserRole {
+  if (!value) return "viewer";
+  const lower = value.trim().toLowerCase();
+  if (isUserRole(lower)) return lower;
+  switch (lower) {
+    case "super admin":
+    case "superadmin":
+    case "super-admin":
+      return "super_admin";
+    case "sales_person":
+    case "salesperson":
+    case "sales_user":
+    case "sales user":
+      return "sales";
+    case "purchaser":
+    case "purchase_user":
+    case "purchase user":
+      return "purchase";
+    case "warehouse":
+    case "inventory_user":
+    case "inventory user":
+      return "inventory";
+    case "accountant":
+    case "accounts_user":
+    case "accounts user":
+      return "accounts";
+    default:
+      return "viewer";
+  }
+}
 
 export type Permission =
   | "business:read"
@@ -20,6 +89,39 @@ export type Permission =
   | "categories:read"
   | "categories:write"
   | "categories:delete"
+  | "brands:read"
+  | "brands:write"
+  | "brands:delete"
+  | "units:read"
+  | "units:write"
+  | "units:delete"
+  | "sales:read"
+  | "sales:write"
+  | "sales:delete"
+  | "sales:approve"
+  | "sales:export"
+  | "quotations:read"
+  | "quotations:write"
+  | "quotations:delete"
+  | "quotations:export"
+  | "purchase_orders:read"
+  | "purchase_orders:write"
+  | "purchase_orders:delete"
+  | "purchase_orders:export"
+  | "purchases:read"
+  | "purchases:write"
+  | "purchases:delete"
+  | "purchases:approve"
+  | "purchases:export"
+  | "proforma_invoices:read"
+  | "proforma_invoices:write"
+  | "proforma_invoices:delete"
+  | "proforma_invoices:export"
+  | "ledgers:read"
+  | "ledgers:export"
+  | "backup:read"
+  | "backup:write"
+  | "notifications:read"
   | "customers:read"
   | "customers:write"
   | "customers:delete"
@@ -110,6 +212,39 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "stock:adjust",
     "stock:import",
     "stock:export",
+    "brands:read",
+    "brands:write",
+    "brands:delete",
+    "units:read",
+    "units:write",
+    "units:delete",
+    "sales:read",
+    "sales:write",
+    "sales:delete",
+    "sales:approve",
+    "sales:export",
+    "quotations:read",
+    "quotations:write",
+    "quotations:delete",
+    "quotations:export",
+    "purchase_orders:read",
+    "purchase_orders:write",
+    "purchase_orders:delete",
+    "purchase_orders:export",
+    "purchases:read",
+    "purchases:write",
+    "purchases:delete",
+    "purchases:approve",
+    "purchases:export",
+    "proforma_invoices:read",
+    "proforma_invoices:write",
+    "proforma_invoices:delete",
+    "proforma_invoices:export",
+    "ledgers:read",
+    "ledgers:export",
+    "backup:read",
+    "backup:write",
+    "notifications:read",
   ],
   admin: [
     "business:read",
@@ -159,6 +294,39 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "stock:adjust",
     "stock:import",
     "stock:export",
+    "brands:read",
+    "brands:write",
+    "brands:delete",
+    "units:read",
+    "units:write",
+    "units:delete",
+    "sales:read",
+    "sales:write",
+    "sales:delete",
+    "sales:approve",
+    "sales:export",
+    "quotations:read",
+    "quotations:write",
+    "quotations:delete",
+    "quotations:export",
+    "purchase_orders:read",
+    "purchase_orders:write",
+    "purchase_orders:delete",
+    "purchase_orders:export",
+    "purchases:read",
+    "purchases:write",
+    "purchases:delete",
+    "purchases:approve",
+    "purchases:export",
+    "proforma_invoices:read",
+    "proforma_invoices:write",
+    "proforma_invoices:delete",
+    "proforma_invoices:export",
+    "ledgers:read",
+    "ledgers:export",
+    "backup:read",
+    "backup:write",
+    "notifications:read",
   ],
   manager: [
     "business:read",
@@ -195,6 +363,25 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "stock:adjust",
     "stock:import",
     "stock:export",
+    "brands:read",
+    "brands:write",
+    "units:read",
+    "units:write",
+    "sales:read",
+    "sales:write",
+    "sales:export",
+    "quotations:read",
+    "quotations:write",
+    "quotations:export",
+    "purchase_orders:read",
+    "purchase_orders:write",
+    "purchase_orders:export",
+    "purchases:read",
+    "purchases:write",
+    "proforma_invoices:read",
+    "proforma_invoices:write",
+    "proforma_invoices:export",
+    "ledgers:read",
   ],
   accountant: [
     "business:read",
@@ -221,6 +408,14 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "settings:read",
     "dashboard:read",
     "stock:read",
+    "brands:read",
+    "units:read",
+    "sales:read",
+    "quotations:read",
+    "purchase_orders:read",
+    "purchases:read",
+    "proforma_invoices:read",
+    "ledgers:read",
   ],
   viewer: [
     "business:read",
@@ -235,6 +430,204 @@ const rolePermissions: Record<UserRole, Permission[]> = {
     "settings:read",
     "dashboard:read",
     "stock:read",
+    "brands:read",
+    "units:read",
+    "sales:read",
+    "quotations:read",
+    "purchase_orders:read",
+    "purchases:read",
+    "proforma_invoices:read",
+    "ledgers:read",
+  ],
+  super_admin: [
+    "business:read",
+    "business:write",
+    "business:delete",
+    "users:read",
+    "users:write",
+    "users:delete",
+    "users:manage",
+    "products:read",
+    "products:write",
+    "products:delete",
+    "products:import",
+    "products:export",
+    "categories:read",
+    "categories:write",
+    "categories:delete",
+    "brands:read",
+    "brands:write",
+    "brands:delete",
+    "units:read",
+    "units:write",
+    "units:delete",
+    "customers:read",
+    "customers:write",
+    "customers:delete",
+    "customers:export",
+    "suppliers:read",
+    "suppliers:write",
+    "suppliers:delete",
+    "suppliers:export",
+    "invoices:read",
+    "invoices:write",
+    "invoices:delete",
+    "invoices:approve",
+    "invoices:export",
+    "sales:read",
+    "sales:write",
+    "sales:delete",
+    "sales:approve",
+    "sales:export",
+    "quotations:read",
+    "quotations:write",
+    "quotations:delete",
+    "quotations:export",
+    "purchase_orders:read",
+    "purchase_orders:write",
+    "purchase_orders:delete",
+    "purchase_orders:export",
+    "purchases:read",
+    "purchases:write",
+    "purchases:delete",
+    "purchases:approve",
+    "purchases:export",
+    "proforma_invoices:read",
+    "proforma_invoices:write",
+    "proforma_invoices:delete",
+    "proforma_invoices:export",
+    "payments:read",
+    "payments:write",
+    "payments:delete",
+    "payments:approve",
+    "payments:export",
+    "ledgers:read",
+    "ledgers:export",
+    "stock:read",
+    "stock:write",
+    "stock:adjust",
+    "stock:import",
+    "stock:export",
+    "reports:read",
+    "reports:export",
+    "reports:gst",
+    "reports:inventory",
+    "reports:financial",
+    "reports:sales",
+    "reports:purchase",
+    "settings:read",
+    "settings:write",
+    "backup:read",
+    "backup:write",
+    "notifications:read",
+    "dashboard:read",
+    "dashboard:analytics",
+  ],
+  sales: [
+    "business:read",
+    "dashboard:read",
+    "products:read",
+    "categories:read",
+    "brands:read",
+    "units:read",
+    "customers:read",
+    "customers:write",
+    "customers:export",
+    "sales:read",
+    "sales:write",
+    "sales:approve",
+    "sales:export",
+    "quotations:read",
+    "quotations:write",
+    "quotations:export",
+    "proforma_invoices:read",
+    "proforma_invoices:write",
+    "payments:read",
+    "payments:write",
+    "ledgers:read",
+    "stock:read",
+    "reports:read",
+    "reports:sales",
+  ],
+  purchase: [
+    "business:read",
+    "dashboard:read",
+    "products:read",
+    "products:write",
+    "categories:read",
+    "brands:read",
+    "units:read",
+    "suppliers:read",
+    "suppliers:write",
+    "suppliers:export",
+    "purchase_orders:read",
+    "purchase_orders:write",
+    "purchase_orders:export",
+    "purchases:read",
+    "purchases:write",
+    "purchases:approve",
+    "purchases:export",
+    "proforma_invoices:read",
+    "payments:read",
+    "payments:write",
+    "ledgers:read",
+    "stock:read",
+    "stock:write",
+    "reports:read",
+    "reports:purchase",
+  ],
+  inventory: [
+    "business:read",
+    "dashboard:read",
+    "products:read",
+    "products:write",
+    "products:import",
+    "products:export",
+    "categories:read",
+    "brands:read",
+    "units:read",
+    "stock:read",
+    "stock:write",
+    "stock:adjust",
+    "stock:import",
+    "stock:export",
+    "reports:read",
+    "reports:inventory",
+  ],
+  accounts: [
+    "business:read",
+    "dashboard:read",
+    "products:read",
+    "categories:read",
+    "brands:read",
+    "units:read",
+    "customers:read",
+    "customers:write",
+    "customers:export",
+    "suppliers:read",
+    "suppliers:write",
+    "suppliers:export",
+    "invoices:read",
+    "invoices:write",
+    "invoices:export",
+    "sales:read",
+    "quotations:read",
+    "purchase_orders:read",
+    "purchases:read",
+    "proforma_invoices:read",
+    "payments:read",
+    "payments:write",
+    "payments:approve",
+    "payments:export",
+    "ledgers:read",
+    "stock:read",
+    "reports:read",
+    "reports:export",
+    "reports:gst",
+    "reports:financial",
+    "reports:sales",
+    "reports:purchase",
+    "settings:read",
   ],
 };
 
@@ -303,6 +696,8 @@ export function canAccessModule(
     | "users"
     | "products"
     | "categories"
+    | "brands"
+    | "units"
     | "customers"
     | "suppliers"
     | "invoices"
@@ -311,6 +706,14 @@ export function canAccessModule(
     | "settings"
     | "dashboard"
     | "stock"
+    | "sales"
+    | "quotations"
+    | "purchase_orders"
+    | "purchases"
+    | "proforma_invoices"
+    | "ledgers"
+    | "backup"
+    | "notifications"
 ): boolean {
   const readPermission = `${module}:read` as Permission;
   return hasPermission(role, readPermission);
@@ -333,7 +736,17 @@ export function canPerformAction(
     | "reports"
     | "settings"
     | "dashboard"
-    | "stock",
+    | "stock"
+    | "brands"
+    | "units"
+    | "sales"
+    | "quotations"
+    | "purchase_orders"
+    | "purchases"
+    | "proforma_invoices"
+    | "ledgers"
+    | "backup"
+    | "notifications",
   action: "read" | "write" | "delete" | "approve" | "export" | "import" | "adjust" | "manage" | "analytics"
 ): boolean {
   const permission = `${module}:${action}` as Permission;
@@ -383,6 +796,8 @@ const routePermissions: Record<string, Permission> = {
   "/products": "products:read",
   "/products/new": "products:write",
   "/categories": "categories:read",
+  "/brands": "brands:read",
+  "/units": "units:read",
   "/customers": "customers:read",
   "/customers/new": "customers:write",
   "/suppliers": "suppliers:read",
@@ -394,9 +809,15 @@ const routePermissions: Record<string, Permission> = {
   "/reports": "reports:read",
   "/reports/sales": "reports:sales",
   "/reports/purchase": "reports:purchase",
-  "/reports/gst": "reports:gst",
   "/reports/inventory": "reports:inventory",
   "/reports/financial": "reports:financial",
+  "/sales": "sales:read",
+  "/quotations": "quotations:read",
+  "/purchase-orders": "purchase_orders:read",
+  "/proforma-invoices": "proforma_invoices:read",
+  "/stock": "stock:read",
+  "/ledgers": "ledgers:read",
+  "/backup": "backup:read",
   "/settings": "settings:read",
   "/settings/business": "settings:write",
   "/settings/users": "users:manage",
@@ -481,10 +902,15 @@ export function canSeeElement(
 // ==========================================
 
 const roleHierarchy: Record<UserRole, number> = {
-  owner: 5,
+  owner: 6,
+  super_admin: 5,
   admin: 4,
   manager: 3,
   accountant: 2,
+  accounts: 2,
+  sales: 2,
+  purchase: 2,
+  inventory: 2,
   viewer: 1,
 };
 
@@ -499,7 +925,17 @@ export function hasMinimumRole(
 }
 
 /**
- * Check if user can manage another user
+ * Roles allowed into the admin-only routes (`/users`). `super_admin` and `owner`
+ * are accepted alongside `admin` because the admin UI offers both labels.
+ */
+export const ADMIN_ROLES: readonly UserRole[] = ["owner", "super_admin", "admin"];
+
+export function isAdminRole(value: string | null | undefined): boolean {
+  return ADMIN_ROLES.includes(normalizeRole(value));
+}
+
+/**
+ * Checks if user can manage another user
  */
 export function canManageUser(
   managerRole: UserRole,
@@ -693,6 +1129,17 @@ export const defaultRoleSettings: Record<
     canManageUsers: true,
     canChangeSettings: true,
   },
+  super_admin: {
+    canCreate: true,
+    canEdit: true,
+    canDelete: true,
+    canApprove: true,
+    canExport: true,
+    canImport: true,
+    canViewReports: true,
+    canManageUsers: true,
+    canChangeSettings: true,
+  },
   admin: {
     canCreate: true,
     canEdit: true,
@@ -722,6 +1169,50 @@ export const defaultRoleSettings: Record<
     canApprove: true,
     canExport: true,
     canImport: false,
+    canViewReports: true,
+    canManageUsers: false,
+    canChangeSettings: false,
+  },
+  accounts: {
+    canCreate: true,
+    canEdit: true,
+    canDelete: false,
+    canApprove: true,
+    canExport: true,
+    canImport: false,
+    canViewReports: true,
+    canManageUsers: false,
+    canChangeSettings: false,
+  },
+  sales: {
+    canCreate: true,
+    canEdit: true,
+    canDelete: false,
+    canApprove: true,
+    canExport: true,
+    canImport: false,
+    canViewReports: true,
+    canManageUsers: false,
+    canChangeSettings: false,
+  },
+  purchase: {
+    canCreate: true,
+    canEdit: true,
+    canDelete: false,
+    canApprove: true,
+    canExport: true,
+    canImport: false,
+    canViewReports: true,
+    canManageUsers: false,
+    canChangeSettings: false,
+  },
+  inventory: {
+    canCreate: true,
+    canEdit: true,
+    canDelete: false,
+    canApprove: false,
+    canExport: true,
+    canImport: true,
     canViewReports: true,
     canManageUsers: false,
     canChangeSettings: false,

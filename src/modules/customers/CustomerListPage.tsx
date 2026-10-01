@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -10,18 +10,19 @@ import {
   Trash2,
   Users,
   Download,
-  FileText,
-  Printer,
 } from 'lucide-react';
-import type { ColumnDef } from '@tanstack/react-table';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Pagination } from '@/components/ui/pagination';
 import { SearchInput } from '@/components/ui/search-input';
+import {
+  AlignedTable,
+  AlignedTableSkeleton,
+  type AlignedTableColumn,
+} from '@/components/ui/aligned-table';
 import {
   Select,
   SelectContent,
@@ -52,6 +53,35 @@ const fadeIn = {
   hidden: { opacity: 0, y: 12 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 };
+
+type CustomerColumnKey =
+  | 'code'
+  | 'name'
+  | 'contact_person'
+  | 'phone'
+  | 'city'
+  | 'state'
+  | 'opening_balance'
+  | 'credit_limit'
+  | 'is_active'
+  | 'actions';
+
+/**
+ * Single source of truth for the customer table columns. Mirrors the supplier
+ * table so both ERP lists share one design system. Widths total 100%.
+ */
+const CUSTOMER_COLUMNS: AlignedTableColumn<CustomerColumnKey>[] = [
+  { key: 'code', header: 'Code', width: '9%', align: 'left' },
+  { key: 'name', header: 'Name', width: '16%', align: 'left' },
+  { key: 'contact_person', header: 'Contact', width: '13%', align: 'left' },
+  { key: 'phone', header: 'Phone', width: '12%', align: 'left' },
+  { key: 'city', header: 'City', width: '9%', align: 'left' },
+  { key: 'state', header: 'State', width: '9%', align: 'left' },
+  { key: 'opening_balance', header: 'Outstanding', width: '11%', align: 'right' },
+  { key: 'credit_limit', header: 'Credit Limit', width: '11%', align: 'right' },
+  { key: 'is_active', header: 'Status', width: '6%', align: 'center' },
+  { key: 'actions', header: 'Actions', width: '4%', align: 'center' },
+];
 
 export default function CustomerListPage() {
   const navigate = useNavigate();
@@ -158,118 +188,102 @@ export default function CustomerListPage() {
     }
   };
 
-  const columns: ColumnDef<CustomerWithRelations, unknown>[] = useMemo(
-    () => [
-      {
-        accessorKey: 'code',
-        header: 'Code',
-        cell: ({ row }) => (
-          <span className="font-mono text-sm">{row.original.code || '-'}</span>
-        ),
-      },
-      {
-        accessorKey: 'name',
-        header: 'Name',
-        cell: ({ row }) => (
+  const renderCustomerCell = (
+    customer: CustomerWithRelations,
+    columnKey: CustomerColumnKey
+  ) => {
+    switch (columnKey) {
+      case 'code':
+        return <span className="font-mono text-sm">{customer.code || '-'}</span>;
+
+      case 'name':
+        return (
           <button
-            onClick={() => navigate(`/customers/${row.original.id}`)}
-            className="text-left font-medium text-foreground hover:text-primary transition-colors"
+            onClick={() => navigate(`/customers/${customer.id}`)}
+            className="max-w-full truncate text-left font-medium text-foreground hover:text-primary transition-colors"
           >
-            {row.original.name}
+            {customer.name}
           </button>
-        ),
-      },
-      {
-        accessorKey: 'contact_person',
-        header: 'Contact',
-        cell: ({ row }) => row.original.contact_person || '-',
-      },
-      {
-        accessorKey: 'phone',
-        header: 'Phone',
-        cell: ({ row }) => row.original.phone || '-',
-      },
-      {
-        accessorKey: 'city',
-        header: 'City',
-        cell: ({ row }) => row.original.city || '-',
-      },
-      {
-        accessorKey: 'state',
-        header: 'State',
-        cell: ({ row }) => row.original.state || '-',
-      },
-      {
-        accessorKey: 'opening_balance',
-        header: 'Outstanding',
-        cell: ({ row }) => {
-          const balance = row.original.opening_balance || 0;
-          return (
-            <span className={cn('font-medium', balance > 0 ? 'text-red-500' : balance < 0 ? 'text-green-500' : 'text-muted-foreground')}>
-              {formatCurrency(balance)}
-            </span>
-          );
-        },
-      },
-      {
-        accessorKey: 'credit_limit',
-        header: 'Credit Limit',
-        cell: ({ row }) => formatCurrency(row.original.credit_limit || 0),
-      },
-      {
-        accessorKey: 'is_active',
-        header: 'Status',
-        cell: ({ row }) => (
-          <Badge variant={row.original.is_active ? 'success' : 'secondary'}>
-            {row.original.is_active ? 'Active' : 'Inactive'}
+        );
+
+      case 'contact_person':
+        return <span className="truncate">{customer.contact_person || '-'}</span>;
+
+      case 'phone':
+        return <span className="whitespace-nowrap">{customer.phone || '-'}</span>;
+
+      case 'city':
+        return <span className="truncate">{customer.city || '-'}</span>;
+
+      case 'state':
+        return <span className="whitespace-nowrap">{customer.state || '-'}</span>;
+
+      case 'opening_balance': {
+        const balance = customer.opening_balance || 0;
+        return (
+          <span
+            className={cn(
+              'whitespace-nowrap font-medium tabular-nums',
+              balance > 0 ? 'text-red-500' : balance < 0 ? 'text-green-500' : 'text-muted-foreground'
+            )}
+          >
+            {formatCurrency(balance)}
+          </span>
+        );
+      }
+
+      case 'credit_limit':
+        return (
+          <span className="whitespace-nowrap tabular-nums">
+            {formatCurrency(customer.credit_limit || 0)}
+          </span>
+        );
+
+      case 'is_active':
+        return (
+          <Badge variant={customer.is_active ? 'success' : 'secondary'}>
+            {customer.is_active ? 'Active' : 'Inactive'}
           </Badge>
-        ),
-      },
-      {
-        id: 'actions',
-        header: 'Actions',
-        cell: ({ row }) => {
-          const customer = row.original;
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => navigate(`/customers/${customer.id}`)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View
+        );
+
+      case 'actions':
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate(`/customers/${customer.id}`)}>
+                <Eye className="mr-2 h-4 w-4" />
+                View
+              </DropdownMenuItem>
+              {canEdit('customers') && (
+                <DropdownMenuItem onClick={() => navigate(`/customers/${customer.id}/edit`)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
                 </DropdownMenuItem>
-                {canEdit('customers') && (
-                  <DropdownMenuItem onClick={() => navigate(`/customers/${customer.id}/edit`)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem onClick={() => navigate(`/ledgers/customers?customer_id=${customer.id}`)}>
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  Ledger
+              )}
+              <DropdownMenuItem onClick={() => navigate(`/ledgers/customers?customer_id=${customer.id}`)}>
+                <BookOpen className="mr-2 h-4 w-4" />
+                Ledger
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {canDelete('customers') && (
+                <DropdownMenuItem
+                  className="text-red-500 focus:text-red-500"
+                  onClick={() => setDeleteId(customer.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {canDelete('customers') && (
-                  <DropdownMenuItem
-                    className="text-red-500 focus:text-red-500"
-                    onClick={() => setDeleteId(customer.id)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
-      },
-    ],
-    [navigate, canEdit, canDelete]
-  );
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+    }
+  };
 
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
@@ -300,7 +314,7 @@ export default function CustomerListPage() {
 
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
             <SearchInput
               placeholder="Search by name, code, phone, email..."
               value={filters.search || ''}
@@ -308,9 +322,9 @@ export default function CustomerListPage() {
                 setFilters((prev) => ({ ...prev, search: value }));
                 setPage(1);
               }}
-              className="w-full sm:w-[320px]"
+              className="w-full lg:max-w-md lg:flex-1"
             />
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 lg:ml-auto lg:flex-nowrap">
               <Select
                 value={filters.is_active === undefined ? 'all' : String(filters.is_active)}
                 onValueChange={(value) => {
@@ -321,7 +335,7 @@ export default function CustomerListPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[132px]">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -338,7 +352,7 @@ export default function CustomerListPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[164px]">
                   <SelectValue placeholder="All States" />
                 </SelectTrigger>
                 <SelectContent>
@@ -354,26 +368,7 @@ export default function CustomerListPage() {
           </div>
 
           {loading ? (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-10 w-[250px]" />
-                <Skeleton className="h-10 w-[120px]" />
-              </div>
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="flex items-center space-x-4 p-4 border rounded-lg">
-                  <Skeleton className="h-4 w-[80px]" />
-                  <Skeleton className="h-4 w-[150px]" />
-                  <Skeleton className="h-4 w-[120px]" />
-                  <Skeleton className="h-4 w-[100px]" />
-                  <Skeleton className="h-4 w-[100px]" />
-                  <Skeleton className="h-4 w-[80px]" />
-                  <Skeleton className="h-4 w-[100px]" />
-                  <Skeleton className="h-4 w-[100px]" />
-                  <Skeleton className="h-6 w-[70px]" />
-                  <Skeleton className="h-8 w-8" />
-                </div>
-              ))}
-            </div>
+            <AlignedTableSkeleton columns={CUSTOMER_COLUMNS} rows={8} />
           ) : customers.length === 0 ? (
             <EmptyState
               icon={<Users className="h-8 w-8 text-muted-foreground/60" />}
@@ -394,104 +389,13 @@ export default function CustomerListPage() {
             />
           ) : (
             <>
-              <div className="rounded-md border border-border">
-                <table className="w-full caption-bottom text-sm">
-                  <thead className="[&_tr]:border-b">
-                    {columns.map((col) => (
-                      <tr key={col.id || 'actions'}>
-                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                          {typeof col.header === 'string' ? col.header : 'Actions'}
-                        </th>
-                      </tr>
-                    ))}
-                  </thead>
-                  <tbody className="[&_tr:last-child]:border-0">
-                    {customers.map((customer) => (
-                      <tr
-                        key={customer.id}
-                        className="border-b border-border transition-colors hover:bg-muted/50"
-                      >
-                        <td className="p-4 font-mono text-sm">{customer.code || '-'}</td>
-                        <td className="p-4">
-                          <button
-                            onClick={() => navigate(`/customers/${customer.id}`)}
-                            className="font-medium text-foreground hover:text-primary transition-colors"
-                          >
-                            {customer.name}
-                          </button>
-                        </td>
-                        <td className="p-4">{customer.contact_person || '-'}</td>
-                        <td className="p-4">{customer.phone || '-'}</td>
-                        <td className="p-4">{customer.city || '-'}</td>
-                        <td className="p-4">{customer.state || '-'}</td>
-                        <td className="p-4">
-                          <span
-                            className={cn(
-                              'font-medium',
-                              (customer.opening_balance || 0) > 0
-                                ? 'text-red-500'
-                                : (customer.opening_balance || 0) < 0
-                                ? 'text-green-500'
-                                : 'text-muted-foreground'
-                            )}
-                          >
-                            {formatCurrency(customer.opening_balance || 0)}
-                          </span>
-                        </td>
-                        <td className="p-4">{formatCurrency(customer.credit_limit || 0)}</td>
-                        <td className="p-4">
-                          <Badge variant={customer.is_active ? 'success' : 'secondary'}>
-                            {customer.is_active ? 'Active' : 'Inactive'}
-                          </Badge>
-                        </td>
-                        <td className="p-4">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => navigate(`/customers/${customer.id}`)}
-                              >
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </DropdownMenuItem>
-                              {canEdit('customers') && (
-                                <DropdownMenuItem
-                                  onClick={() => navigate(`/customers/${customer.id}/edit`)}
-                                >
-                                  <Pencil className="mr-2 h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  navigate(`/ledgers/customers?customer_id=${customer.id}`)
-                                }
-                              >
-                                <BookOpen className="mr-2 h-4 w-4" />
-                                Ledger
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              {canDelete('customers') && (
-                                <DropdownMenuItem
-                                  className="text-red-500 focus:text-red-500"
-                                  onClick={() => setDeleteId(customer.id)}
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Delete
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <AlignedTable
+                columns={CUSTOMER_COLUMNS}
+                rows={customers}
+                rowKey={(customer) => customer.id}
+                renderCell={renderCustomerCell}
+                rowClassName="transition-colors hover:bg-muted/50"
+              />
 
               <div className="mt-4">
                 <Pagination

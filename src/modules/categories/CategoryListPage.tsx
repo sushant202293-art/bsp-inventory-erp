@@ -116,8 +116,12 @@ function CategoryTreeNode({
   );
 }
 
-export default function CategoryListPage() {
-  const navigate = useNavigate();
+/**
+ * Embeddable category management panel. Rendered as a tab inside the Product
+ * workspace and reused by the standalone `/categories` route wrapper below, so
+ * both surfaces share one implementation.
+ */
+export function CategoryPanel() {
   const { toast } = useToast();
 
   const [categories, setCategories] = useState<CategoryWithChildren[]>([]);
@@ -277,25 +281,9 @@ export default function CategoryListPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Categories"
-        description="Organize your products with categories"
-        breadcrumbs={[
-          { label: 'Dashboard', onClick: () => navigate('/dashboard') },
-          { label: 'Products', onClick: () => navigate('/products') },
-          { label: 'Categories' },
-        ]}
-        actions={
-          <Button onClick={() => openCreateDialog()} className="gap-2">
-            <Plus className="h-4 w-4" />
-            Add Category
-          </Button>
-        }
-      />
-
       <Card>
         <CardContent className="p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -305,6 +293,10 @@ export default function CategoryListPage() {
                 className="pl-10"
               />
             </div>
+            <Button onClick={() => openCreateDialog()} className="gap-2 sm:shrink-0">
+              <Plus className="h-4 w-4" />
+              Add Category
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -416,6 +408,28 @@ export default function CategoryListPage() {
         variant="danger"
         onConfirm={handleDelete}
       />
+    </div>
+  );
+}
+
+/**
+ * Standalone `/categories` route. Kept so existing bookmarks and deep links
+ * keep working; the add action lives inside the panel itself.
+ */
+export default function CategoryListPage() {
+  const navigate = useNavigate();
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title="Categories"
+        description="Organize your products with categories"
+        breadcrumbs={[
+          { label: 'Dashboard', onClick: () => navigate('/dashboard') },
+          { label: 'Products', onClick: () => navigate('/products') },
+          { label: 'Categories' },
+        ]}
+      />
+      <CategoryPanel />
     </div>
   );
 }

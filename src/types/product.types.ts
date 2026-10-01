@@ -41,6 +41,7 @@ export interface ProductFilters {
   search?: string;
   category_id?: string;
   brand_id?: string;
+  unit_id?: string;
   is_active?: boolean;
   low_stock?: boolean;
   out_of_stock?: boolean;
@@ -122,4 +123,5 @@ export interface BrandWithStats extends Brand {
 export interface UnitWithBase extends Unit {
   base_unit?: Unit | null;
   child_units?: Unit[];
+  product_count?: number;
 }

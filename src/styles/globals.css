@@ -1091,10 +1091,29 @@
 
   table {
     border-collapse: collapse !important;
-    page-break-inside: avoid;
+    /* A table must be allowed to flow onto the next page. Forcing
+       `page-break-inside: avoid` on the table itself makes the print engine
+       either drop the overflowing rows or squeeze the whole table onto one
+       page, which is what produced the "report ends early" symptom. Rows and
+       repeating headers are handled below instead. */
+    page-break-inside: auto;
+    break-inside: auto;
   }
 
-  table, tr, td, th, img {
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  table, td, th, img {
     page-break-inside: avoid;
   }
 
@@ -1123,6 +1142,277 @@
 
   .print-break-after {
     page-break-after: always;
+  }
+}
+
+/* ==========================================================================
+   Product Management print report
+   --------------------------------------------------------------------------
+   A dedicated, data-only document rendered into a portal on <body>, so it is
+   not a descendant of the app shell's `h-screen overflow-hidden` / `flex-1
+   overflow-y-auto` scroll containers that used to trap the print output
+   inside a viewport-sized box with its own scrollbar.
+
+   Mounting is signalled with `body.is-printing-report`; the app tree is hidden
+   only while that class is present, so the invoice/quotation print path
+   (which prints the live app) keeps working unchanged.
+   ========================================================================== */
+
+/* Named page keeps this report landscape without changing the portrait
+   default used by the document/invoice print path. */
+@page product-report {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+.print-report-root {
+  display: none;
+}
+
+@media print {
+  /* Print only the report, and only while it is mounted. */
+  body.is-printing-report > *:not(.print-report-root) {
+    display: none !important;
+  }
+
+  body.is-printing-report {
+    background: #fff !important;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+
+  .print-report-root {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    page: product-report;
+  }
+
+  .print-report {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    color: #000 !important;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  /* The global print reset forces every colour to black, which is right for
+     the app chrome but wrong for the status pills. These are more specific
+     than `*`, so they win. */
+  .print-report * {
+    box-sizing: border-box;
+  }
+
+  .print-report a[href]::after {
+    content: none !important;
+  }
+
+  .print-report__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    border-bottom: 1.5px solid #000;
+  }
+
+  .print-report__title {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .print-report__subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .print-report__meta {
+    text-align: right;
+    font-size: 9.5px;
+    white-space: nowrap;
+  }
+
+  .print-report__meta p {
+    margin: 0;
+  }
+
+  .print-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .print-summary__item {
+    flex: 1 1 0;
+    min-width: 88px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 4px 7px;
+  }
+
+  .print-summary__label {
+    display: block;
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #444 !important;
+  }
+
+  .print-summary__value {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .print-filters {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 8px;
+    padding: 4px 7px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    background: #f2f2f2 !important;
+  }
+
+  .print-filters__label {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #444 !important;
+    white-space: nowrap;
+  }
+
+  .print-filters__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 14px;
+  }
+
+  .print-filters__item {
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .print-warning {
+    margin: 0 0 8px;
+    padding: 4px 7px;
+    border: 1px solid #000;
+    font-size: 9px;
+    font-weight: 600;
+  }
+
+  /* The wrapper must not re-introduce a scroll container. */
+  .print-table-wrapper {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    width: 100%;
+  }
+
+  .print-table {
+    width: 100% !important;
+    table-layout: fixed;
+    border-collapse: collapse !important;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 0.5px solid #808080;
+    padding: 2.5px 4px;
+    font-size: 9.5px;
+    vertical-align: top;
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: manual;
+  }
+
+  .print-table thead th {
+    background: #e6e6e6 !important;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: left;
+    vertical-align: bottom;
+  }
+
+  /* Column widths. `col` + `table-layout: fixed` gives predictable widths
+     instead of the browser equalising every column and squeezing names. */
+  .print-col-index   { width: 3%; }
+  .print-col-code    { width: 9%; }
+  .print-col-name    { width: 24%; }
+  .print-col-medium  { width: 11%; }
+  .print-col-unit    { width: 5%; }
+  .print-col-money   { width: 10%; }
+  .print-col-stock   { width: 7%; }
+  .print-col-status  { width: 10%; }
+
+  .print-num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .print-code {
+    font-family: "Consolas", "SF Mono", "Courier New", monospace;
+    font-size: 9px;
+  }
+
+  .print-name {
+    font-weight: 600;
+  }
+
+  .print-badge {
+    display: inline-block;
+    padding: 0 4px;
+    border: 0.5px solid #000;
+    border-radius: 2px;
+    font-size: 8.5px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .print-badge--success { color: #14532d !important; }
+  .print-badge--warning { color: #713f12 !important; }
+  .print-badge--danger  { color: #7f1d1d !important; }
+
+  /* `table-footer-group` makes the browser repeat this on every printed page,
+     which is the only reliable page-footer technique: `@page` margin boxes with
+     counter(page) are not supported by Chromium, and computing the page count
+     in JS would require a second layout pass. */
+  .print-table tfoot {
+    display: table-footer-group;
+  }
+
+  .print-tfoot {
+    border: 0 !important;
+    padding-top: 3px !important;
+    font-size: 8.5px;
+    color: #333 !important;
   }
 }
 
@@ -1195,4 +1485,87 @@
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 72px;
   --header-height: 64px;
+}
+
+/* ============================================================ *
+ *  DERIVED / SHADCN-COMPAT TOKENS
+ *
+ *  The app calls for `text-muted-foreground`, `destructive` and
+ *  `*-foreground`, none of which existed in the scale above, so
+ *  Tailwind never emitted them and the affected text inherited
+ *  its parent's colour. These definitions activate that markup.
+ *
+ *  Placed last so they win over the earlier same-specificity
+ *  blocks, which keeps each theme's existing scale untouched.
+ * ============================================================ */
+:root {
+  /* secondary text: readable on the light surfaces above */
+  --color-muted-foreground: 100 116 139;
+  --color-primary-foreground: 255 255 255;
+  --color-secondary-foreground: 255 255 255;
+  --color-accent-foreground: 2 6 23;
+  --color-destructive-foreground: 255 255 255;
+  --color-input: 203 213 225;
+  --color-shadow: 15 23 42;
+}
+
+.dark {
+  --color-muted-foreground: 148 163 184;
+  --color-primary-foreground: 255 255 255;
+  --color-secondary-foreground: 255 255 255;
+  --color-accent-foreground: 2 6 23;
+  --color-destructive-foreground: 255 255 255;
+  --color-input: 51 65 85;
+  --color-shadow: 0 0 0;
+}
+
+/* `*-foreground` is the colour of text drawn ON the saturated
+   brand colour, so it flips to near-black on the bright neon
+   palettes and stays white on the deep ones. */
+[data-theme="neon-blue"]     { --color-primary-foreground: 2 8 23;    --color-muted-foreground: 71 85 105; }
+[data-theme="cyber-purple"]  { --color-primary-foreground: 250 245 255; --color-muted-foreground: 71 85 105; }
+[data-theme="emerald"]       { --color-primary-foreground: 2 46 34;   --color-muted-foreground: 71 85 105; }
+[data-theme="ocean"]         { --color-primary-foreground: 3 30 46;   --color-muted-foreground: 71 85 105; }
+[data-theme="sunset"]        { --color-primary-foreground: 41 15 4;   --color-muted-foreground: 71 85 105; }
+[data-theme="royal"]         { --color-primary-foreground: 245 243 255; --color-muted-foreground: 71 85 105; }
+[data-theme="crimson"]       { --color-primary-foreground: 254 242 242; --color-muted-foreground: 71 85 105; }
+[data-theme="aurora"]        { --color-primary-foreground: 3 24 32;   --color-muted-foreground: 71 85 105; }
+[data-theme="midnight"]      { --color-primary-foreground: 10 10 20;  --color-muted-foreground: 71 85 105; }
+[data-theme="light-professional"] { --color-primary-foreground: 255 255 255; --color-muted-foreground: 100 116 139; }
+
+/* Dark mode: tint the secondary text with the theme so it reads as
+   neon rather than grey, and keep it bright enough on the dark card. */
+.dark[data-theme="neon-blue"]    { --color-muted-foreground: 125 211 252; }
+.dark[data-theme="cyber-purple"] { --color-muted-foreground: 216 180 254; }
+.dark[data-theme="emerald"]      { --color-muted-foreground: 110 231 183; }
+.dark[data-theme="ocean"]        { --color-muted-foreground: 125 211 252; }
+.dark[data-theme="sunset"]       { --color-muted-foreground: 253 224 71; }
+.dark[data-theme="royal"]        { --color-muted-foreground: 199 210 254; }
+.dark[data-theme="crimson"]      { --color-muted-foreground: 252 165 165; }
+.dark[data-theme="aurora"]       { --color-muted-foreground: 165 243 252; }
+.dark[data-theme="midnight"]     { --color-muted-foreground: 165 180 252; }
+.dark[data-theme="light-professional"] { --color-muted-foreground: 203 213 225; }
+
+/* Surfaces and states referenced by AppLayout / Sidebar / TopHeader.
+   These came from theme.config's camelCase names, which globals.css
+   never carried, so the header strip and sidebar states fell back to
+   unstyled defaults. */
+:root {
+  --color-header: 255 255 255;
+  --color-border-light: 241 245 249;
+  --color-error: 239 68 68;
+  --color-sidebar-hover: 241 245 249;
+  --color-sidebar-active: 219 234 254;
+  --color-sidebar-text: 71 85 105;
+  --color-sidebar-text-active: 30 64 175;
+}
+
+.dark {
+  --color-header: 15 23 42;
+  --color-border-light: 39 39 58;
+  --color-error: 248 113 113;
+  --color-sidebar-hover: 26 26 43;
+  --color-sidebar-active: 12 74 110;
+  --color-sidebar-text: 148 163 184;
+  --color-sidebar-text-active: 125 211 252;
 }

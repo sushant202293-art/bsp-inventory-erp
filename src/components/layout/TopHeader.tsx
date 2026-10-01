@@ -43,8 +43,8 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
-          className="rounded-lg p-2 transition-colors hover:bg-[var(--color-backgroundAlt)]"
-          style={{ color: 'var(--color-text)' }}
+          className="rounded-lg p-2 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+          style={{ color: 'rgb(var(--color-text))' }}
           aria-label="Toggle sidebar"
         >
           <Menu size={20} />
@@ -53,7 +53,7 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
         <div className="hidden items-center gap-2 md:flex">
           <h2
             className="text-lg font-semibold"
-            style={{ color: 'var(--color-text)' }}
+            style={{ color: 'rgb(var(--color-text))' }}
           >
             {getPageTitle()}
           </h2>
@@ -77,9 +77,9 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
                 autoFocus
                 className="w-full rounded-lg border px-3 py-2 pr-10 text-sm outline-none transition-colors focus:ring-2"
                 style={{
-                  background: 'var(--color-input)',
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-text)',
+                  background: 'rgb(var(--color-input))',
+                  borderColor: 'rgb(var(--color-border))',
+                  color: 'rgb(var(--color-text))',
                   
                 }}
                 onKeyDown={(e) => {
@@ -88,19 +88,19 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
               />
               <button
                 onClick={toggleSearch}
-                className="absolute right-2 rounded p-1 hover:bg-[var(--color-backgroundAlt)]"
-                style={{ color: 'var(--color-textMuted)' }}
+                className="absolute right-2 rounded p-1 hover:bg-[rgb(var(--color-sidebar))]"
+                style={{ color: 'rgb(var(--color-muted))' }}
               >
-                ×
+                Ãƒâ€”
               </button>
             </motion.div>
           ) : (
             <button
               onClick={toggleSearch}
-              className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[var(--color-backgroundAlt)]"
+              className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[rgb(var(--color-sidebar))]"
               style={{
-                borderColor: 'var(--color-border)',
-                color: 'var(--color-textMuted)',
+                borderColor: 'rgb(var(--color-border))',
+                color: 'rgb(var(--color-muted))',
               }}
               title="Search (Ctrl+K)"
             >
@@ -108,11 +108,11 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
               <span className="hidden lg:inline">Search...</span>
               <kbd className="hidden rounded border px-1.5 py-0.5 text-[10px] font-medium lg:inline"
                 style={{
-                  borderColor: 'var(--color-border)',
-                  color: 'var(--color-textMuted)',
+                  borderColor: 'rgb(var(--color-border))',
+                  color: 'rgb(var(--color-muted))',
                 }}
               >
-                ⌘K
+                Ã¢Å’ËœK
               </kbd>
             </button>
           )}
@@ -120,8 +120,8 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
 
         <button
           onClick={() => setTheme(isDark ? 'light-professional' : 'neon-blue')}
-          className="rounded-lg p-2 transition-colors hover:bg-[var(--color-backgroundAlt)]"
-          style={{ color: 'var(--color-textSecondary)' }}
+          className="rounded-lg p-2 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+          style={{ color: 'rgb(var(--color-text-secondary))' }}
           title={isDark ? 'Light Mode' : 'Dark Mode'}
         >
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
@@ -133,13 +133,13 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
               setNotificationOpen((prev) => !prev);
               setProfileOpen(false);
             }}
-            className="relative rounded-lg p-2 transition-colors hover:bg-[var(--color-backgroundAlt)]"
-            style={{ color: 'var(--color-textSecondary)' }}
+            className="relative rounded-lg p-2 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+            style={{ color: 'rgb(var(--color-text-secondary))' }}
           >
             <Bell size={18} />
             <span
               className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white"
-              style={{ background: 'var(--color-error)' }}
+              style={{ background: 'rgb(var(--color-error))' }}
             >
               3
             </span>
@@ -156,24 +156,24 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
               setProfileOpen((prev) => !prev);
               setNotificationOpen(false);
             }}
-            className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-[var(--color-backgroundAlt)]"
+            className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
           >
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
-              style={{ background: 'var(--color-primary)' }}
+              style={{ background: 'rgb(var(--color-primary))' }}
             >
               {(profile?.full_name ?? user?.email ?? "User")?.charAt(0) || 'A'}
             </div>
             <div className="hidden text-left md:block">
               <p
                 className="text-sm font-medium leading-tight"
-                style={{ color: 'var(--color-text)' }}
+                style={{ color: 'rgb(var(--color-text))' }}
               >
                 {(profile?.full_name ?? user?.email ?? "User") || 'Admin'}
               </p>
               <p
                 className="text-xs capitalize"
-                style={{ color: 'var(--color-textMuted)' }}
+                style={{ color: 'rgb(var(--color-muted))' }}
               >
                 {user?.role || 'admin'}
               </p>
@@ -181,7 +181,7 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
             <ChevronDown
               size={14}
               className="hidden md:block"
-              style={{ color: 'var(--color-textMuted)' }}
+              style={{ color: 'rgb(var(--color-muted))' }}
             />
           </button>
           <ProfileDropdown

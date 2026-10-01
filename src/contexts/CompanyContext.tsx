@@ -38,6 +38,7 @@ interface CompanyContextType {
   updateCompany: (updates: Partial<Company>) => Promise<void>;
   updateSettings: (updates: Partial<CompanySettings>) => Promise<void>;
   uploadLogo: (file: File) => Promise<string>;
+  removeLogo: () => Promise<void>;
   refreshCompany: () => Promise<void>;
 }
 
@@ -199,7 +200,23 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
   const uploadLogo = useCallback(async (file: File): Promise<string> => {
     if (!company) throw new Error('No company loaded');
 
-    const ext = file.name.split('.').pop()?.toLowerCase() ?? 'png';
+    // Validate before hitting storage so the user gets a useful message
+    // instead of a raw PostgREST error.
+    const allowed: Record<string, string> = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/webp': 'webp',
+    };
+    const ext = allowed[file.type];
+    if (!ext) {
+      throw new Error('Please upload a PNG, JPG, JPEG or WEBP image.');
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      throw new Error('Logo must be 2 MB or smaller.');
+    }
+
+    // Unique path per upload so replacing a logo never serves the cached
+    // previous image, and the bucket's company-folder policy is satisfied.
     const path = `${company.id}/logo-${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
@@ -208,16 +225,43 @@ export function CompanyProvider({ children }: { children: ReactNode }) {
 
     if (uploadError) throw uploadError;
 
-    const { data: urlData } = supabase.storage.from('company-assets').getPublicUrl(path);
+    const { data: urlData } = supabase.storage
+      .from('company-assets')
+      .getPublicUrl(path);
+
     const logoUrl = urlData.publicUrl;
 
+    // Persist first: a success toast must never be shown for an upload whose
+    // URL was not actually written to the company record.
     await updateCompany({ logo_url: logoUrl });
     return logoUrl;
   }, [company, updateCompany]);
 
+  const removeLogo = useCallback(async () => {
+    if (!company) throw new Error('No company loaded');
+    const previous = company.logo_url;
+
+    await updateCompany({ logo_url: null });
+
+    // Best-effort cleanup of the stored object; the profile is already cleared
+    // even if the delete is rejected by policy.
+    if (previous) {
+      try {
+        const marker = '/storage/v1/object/public/company-assets/';
+        const index = previous.indexOf(marker);
+        if (index !== -1) {
+          const objectPath = decodeURIComponent(previous.slice(index + marker.length));
+          await supabase.storage.from('company-assets').remove([objectPath]);
+        }
+      } catch {
+        // Ignore cleanup failures.
+      }
+    }
+  }, [company, updateCompany]);
+
   return (
     <CompanyContext.Provider
-      value={{ company, settings, loading, updateCompany, updateSettings, uploadLogo, refreshCompany: loadCompany }}
+      value={{ company, settings, loading, updateCompany, updateSettings, uploadLogo, removeLogo, refreshCompany: loadCompany }}
     >
       {children}
     </CompanyContext.Provider>

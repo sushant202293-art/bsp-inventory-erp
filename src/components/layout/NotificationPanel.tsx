@@ -43,7 +43,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '2',
     title: 'New Sale Created',
-    message: 'Invoice INV-2026-09-001 created for ₹45,000',
+    message: 'Invoice INV-2026-09-001 created for Ã¢â€šÂ¹45,000',
     type: 'success',
     timestamp: '15 minutes ago',
     read: false,
@@ -53,7 +53,7 @@ const MOCK_NOTIFICATIONS: Notification[] = [
   {
     id: '3',
     title: 'Payment Received',
-    message: 'Payment of ₹25,000 received from Acme Corp',
+    message: 'Payment of Ã¢â€šÂ¹25,000 received from Acme Corp',
     type: 'info',
     timestamp: '1 hour ago',
     read: false,
@@ -90,10 +90,10 @@ const iconMap: Record<string, React.ComponentType<{ size?: number; className?: s
 };
 
 const typeColors: Record<string, string> = {
-  info: 'var(--color-info)',
-  success: 'var(--color-success)',
-  warning: 'var(--color-warning)',
-  error: 'var(--color-error)',
+  info: 'rgb(var(--color-info))',
+  success: 'rgb(var(--color-success))',
+  warning: 'rgb(var(--color-warning))',
+  error: 'rgb(var(--color-error))',
 };
 
 export default function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
@@ -124,26 +124,26 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
             transition={{ duration: 0.15 }}
             className="absolute right-0 top-full z-50 mt-2 w-96 rounded-xl border shadow-xl"
             style={{
-              background: 'var(--color-card)',
-              borderColor: 'var(--color-border)',
+              background: 'rgb(var(--color-card))',
+              borderColor: 'rgb(var(--color-border))',
             }}
           >
             <div
               className="flex items-center justify-between border-b px-4 py-3"
-              style={{ borderColor: 'var(--color-border)' }}
+              style={{ borderColor: 'rgb(var(--color-border))' }}
             >
               <div className="flex items-center gap-2">
-                <Bell size={18} style={{ color: 'var(--color-text)' }} />
+                <Bell size={18} style={{ color: 'rgb(var(--color-text))' }} />
                 <h3
                   className="font-semibold"
-                  style={{ color: 'var(--color-text)' }}
+                  style={{ color: 'rgb(var(--color-text))' }}
                 >
                   Notifications
                 </h3>
                 {unreadCount > 0 && (
                   <span
                     className="flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-white"
-                    style={{ background: 'var(--color-error)' }}
+                    style={{ background: 'rgb(var(--color-error))' }}
                   >
                     {unreadCount}
                   </span>
@@ -151,16 +151,16 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
               </div>
               <div className="flex items-center gap-1">
                 <button
-                  className="rounded p-1 transition-colors hover:bg-[var(--color-backgroundAlt)]"
-                  style={{ color: 'var(--color-primary)' }}
+                  className="rounded p-1 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+                  style={{ color: 'rgb(var(--color-primary))' }}
                   title="Mark all as read"
                 >
                   <CheckCheck size={16} />
                 </button>
                 <button
                   onClick={onClose}
-                  className="rounded p-1 transition-colors hover:bg-[var(--color-backgroundAlt)]"
-                  style={{ color: 'var(--color-textMuted)' }}
+                  className="rounded p-1 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+                  style={{ color: 'rgb(var(--color-muted))' }}
                 >
                   <X size={16} />
                 </button>
@@ -172,18 +172,18 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
                 <div className="flex flex-col items-center justify-center py-12">
                   <Bell
                     size={40}
-                    style={{ color: 'var(--color-textMuted)' }}
+                    style={{ color: 'rgb(var(--color-muted))' }}
                     className="mb-3 opacity-50"
                   />
                   <p
                     className="text-sm font-medium"
-                    style={{ color: 'var(--color-textSecondary)' }}
+                    style={{ color: 'rgb(var(--color-text-secondary))' }}
                   >
                     No notifications
                   </p>
                   <p
                     className="text-xs"
-                    style={{ color: 'var(--color-textMuted)' }}
+                    style={{ color: 'rgb(var(--color-muted))' }}
                   >
                     You're all caught up!
                   </p>
@@ -196,8 +196,8 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
                       className={cn(
-                        'flex w-full items-start gap-3 border-b px-4 py-3 text-left transition-colors hover:bg-[var(--color-backgroundAlt)]',
-                        !notification.read && 'bg-[var(--color-backgroundAlt)]/50'
+                        'flex w-full items-start gap-3 border-b px-4 py-3 text-left transition-colors hover:bg-[rgb(var(--color-sidebar))]',
+                        !notification.read && 'bg-[rgb(var(--color-sidebar))]/50'
                       )}
                       style={{ borderColor: 'var(--color-borderLight)' }}
                     >
@@ -214,26 +214,26 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
                         <div className="flex items-center gap-2">
                           <p
                             className="truncate text-sm font-medium"
-                            style={{ color: 'var(--color-text)' }}
+                            style={{ color: 'rgb(var(--color-text))' }}
                           >
                             {notification.title}
                           </p>
                           {!notification.read && (
                             <span
                               className="h-2 w-2 shrink-0 rounded-full"
-                              style={{ background: 'var(--color-primary)' }}
+                              style={{ background: 'rgb(var(--color-primary))' }}
                             />
                           )}
                         </div>
                         <p
                           className="mt-0.5 line-clamp-2 text-xs"
-                          style={{ color: 'var(--color-textSecondary)' }}
+                          style={{ color: 'rgb(var(--color-text-secondary))' }}
                         >
                           {notification.message}
                         </p>
                         <p
                           className="mt-1 text-[10px]"
-                          style={{ color: 'var(--color-textMuted)' }}
+                          style={{ color: 'rgb(var(--color-muted))' }}
                         >
                           {notification.timestamp}
                         </p>
@@ -243,9 +243,9 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
                           onClick={(e) => {
                             e.stopPropagation();
                           }}
-                          className="mt-1 shrink-0 rounded p-1 transition-colors hover:bg-[var(--color-background)]"
+                          className="mt-1 shrink-0 rounded p-1 transition-colors hover:bg-[rgb(var(--color-background))]"
                           title="Mark as read"
-                          style={{ color: 'var(--color-textMuted)' }}
+                          style={{ color: 'rgb(var(--color-muted))' }}
                         >
                           <Check size={12} />
                         </button>
@@ -258,15 +258,15 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
 
             <div
               className="border-t px-4 py-2.5"
-              style={{ borderColor: 'var(--color-border)' }}
+              style={{ borderColor: 'rgb(var(--color-border))' }}
             >
               <button
                 onClick={() => {
                   navigate('/notifications');
                   onClose();
                 }}
-                className="w-full rounded-lg py-1.5 text-center text-sm font-medium transition-colors hover:bg-[var(--color-backgroundAlt)]"
-                style={{ color: 'var(--color-primary)' }}
+                className="w-full rounded-lg py-1.5 text-center text-sm font-medium transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+                style={{ color: 'rgb(var(--color-primary))' }}
               >
                 View All Notifications
               </button>

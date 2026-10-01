@@ -90,31 +90,31 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
             transition={{ duration: 0.15 }}
             className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border shadow-xl"
             style={{
-              background: 'var(--color-card)',
-              borderColor: 'var(--color-border)',
+              background: 'rgb(var(--color-card))',
+              borderColor: 'rgb(var(--color-border))',
             }}
           >
             <div
               className="border-b px-4 py-3"
-              style={{ borderColor: 'var(--color-border)' }}
+              style={{ borderColor: 'rgb(var(--color-border))' }}
             >
               <p
                 className="text-sm font-semibold"
-                style={{ color: 'var(--color-text)' }}
+                style={{ color: 'rgb(var(--color-text))' }}
               >
                 {(profile?.full_name ?? user?.email ?? "User") || 'Admin User'}
               </p>
               <p
                 className="text-xs"
-                style={{ color: 'var(--color-textMuted)' }}
+                style={{ color: 'rgb(var(--color-muted))' }}
               >
                 {user?.email || 'admin@bspinventory.com'}
               </p>
               <span
                 className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium uppercase"
                 style={{
-                  background: 'var(--color-primary)20',
-                  color: 'var(--color-primary)',
+                  background: 'rgb(var(--color-primary))20',
+                  color: 'rgb(var(--color-primary))',
                 }}
               >
                 {user?.role || 'admin'}
@@ -128,13 +128,13 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
                   <button
                     key={item.id}
                     onClick={item.action}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-[var(--color-backgroundAlt)]"
-                    style={{ color: 'var(--color-textSecondary)' }}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+                    style={{ color: 'rgb(var(--color-text-secondary))' }}
                   >
                     <Icon size={16} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {item.submenu && (
-                      <ChevronRight size={14} style={{ color: 'var(--color-textMuted)' }} />
+                      <ChevronRight size={14} style={{ color: 'rgb(var(--color-muted))' }} />
                     )}
                   </button>
                 );
@@ -143,15 +143,15 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
 
             <div
               className="border-t py-1"
-              style={{ borderColor: 'var(--color-border)' }}
+              style={{ borderColor: 'rgb(var(--color-border))' }}
             >
               <button
                 onClick={handleLogout}
                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-red-500/10"
-                style={{ color: 'var(--color-error)' }}
+                style={{ color: 'rgb(var(--color-error))' }}
               >
                 <LogOut size={16} />
-                <span>signOut</span>
+                <span>Log Out</span>
               </button>
             </div>
           </motion.div>

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Product, ProductStock, StockMovement } from '@/types/database.types';
+import type { Product, StockMovement } from '@/types/database.types';
 import type {
   ProductWithRelations,
   ProductFormData,
@@ -22,19 +22,66 @@ async function getCompanyId(): Promise<string> {
   return profile.company_id;
 }
 
-export async function getProducts(
-  filters: ProductFilters = {},
-  page: number = 1,
-  perPage: number = 50
-): Promise<ProductListResponse> {
-  try {
-    const companyId = await getCompanyId();
-    const from = (page - 1) * perPage;
-    const to = from + perPage - 1;
+/** Display name of the signed-in user's company, for report letterheads. */
+export async function getCompanyName(): Promise<string> {
+  const companyId = await getCompanyId();
+  const { data } = await supabase
+    .from('companies')
+    .select('name')
+    .eq('id', companyId)
+    .maybeSingle();
+  return data?.name?.trim() || 'BSP Traders';
+}
 
-    let query = supabase
-      .from('products')
-      .select(`
+/**
+ * Resolves the ids of products matching a stock-status filter.
+ *
+ * Stock status cannot be expressed as a simple PostgREST filter because
+ * `current_stock` lives in `product_stock` (one row per warehouse) while
+ * `low_stock_level` lives in `products`. This aggregates both sides in JS and
+ * returns an id list that `getProducts` can push into the main query, so
+ * pagination and totals stay correct instead of filtering only the current
+ * page. Only invoked when a stock-status filter is actually selected.
+ */
+async function resolveStockStatusIds(
+  lowStock: boolean,
+  outOfStock: boolean
+): Promise<string[]> {
+  const { data: products, error: productsError } = await supabase
+    .from('products')
+    .select('id, low_stock_level');
+  if (productsError) throw productsError;
+
+  const { data: stockRows, error: stockError } = await supabase
+    .from('product_stock')
+    .select('product_id, current_stock');
+  if (stockError) throw stockError;
+
+  const totals = new Map<string, number>();
+  (stockRows || []).forEach((row) => {
+    totals.set(row.product_id, (totals.get(row.product_id) || 0) + (row.current_stock || 0));
+  });
+
+  const matches: string[] = [];
+  (products || []).forEach((product) => {
+    const total = totals.get(product.id) || 0;
+    if (outOfStock && total <= 0) {
+      matches.push(product.id);
+      return;
+    }
+    if (lowStock && total > 0 && total <= (product.low_stock_level || 0)) {
+      matches.push(product.id);
+    }
+  });
+
+  return matches;
+}
+
+/**
+ * Columns needed by the product table, the detail page and the print report.
+ * Kept in one place so the report can never drift from the on-screen table.
+ */
+const PRODUCT_WITH_RELATIONS_SELECT = `
         *,
         category:categories(id, name),
         brand:brands(id, name),
@@ -43,47 +90,83 @@ export async function getProducts(
           id, product_id, warehouse_id, current_stock, avg_cost, last_updated,
           warehouse:warehouses(id, name)
         )
-      `, { count: 'exact' })
-      .eq('company_id', companyId);
+      `;
 
-    if (filters.search) {
-      query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%,barcode.ilike.%${filters.search}%`);
+/**
+ * Builds the filtered product query without ordering, paging or counting, so
+ * both the paginated table and the unpaginated print report apply identical
+ * filter semantics. Callers add `.order()` / `.range()` themselves.
+ *
+ * The builder is returned wrapped in an object on purpose: a PostgREST builder
+ * is a thenable, so returning it bare and awaiting the async function would
+ * execute the request and hand back a response instead of a query.
+ */
+async function buildProductsQuery(filters: ProductFilters = {}) {
+  const companyId = await getCompanyId();
+
+  let query = supabase
+    .from('products')
+    .select(PRODUCT_WITH_RELATIONS_SELECT, { count: 'exact' })
+    .eq('company_id', companyId);
+
+  if (filters.search) {
+    query = query.or(`name.ilike.%${filters.search}%,code.ilike.%${filters.search}%,barcode.ilike.%${filters.search}%`);
+  }
+  if (filters.category_id) {
+    query = query.eq('category_id', filters.category_id);
+  }
+  if (filters.brand_id) {
+    query = query.eq('brand_id', filters.brand_id);
+  }
+  if (filters.unit_id) {
+    query = query.eq('unit_id', filters.unit_id);
+  }
+  if (filters.is_active !== undefined) {
+    query = query.eq('is_active', filters.is_active);
+  }
+
+  if (filters.low_stock || filters.out_of_stock) {
+    const ids = await resolveStockStatusIds(Boolean(filters.low_stock), Boolean(filters.out_of_stock));
+    // An empty id list must short-circuit: `.in('id', [])` is a syntax error
+    // and the intent is "no rows match", not "no filter".
+    if (ids.length === 0) {
+      return { query: null };
     }
-    if (filters.category_id) {
-      query = query.eq('category_id', filters.category_id);
-    }
-    if (filters.brand_id) {
-      query = query.eq('brand_id', filters.brand_id);
-    }
-    if (filters.is_active !== undefined) {
-      query = query.eq('is_active', filters.is_active);
+    query = query.in('id', ids);
+  }
+
+  return { query };
+}
+
+/** Flattens the per-warehouse `stocks` embed into a single `total_stock`. */
+function withTotalStock<T extends { stocks?: unknown }>(row: T): ProductWithRelations {
+  const stocks = (row.stocks as unknown as ProductStockWithWarehouse[]) || [];
+  const total_stock = stocks.reduce((sum, s) => sum + (s.current_stock || 0), 0);
+  return { ...row, total_stock } as unknown as ProductWithRelations;
+}
+
+export async function getProducts(
+  filters: ProductFilters = {},
+  page: number = 1,
+  perPage: number = 50
+): Promise<ProductListResponse> {
+  try {
+    const from = (page - 1) * perPage;
+    const to = from + perPage - 1;
+
+    const { query } = await buildProductsQuery(filters);
+    if (!query) {
+      return { products: [], total: 0, page, per_page: perPage, total_pages: 0 };
     }
 
-    query = query.order('name', { ascending: true }).range(from, to);
-
-    const { data, error, count } = await query;
+    const { data, error, count } = await query.order('name', { ascending: true }).range(from, to);
     if (error) throw error;
 
-    const products = (data || []).map((p) => {
-      const stocks = (p.stocks as unknown as ProductStockWithWarehouse[]) || [];
-      const total_stock = stocks.reduce((sum, s) => sum + (s.current_stock || 0), 0);
-      return { ...p, total_stock } as ProductWithRelations;
-    });
-
-    let filtered = products;
-    if (filters.low_stock) {
-      filtered = products.filter((p) => {
-        const stock = p.total_stock || 0;
-        return stock > 0 && stock <= (p.low_stock_level || 0);
-      });
-    }
-    if (filters.out_of_stock) {
-      filtered = products.filter((p) => (p.total_stock || 0) <= 0);
-    }
+    const products = (data || []).map(withTotalStock);
 
     const total = count || 0;
     return {
-      products: filtered,
+      products,
       total,
       page,
       per_page: perPage,
@@ -91,6 +174,105 @@ export async function getProducts(
     };
   } catch (error) {
     throw new Error(`Failed to fetch products: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Upper bound on rows fetched for a print report.
+ *
+ * A report has to render every matching row in one document, so this cannot be
+ * paginated. The cap keeps a pathological filter (or a 100k-row tenant) from
+ * locking the tab; the report header reports when it was hit.
+ */
+export const PRODUCT_REPORT_MAX_ROWS = 5000;
+
+/**
+ * Every product matching `filters`, unpaginated and in the same order as the
+ * on-screen table, for the print report.
+ */
+export async function getProductsForReport(
+  filters: ProductFilters = {}
+): Promise<{ products: ProductWithRelations[]; matchedCount: number; truncated: boolean }> {
+  const { query } = await buildProductsQuery(filters);
+  if (!query) return { products: [], matchedCount: 0, truncated: false };
+
+  const { data, error, count } = await query
+    .order('name', { ascending: true })
+    .range(0, PRODUCT_REPORT_MAX_ROWS - 1);
+  if (error) throw error;
+
+  const matchedCount = count || 0;
+  return {
+    products: (data || []).map(withTotalStock),
+    matchedCount,
+    truncated: matchedCount > PRODUCT_REPORT_MAX_ROWS,
+  };
+}
+
+/**
+ * Company-wide product rollup used by the Products tab summary cards. Counts
+ * every product regardless of the active table filters, so the cards stay
+ * stable while the user narrows the table below them.
+ */
+export interface ProductStats {
+  total: number;
+  active: number;
+  inactive: number;
+  low_stock: number;
+  out_of_stock: number;
+  stock_value: number;
+}
+
+export async function getProductStats(): Promise<ProductStats> {
+  try {
+    // Auth/company guard. The rows below are scoped by RLS, so the company id
+    // itself is not needed here.
+    await getCompanyId();
+
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select('id, is_active, low_stock_level');
+    if (productsError) throw productsError;
+
+    const { data: stockRows, error: stockError } = await supabase
+      .from('product_stock')
+      .select('product_id, current_stock, avg_cost');
+    if (stockError) throw stockError;
+
+    const totals = new Map<string, { qty: number; value: number }>();
+    (stockRows || []).forEach((row) => {
+      const current = totals.get(row.product_id) || { qty: 0, value: 0 };
+      current.qty += row.current_stock || 0;
+      current.value += (row.current_stock || 0) * (row.avg_cost || 0);
+      totals.set(row.product_id, current);
+    });
+
+    let active = 0;
+    let inactive = 0;
+    let lowStock = 0;
+    let outOfStock = 0;
+
+    (products || []).forEach((product) => {
+      if (product.is_active) active += 1;
+      else inactive += 1;
+
+      const total = totals.get(product.id)?.qty || 0;
+      if (total <= 0) outOfStock += 1;
+      else if (total <= (product.low_stock_level || 0)) lowStock += 1;
+    });
+
+    const stockValue = Array.from(totals.values()).reduce((sum, t) => sum + t.value, 0);
+
+    return {
+      total: (products || []).length,
+      active,
+      inactive,
+      low_stock: lowStock,
+      out_of_stock: outOfStock,
+      stock_value: stockValue,
+    };
+  } catch (error) {
+    throw new Error(`Failed to fetch product stats: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -249,14 +431,14 @@ export async function duplicateProduct(id: string): Promise<Product> {
 
     if (fetchError || !original) throw new Error('Product not found');
 
-    const { id: _id, created_at, updated_at, ...rest } = original;
+    // `_id`, `created_at` and `updated_at` are dropped so the copy gets fresh
+    // server-generated values instead of reusing the original's timestamps.
+    const { id: _id, created_at: _createdAt, updated_at: _updatedAt, ...rest } = original;
     const duplicateData = {
       ...rest,
       name: `${original.name} (Copy)`,
       code: `${original.code}-COPY`,
-      created_at: undefined,
-      updated_at: undefined,
-    };
+};
 
     const { data: product, error: insertError } = await supabase
       .from('products')
@@ -427,8 +609,11 @@ export async function exportProducts(filters: ProductFilters = {}): Promise<Prod
     if (filters.category_id) {
       query = query.eq('category_id', filters.category_id);
     }
-    if (filters.brand_id) {
+if (filters.brand_id) {
       query = query.eq('brand_id', filters.brand_id);
+    }
+    if (filters.unit_id) {
+      query = query.eq('unit_id', filters.unit_id);
     }
     if (filters.is_active !== undefined) {
       query = query.eq('is_active', filters.is_active);
@@ -465,7 +650,174 @@ export async function exportProducts(filters: ProductFilters = {}): Promise<Prod
 }
 
 
+/**
+ * A document line for a product, joined to its parent transaction plus the
+ * customer/supplier counterparty. This is what powers the Transactions,
+ * Suppliers, Customers and History tabs on the product detail screen. The
+ * `products` table has no supplier/customer column, so the counterparty is
+ * derived from `transaction_items.product_id -> transactions.supplier_id /
+ * customer_id` rather than stored redundantly.
+ */
+export interface ProductTransactionLine {
+  id: string;
+  transaction_id: string;
+  document_number: string;
+  document_date: string;
+  type: string;
+  status: string;
+  documentStatusLabel: string;
+  quantity: number;
+  unit: string | null;
+  rate: number;
+  discount_percent: number;
+  discount_amount: number;
+  taxable_value: number;
+  gst_rate: number;
+  total_amount: number;
+  grand_total: number;
+  counterpartyId: string | null;
+  counterpartyName: string | null;
+  counterpartyKind: 'customer' | 'supplier' | null;
+  notes: string | null;
+}
+
+export interface ProductCounterparty {
+  id: string;
+  name: string;
+  kind: 'customer' | 'supplier';
+  documentCount: number;
+  totalQuantity: number;
+  totalValue: number;
+  lastTransactionDate: string | null;
+}
+
+export async function getProductTransactions(
+  productId: string,
+  kind?: 'sale' | 'purchase'
+): Promise<ProductTransactionLine[]> {
+  try {
+    const companyId = await getCompanyId();
+
+    const { data: product, error: prodErr } = await supabase
+      .from('products')
+      .select('id')
+      .eq('id', productId)
+      .eq('company_id', companyId)
+      .single();
+    if (prodErr || !product) throw new Error('Product not found');
+
+    let query = supabase
+      .from('transaction_items')
+      .select(`
+        id,
+        transaction_id,
+        quantity,
+        unit,
+        rate,
+        discount_percent,
+        discount_amount,
+        taxable_value,
+        gst_rate,
+        total_amount,
+        transaction:transactions!inner(
+          id, type, status, document_number, document_date, grand_total, notes,
+          customer:customers(id, name),
+          supplier:suppliers(id, name)
+        )
+      `)
+      .eq('product_id', productId)
+      .eq('transactions.company_id', companyId)
+      .order('document_date', { referencedTable: 'transactions', ascending: false });
+
+    if (kind) {
+      query = query.eq('transactions.type', kind);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    return (data || []).map((row) => {
+      const tx = row.transaction as unknown as {
+        id: string;
+        type: string;
+        status: string;
+        document_number: string;
+        document_date: string;
+        grand_total: number;
+        notes: string | null;
+        customer: { id: string; name: string } | null;
+        supplier: { id: string; name: string } | null;
+      };
+      const counterparty = tx.customer || tx.supplier || null;
+      return {
+        id: row.id,
+        transaction_id: tx.id,
+        document_number: tx.document_number,
+        document_date: tx.document_date,
+        type: tx.type,
+        status: tx.status,
+        documentStatusLabel: tx.status,
+        quantity: row.quantity,
+        unit: row.unit,
+        rate: row.rate,
+        discount_percent: row.discount_percent,
+        discount_amount: row.discount_amount,
+        taxable_value: row.taxable_value,
+        gst_rate: row.gst_rate,
+        total_amount: row.total_amount,
+        grand_total: tx.grand_total,
+        counterpartyId: counterparty?.id || null,
+        counterpartyName: counterparty?.name || null,
+        counterpartyKind: tx.customer ? 'customer' : tx.supplier ? 'supplier' : null,
+        notes: tx.notes,
+      } as ProductTransactionLine;
+    });
+  } catch (error) {
+    throw new Error(`Failed to fetch product transactions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+/**
+ * Collapses `getProductTransactions` output into the distinct counterparties
+ * for the Suppliers and Customers tabs, ordered by most recent activity.
+ */
+export function summarizeCounterparties(
+  lines: ProductTransactionLine[]
+): ProductCounterparty[] {
+  const byId = new Map<string, ProductCounterparty>();
+
+  lines.forEach((line) => {
+    if (!line.counterpartyId || !line.counterpartyKind) return;
+    const existing = byId.get(line.counterpartyId);
+    if (existing) {
+      existing.documentCount += 1;
+      existing.totalQuantity += line.quantity || 0;
+      existing.totalValue += line.total_amount || 0;
+      if (!existing.lastTransactionDate || line.document_date > existing.lastTransactionDate) {
+        existing.lastTransactionDate = line.document_date;
+      }
+      return;
+    }
+    byId.set(line.counterpartyId, {
+      id: line.counterpartyId,
+      name: line.counterpartyName || 'Unknown',
+      kind: line.counterpartyKind,
+      documentCount: 1,
+      totalQuantity: line.quantity || 0,
+      totalValue: line.total_amount || 0,
+      lastTransactionDate: line.document_date,
+    });
+  });
+
+  return Array.from(byId.values()).sort((a, b) => {
+    if (!a.lastTransactionDate) return 1;
+    if (!b.lastTransactionDate) return -1;
+    return b.lastTransactionDate.localeCompare(a.lastTransactionDate);
+  });
+}
+
 export const productService = {
   getProducts, getProduct, createProduct, updateProduct, deleteProduct,
-  duplicateProduct, getProductStock, importProducts, exportProducts,
+  duplicateProduct, getProductStock, getProductStats, getProductTransactions,
+  importProducts, exportProducts,
 };

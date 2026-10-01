@@ -16,12 +16,23 @@ export type ThemeMode = 'dark' | 'light' | 'system';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+/**
+ * Applies a theme by setting `data-theme` on <html>.
+ *
+ * It deliberately does NOT write the theme's colors as inline custom
+ * properties. tailwind.config.js emits colors as
+ * `rgb(var(--color-primary) / <alpha-value>)`, which only resolves when the
+ * variable holds a space-separated RGB triplet ("59 130 246"). Writing the
+ * theme.config hex instead produced `rgb(#3b82f6 / 0.5)`, an invalid value,
+ * so every bg-primary / text-primary / border-primary rule silently stopped
+ * rendering. Inline styles also outrank the `[data-theme]` and `.dark` rules,
+ * which pinned one palette and defeated light/dark switching.
+ *
+ * globals.css already carries a full token set per theme, including dark
+ * variants, so it stays the single source of truth.
+ */
 function applyThemeToDOM(theme: ThemeConfig) {
-  const root = document.documentElement;
-  Object.entries(theme.colors).forEach(([key, value]) => {
-    const cssVar = `--color-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
-    root.style.setProperty(cssVar, value);
-  });
+  document.documentElement.setAttribute('data-theme', theme.id);
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {

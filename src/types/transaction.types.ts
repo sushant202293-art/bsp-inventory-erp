@@ -27,6 +27,7 @@ export interface TransactionWithRelations extends Transaction {
     email: string | null;
     gstin: string | null;
     state: string | null;
+    payment_terms: string | null;
     billing_address: Address | null;
     shipping_address: Address | null;
   } | null;
