@@ -18,7 +18,7 @@ export function InvoiceTotals({
   onHeaderDiscountChange,
 }: Props) {
   return (
-    <div className="w-full max-w-sm space-y-1 text-sm">
+    <div className="w-full shrink-0 space-y-1 text-[13px] xl:w-[17.5rem]">
       <Row label="Total quantity" value={String(totals.quantity)} />
       <Row label="Gross subtotal" value={formatCurrency(totals.gross)} />
       <div className="flex items-center justify-between gap-4">
@@ -46,12 +46,12 @@ export function InvoiceTotals({
         </>
       )}
       <Row label="Round off" value={`${totals.round_off >= 0 ? '+' : ''}${formatCurrency(totals.round_off)}`} />
-      <Separator className="my-2" />
-      <div className="flex items-center justify-between text-lg font-bold">
+      <Separator className="my-1.5" />
+      <div className="flex items-center justify-between text-base font-bold">
         <span>Grand Total</span>
         <span className="tabular-nums">{formatCurrency(totals.grand_total)}</span>
       </div>
-      <p className="pt-2 text-xs italic text-muted-foreground">
+      <p className="pt-1 text-xs leading-snug italic text-muted-foreground">
         <span className="font-semibold not-italic text-foreground">Amount in words:</span>{' '}
         {totals.amount_in_words}
       </p>

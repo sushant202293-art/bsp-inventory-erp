@@ -1,5 +1,5 @@
 import { formatDate, formatCurrency, formatNumber } from '@/lib/utils';
-import { addressToMultiline } from '@/lib/address';
+import { addressToMultiline, isAddressEmpty } from '@/lib/address';
 import { maskAccountNumber } from '../billing-config.service';
 import type { BillingPrintModel, BillingItemRow } from '../billing.types';
 
@@ -9,7 +9,8 @@ import type { BillingPrintModel, BillingItemRow } from '../billing.types';
  */
 export function InvoicePrintTemplate({ model }: { model: BillingPrintModel }) {
   const t = model.totals;
-  const showShip = Boolean(model.shipTo);
+  const ship = model.shipTo;
+  const hasShipAddress = Boolean(ship && !isAddressEmpty(ship.address));
 
   return (
     <div className="billing-print-doc">
@@ -79,31 +80,40 @@ export function InvoicePrintTemplate({ model }: { model: BillingPrintModel }) {
           <p>
             {model.billTo.gstin ? <strong>GSTIN: {model.billTo.gstin}</strong> : <span className="muted">GSTIN: —</span>}
           </p>
-          <p className="muted">State: {model.billTo.state || '—'}</p>
+          <p className="muted">Place of Supply: {model.billTo.state || '—'}</p>
+          <p className="muted">
+            {model.interState ? 'Inter-state supply — IGST applies' : 'Intra-state supply — CGST + SGST apply'}
+          </p>
         </div>
 
-        {showShip && model.shipTo ? (
-          <div className="box">
-            <p style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 10, letterSpacing: '0.06em' }}>
-              Ship To / Delivery Address
+        <div className="box">
+          <p style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 10, letterSpacing: '0.06em' }}>
+            Ship To / Delivery Address
+          </p>
+          <p style={{ fontWeight: 600, marginTop: 4 }}>
+            {(hasShipAddress && ship?.name) || model.billTo.name || '—'}
+          </p>
+          {hasShipAddress && ship ? (
+            <>
+              <p className="whitespace-pre-line">{addressToMultiline(ship.address)}</p>
+              {ship.contact_person ? <p className="muted">Contact: {ship.contact_person}</p> : null}
+              {ship.phone ? <p className="muted">Phone: {ship.phone}</p> : null}
+              {ship.email ? <p className="muted">Email: {ship.email}</p> : null}
+              {ship.gstin ? (
+                <p>
+                  <strong>GSTIN: {ship.gstin}</strong>
+                </p>
+              ) : null}
+              <p className="muted">State: {ship.state || '—'}</p>
+            </>
+          ) : (
+            <p className="muted" style={{ marginTop: 4 }}>
+              No delivery address available yet. Tick &ldquo;Same as billing address&rdquo; after selecting a
+              {model.billTo.name ? ` customer with a billing address` : ''}, or untick it to enter a delivery address
+              manually.
             </p>
-            <p style={{ fontWeight: 600, marginTop: 4 }}>{model.shipTo.name || '—'}</p>
-            <p className="whitespace-pre-line">{addressToMultiline(model.shipTo.address)}</p>
-            {model.shipTo.contact_person ? <p className="muted">Contact: {model.shipTo.contact_person}</p> : null}
-            {model.shipTo.phone ? <p className="muted">Phone: {model.shipTo.phone}</p> : null}
-            <p className="muted">State: {model.shipTo.state || '—'}</p>
-          </div>
-        ) : (
-          <div className="box">
-            <p style={{ fontWeight: 700, textTransform: 'uppercase', fontSize: 10, letterSpacing: '0.06em' }}>
-              Place of Supply
-            </p>
-            <p style={{ marginTop: 4 }}>{model.billTo.state || '—'}</p>
-            <p className="muted">
-              {model.interState ? 'Inter-state supply — IGST applies' : 'Intra-state supply — CGST + SGST apply'}
-            </p>
-          </div>
-        )}
+          )}
+        </div>
       </section>
 
       {/* ---------------- Items ---------------- */}

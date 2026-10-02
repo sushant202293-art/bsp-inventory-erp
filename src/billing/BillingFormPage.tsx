@@ -400,16 +400,23 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
       address: party.billing,
     };
 
+    // Source of truth: checked -> derive delivery address from the Bill To
+    // customer's billing address (never the Place of Supply); unchecked -> the
+    // manually entered shipping address. Derived fresh every render so a party
+    // or address change can never leave Ship To stale.
+    const sameAsBilling = party.same_as_billing;
     const shippingParty: BillingPrintParty = {
       label: 'Delivery Address',
-      name: party.shipping_recipient || party.name,
+      name: sameAsBilling ? party.name : party.shipping_recipient || party.name,
       code: null,
-      contact_person: party.shipping_contact || party.contact_person || null,
-      phone: party.shipping_phone || null,
-      email: party.shipping_email || null,
+      contact_person: sameAsBilling
+        ? party.contact_person
+        : party.shipping_contact || party.contact_person,
+      phone: sameAsBilling ? party.phone : party.shipping_phone,
+      email: sameAsBilling ? party.email : party.shipping_email,
       gstin: party.gstin || null,
-      state: (party.same_as_billing ? party.billing.state : party.shipping.state) || null,
-      address: party.same_as_billing ? party.billing : party.shipping,
+      state: (sameAsBilling ? party.billing.state : party.shipping.state) || null,
+      address: sameAsBilling ? party.billing : party.shipping,
     };
 
     return {
@@ -423,7 +430,7 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
       status,
       company: storedSnapshot ?? snapshot(),
       billTo,
-      shipTo: party.same_as_billing ? null : shippingParty,
+      shipTo: shippingParty,
       interState,
       items: validItems,
       totals,
@@ -454,117 +461,132 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
         : null;
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">
+    <div className="pb-6">
+      <div
+        className="sticky top-0 z-20 -mx-4 flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-1.5 md:-mx-6 md:px-6"
+        style={{ background: 'rgb(var(--color-sidebar))' }}
+      >
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-bold leading-tight">
             {id ? 'Edit' : 'New'} {docConfig.formTitle}
           </h1>
-          <p className="text-sm text-muted-foreground">{docConfig.title} &middot; {status}</p>
+          <p className="truncate text-[11px] leading-tight text-muted-foreground">
+            {docConfig.title} &middot; {status}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setShowPreview(true)} disabled={saving}>
-            <Eye className="mr-2 h-4 w-4" /> Print Preview
+          <Button size="sm" variant="outline" onClick={() => setShowPreview(true)} disabled={saving}>
+            <Eye className="mr-1.5 h-3.5 w-3.5" /> Print Preview
           </Button>
-          <Button variant="outline" onClick={() => save('draft')} disabled={saving}>
-            <Save className="mr-2 h-4 w-4" /> Save Draft
+          <Button size="sm" variant="outline" onClick={() => save('draft')} disabled={saving}>
+            <Save className="mr-1.5 h-3.5 w-3.5" /> Save Draft
           </Button>
-          <Button onClick={() => save('approved')} disabled={saving}>
-            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+          <Button size="sm" onClick={() => save('approved')} disabled={saving}>
+            {saving ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />}
             Approve &amp; Save
           </Button>
         </div>
       </div>
 
-      <DocumentHeaderBar
-        title={docConfig.type === 'quotation' ? 'Quotation' : 'Document'}
-        docNumber={docNumber}
-        docNumberLoading={docNumberLoading}
-        docDate={docDate}
-        onDocDateChange={setDocDate}
-        extraDate={extraDateField}
-        referenceNumber={referenceNumber}
-        onReferenceNumberChange={setReferenceNumber}
-        status={status}
-      />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <SourceCompanyBlock company={companyView} />
-        <BillToBlock
-          kind={docConfig.party}
-          label={docConfig.partyLabel}
-          state={party}
-          onChange={setParty}
-          newPartyPath={docConfig.party === 'customer' ? '/customers/new' : '/suppliers/new'}
+      <div className="space-y-2 pt-2">
+        <DocumentHeaderBar
+          title={docConfig.type === 'quotation' ? 'Quotation' : 'Document'}
+          docNumber={docNumber}
+          docNumberLoading={docNumberLoading}
+          docDate={docDate}
+          onDocDateChange={setDocDate}
+          extraDate={extraDateField}
+          referenceNumber={referenceNumber}
+          onReferenceNumberChange={setReferenceNumber}
+          status={status}
         />
-        <ShipToBlock state={party} onChange={setParty} savedShipping={null} />
-      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Items</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_auto]">
-            <InvoiceItemsTable
-              items={items}
-              priceField={docConfig.priceField}
-              interState={interState}
-              onChange={setItems}
-              onProductSelect={() => undefined}
-            />
-            <InvoiceTotals
-              totals={totals}
-              interState={interState}
-              headerDiscount={headerDiscount}
-              onHeaderDiscountChange={setHeaderDiscount}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <PaymentAllocationEditor
-            methods={billingConfig?.paymentMethods ?? []}
-            bankAccounts={billingConfig?.bankAccounts ?? []}
-            allocations={payments}
-            grandTotal={totals.grand_total}
-            amountPaid={amountPaid}
-            isEstimate={docConfig.isEstimate}
-            onChange={setPayments}
+        <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
+          <SourceCompanyBlock company={companyView} />
+          <BillToBlock
+            kind={docConfig.party}
+            label={docConfig.partyLabel}
+            state={party}
+            onChange={setParty}
+            newPartyPath={docConfig.party === 'customer' ? '/customers/new' : '/suppliers/new'}
           />
-        </CardContent>
-      </Card>
+          <ShipToBlock state={party} onChange={setParty} savedShipping={null} />
+        </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Terms &amp; Conditions</CardTitle>
+        <Card className="rounded-lg">
+          <CardHeader className="px-3 pt-2 pb-0.5">
+            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Items
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Label className="sr-only" htmlFor="terms">Terms and conditions</Label>
-            <Textarea id="terms" rows={7} value={terms} onChange={(e) => setTerms(e.target.value)} />
+          <CardContent className="px-3 pb-2.5 pt-0">
+            <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_auto] lg:min-h-[600px]">
+              <InvoiceItemsTable
+                items={items}
+                priceField={docConfig.priceField}
+                interState={interState}
+                onChange={setItems}
+                onProductSelect={() => undefined}
+              />
+              <InvoiceTotals
+                totals={totals}
+                interState={interState}
+                headerDiscount={headerDiscount}
+                onHeaderDiscountChange={setHeaderDiscount}
+              />
+            </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Notes</CardTitle>
+
+        <Card className="rounded-lg">
+          <CardHeader className="px-3 pt-2 pb-0.5">
+            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Payment Details
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-            <Label className="sr-only" htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              rows={7}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Internal note printed on the document, e.g. delivery instructions."
+          <CardContent className="px-3 pb-2.5 pt-0">
+            <PaymentAllocationEditor
+              methods={billingConfig?.paymentMethods ?? []}
+              bankAccounts={billingConfig?.bankAccounts ?? []}
+              allocations={payments}
+              grandTotal={totals.grand_total}
+              amountPaid={amountPaid}
+              isEstimate={docConfig.isEstimate}
+              onChange={setPayments}
             />
           </CardContent>
         </Card>
+
+        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+          <Card className="rounded-lg">
+            <CardHeader className="px-3 pt-2 pb-0.5">
+              <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Terms &amp; Conditions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-3 pb-2.5 pt-0">
+              <Label className="sr-only" htmlFor="terms">Terms and conditions</Label>
+              <Textarea id="terms" rows={3} value={terms} onChange={(e) => setTerms(e.target.value)} />
+            </CardContent>
+          </Card>
+          <Card className="rounded-lg">
+            <CardHeader className="px-3 pt-2 pb-0.5">
+              <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Notes
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-3 pb-2.5 pt-0">
+              <Label className="sr-only" htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Internal note printed on the document, e.g. delivery instructions."
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {showPreview ? (

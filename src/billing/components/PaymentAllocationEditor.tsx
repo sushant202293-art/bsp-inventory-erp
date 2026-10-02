@@ -78,9 +78,6 @@ export function PaymentAllocationEditor({
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Payment Details
-        </h3>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
             status === 'Paid'
@@ -103,10 +100,10 @@ export function PaymentAllocationEditor({
           <table className="w-full min-w-[40rem] text-sm">
             <thead>
               <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
-                <th className="py-2 pr-2">Method</th>
-                <th className="py-2 pr-2">Bank account</th>
-                <th className="py-2 pr-2">Reference no.</th>
-                <th className="py-2 pr-2 text-right">Amount</th>
+                <th className="py-1.5 pr-2">Method</th>
+                <th className="py-1.5 pr-2">Bank account</th>
+                <th className="py-1.5 pr-2">Reference no.</th>
+                <th className="py-1.5 pr-2 text-right">Amount</th>
                 <th className="w-10 py-2" />
               </tr>
             </thead>
@@ -116,7 +113,7 @@ export function PaymentAllocationEditor({
                 const needsBank = Boolean(meta?.requires_bank);
                 return (
                   <tr key={`${row.method_key}-${index}`} className="border-b">
-                    <td className="py-2 pr-2">
+                    <td className="py-1.5 pr-2">
                       <select
                         value={row.method_key}
                         disabled={disabled}
@@ -129,7 +126,7 @@ export function PaymentAllocationEditor({
                             bank_label: next?.requires_bank ? row.bank_label : null,
                           });
                         }}
-                        className="h-9 w-36 rounded border border-input bg-transparent px-2"
+                        className="h-8 w-36 rounded border border-input bg-transparent px-2"
                       >
                         {enabled.map((m) => (
                           <option key={m.key} value={m.key}>
@@ -138,7 +135,7 @@ export function PaymentAllocationEditor({
                         ))}
                       </select>
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-1.5 pr-2">
                       {needsBank ? (
                         <select
                           value={row.bank_account_id || ''}
@@ -152,7 +149,7 @@ export function PaymentAllocationEditor({
                                 : null,
                             });
                           }}
-                          className="h-9 w-48 rounded border border-input bg-transparent px-2"
+                          className="h-8 w-48 rounded border border-input bg-transparent px-2"
                         >
                           <option value="">Select bank...</option>
                           {activeBanks.map((account) => (
@@ -168,7 +165,7 @@ export function PaymentAllocationEditor({
                         <span className="text-muted-foreground">—</span>
                       )}
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-1.5 pr-2">
                       <Input
                         value={row.reference || ''}
                         disabled={disabled}
@@ -180,10 +177,10 @@ export function PaymentAllocationEditor({
                               ? 'Cheque no.'
                               : 'Reference'
                         }
-                        className="h-9 w-40"
+                        className="h-8 w-40"
                       />
                     </td>
-                    <td className="py-2 pr-2">
+                    <td className="py-1.5 pr-2">
                       <Input
                         value={String(row.amount ?? '')}
                         disabled={disabled}
@@ -193,7 +190,7 @@ export function PaymentAllocationEditor({
                             amount: Number(e.target.value.replace(/[^0-9.]/g, '')) || 0,
                           })
                         }
-                        className="h-9 w-32 text-right"
+                        className="h-8 w-32 text-right"
                       />
                     </td>
                     <td className="py-2">

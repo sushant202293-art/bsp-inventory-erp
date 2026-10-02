@@ -4,13 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Building2, Check, Pencil, Plus, Search } from 'lucide-react';
+import { Building2, Check, ChevronDown, ChevronRight, Pencil, Plus, Search } from 'lucide-react';
 import { customerService } from '@/services/customer.service';
 import { supplierService } from '@/services/supplier.service';
-import { EMPTY_ADDRESS, toAddress, addressToMultiline } from '@/lib/address';
+import { EMPTY_ADDRESS, toAddress, addressToMultiline, addressToString } from '@/lib/address';
 import type { Address } from '@/types/database.types';
 import type { BillingPartyState } from '../billing.types';
 import type { CompanyView } from '@/contexts/CompanyContext';
+
+/**
+ * Every party card is deliberately shallow (~150-220px on a 1920px screen) so
+ * that the items grid below gets the viewport: tight header, 12px body text
+ * with short line boxes, 28px inputs and collapsed address fields.
+ */
+const HEADER = 'px-3 pt-2 pb-0.5';
+const BODY = 'px-3 pb-2.5 pt-0 text-[12px] leading-snug';
 
 /* ------------------------------------------------------------------ */
 /* Source Company / From                                               */
@@ -27,46 +35,58 @@ export function SourceCompanyBlock({ company }: { company: CompanyView }) {
   if (!company.address) missing.push('address');
   if (!company.gstin) missing.push('GSTIN');
 
+  const cityLine = [company.city, company.state, company.pincode].filter(Boolean).join(', ');
+  const contactLine = [company.phone ? `Ph ${company.phone}` : '', company.email || ''].filter(Boolean).join('  ·  ');
+
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          <Building2 className="h-4 w-4" /> Source Company / From
+    <Card className="rounded-lg">
+      <CardHeader className={HEADER}>
+        <CardTitle className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <Building2 className="h-3 w-3" /> Source Company / From
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-1 pt-0 text-sm">
-        <div className="flex items-start gap-3">
+      <CardContent className={`${BODY} space-y-0.5`}>
+        <div className="flex items-start gap-2">
           {company.logo ? (
             <img
               src={company.logo}
               alt=""
-              className="h-10 w-10 shrink-0 rounded border object-contain bg-white"
+              className="h-7 w-7 shrink-0 rounded border object-contain bg-white"
             />
           ) : null}
-          <div className="min-w-0">
-            <p className="font-semibold text-foreground">{company.name || 'Company not configured'}</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold leading-tight text-foreground">
+              {company.name || 'Company not configured'}
+            </p>
             {company.tagline ? (
-              <p className="text-xs text-muted-foreground">{company.tagline}</p>
+              <p className="truncate text-[11px] leading-tight text-muted-foreground">{company.tagline}</p>
             ) : null}
           </div>
         </div>
 
-        {company.address ? <p className="text-muted-foreground">{company.address}</p> : null}
-        <p className="text-muted-foreground">
-          {[company.city, company.state, company.pincode].filter(Boolean).join(', ')}
+        {company.address ? <p className="truncate text-muted-foreground">{company.address}</p> : null}
+        <p className="truncate text-muted-foreground">
+          {cityLine}
           {company.country ? ` ${company.country}` : ''}
         </p>
-        {company.phone ? <p className="text-muted-foreground">Phone: {company.phone}</p> : null}
-        {company.email ? <p className="text-muted-foreground">Email: {company.email}</p> : null}
-        {company.website ? <p className="text-muted-foreground">{company.website}</p> : null}
-        <p className="text-muted-foreground">
-          {company.gstin ? <>GSTIN: <span className="font-medium text-foreground">{company.gstin}</span></> : 'GSTIN: not set'}
+        <p className="truncate text-muted-foreground">
+          {contactLine}
+          {company.website ? `  ·  ${company.website}` : ''}
+        </p>
+        <p className="truncate text-muted-foreground">
+          {company.gstin ? (
+            <>
+              GSTIN: <span className="font-medium text-foreground">{company.gstin}</span>
+            </>
+          ) : (
+            'GSTIN: not set'
+          )}
           {company.pan ? <> &middot; PAN: {company.pan}</> : null}
         </p>
 
         {missing.length > 0 ? (
-          <p className="mt-2 rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-600 dark:text-amber-400">
-            Missing {missing.join(', ')} — complete it in Settings &rarr; Company before approving this document.
+          <p className="rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] leading-snug text-amber-600 dark:text-amber-400">
+            Missing {missing.join(', ')} — complete it in Settings &rarr; Company before approving.
           </p>
         ) : null}
       </CardContent>
@@ -91,12 +111,23 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
   const [results, setResults] = useState<Array<Record<string, unknown>>>([]);
   const [open, setOpen] = useState(false);
   const [searching, setSearching] = useState(false);
+  // Address fields only take the space they need: collapsed into a one-line
+  // summary until the party has none on file or the user asks to edit it.
+  const [showAddress, setShowAddress] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Prefill the search box with the selected party's name so the field is
   // never left showing raw address text.
   useEffect(() => {
     if (state.party_id) setQuery(state.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.party_id]);
+
+  // A party without an address needs the fields straight away; one with an
+  // address on file keeps them folded away until "Edit address".
+  useEffect(() => {
+    if (!state.party_id) return;
+    setShowAddress(!(state.billing.line1 || state.billing.city));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.party_id]);
 
@@ -171,30 +202,31 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
 
   const noAddress = !state.billing.line1 && !state.billing.city;
   const isNewParty = Boolean(state.party_id) === false && Boolean(state.name);
+  const addressSummary = addressToString(state.billing) || 'No billing address';
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+    <Card className="rounded-lg">
+      <CardHeader className={HEADER}>
+        <CardTitle className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           <span>Bill To / {label}</span>
-          <Link to={newPartyPath} className="flex items-center gap-1 text-xs font-normal normal-case text-primary hover:underline">
+          <Link to={newPartyPath} className="flex items-center gap-1 text-[11px] font-normal normal-case text-primary hover:underline">
             <Plus className="h-3 w-3" /> New
           </Link>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 pt-0">
+      <CardContent className={`${BODY} space-y-1.5`}>
         <div className="relative">
-          <Search className="pointer-events-none absolute left-2 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="pointer-events-none absolute left-2 top-2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             value={query}
             onChange={(e) => search(e.target.value)}
             onFocus={() => results.length > 0 && setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
             placeholder={`Search ${label.toLowerCase()} name, code, phone, GSTIN...`}
-            className="pl-7"
+            className="h-7 pl-7 text-[12px]"
           />
           {open && (
-            <div className="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-popover shadow-md">
+            <div className="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-popover shadow-lg">
               {searching ? (
                 <p className="px-3 py-2 text-sm text-muted-foreground">Searching...</p>
               ) : results.length === 0 ? (
@@ -208,7 +240,7 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => select(row)}
-                    className="block w-full px-3 py-2 text-left text-sm hover:bg-accent"
+                    className="block w-full px-3 py-1.5 text-left text-sm hover:bg-accent"
                   >
                     <span className="font-medium">{row.name as string}</span>
                     <span className="ml-2 text-xs text-muted-foreground">
@@ -222,13 +254,15 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
         </div>
 
         {state.party_id ? (
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Check className="h-3.5 w-3.5 text-green-500" />
-            Selected: <span className="font-medium text-foreground">{state.name}</span>
-            {state.code ? <span className="text-muted-foreground">({state.code})</span> : null}
+          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+            <Check className="h-3.5 w-3.5 shrink-0 text-green-500" />
+            <span className="truncate">
+              Selected: <span className="font-medium text-foreground">{state.name}</span>
+              {state.code ? <span className="text-muted-foreground"> ({state.code})</span> : null}
+            </span>
             <button
               type="button"
-              className="ml-auto flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              className="ml-auto flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
               onClick={() =>
                 onChange({
                   ...state,
@@ -255,58 +289,78 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
           </div>
         ) : null}
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 2xl:grid-cols-4">
           <Field label="Contact person" value={state.contact_person} onChange={(v) => patch({ contact_person: v })} />
           <Field label="Phone" value={state.phone} onChange={(v) => patch({ phone: v })} />
           <Field label="Email" value={state.email} onChange={(v) => patch({ email: v })} />
           <Field label="GSTIN" value={state.gstin} onChange={(v) => patch({ gstin: v })} />
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">Billing address</Label>
-          <Input
-            value={state.billing.line1}
-            onChange={(e) => patchBilling({ line1: e.target.value })}
-            placeholder="Address line 1"
-          />
-          <Input
-            value={state.billing.line2 || ''}
-            onChange={(e) => patchBilling({ line2: e.target.value || null })}
-            placeholder="Address line 2"
-          />
-          <div className="grid grid-cols-3 gap-2">
-            <Input
-              value={state.billing.city}
-              onChange={(e) => patchBilling({ city: e.target.value })}
-              placeholder="City"
-            />
-            <Input
-              value={state.billing.state}
-              onChange={(e) => patchBilling({ state: e.target.value })}
-              placeholder="State"
-            />
-            <Input
-              value={state.billing.pin}
-              onChange={(e) => patchBilling({ pin: e.target.value })}
-              placeholder="PIN"
-            />
-          </div>
-          <Input
-            value={state.billing.country}
-            onChange={(e) => patchBilling({ country: e.target.value })}
-            placeholder="Country"
-          />
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowAddress((prev) => !prev)}
+            className="flex w-full items-center justify-between gap-2 rounded border border-border bg-muted/40 px-2 py-1 text-left text-[11px] leading-tight text-muted-foreground hover:bg-muted"
+          >
+            <span className="truncate">{showAddress ? 'Billing address' : addressSummary}</span>
+            <span className="flex shrink-0 items-center gap-1 text-primary">
+              {showAddress ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+              {showAddress ? 'Hide' : 'Edit'}
+            </span>
+          </button>
+
+          {showAddress ? (
+            <div className="mt-1.5 space-y-1.5">
+              <Input
+                value={state.billing.line1}
+                onChange={(e) => patchBilling({ line1: e.target.value })}
+                placeholder="Address line 1"
+                className="h-7 text-[12px]"
+              />
+              <Input
+                value={state.billing.line2 || ''}
+                onChange={(e) => patchBilling({ line2: e.target.value || null })}
+                placeholder="Address line 2"
+                className="h-7 text-[12px]"
+              />
+              <div className="grid grid-cols-3 gap-1.5">
+                <Input
+                  value={state.billing.city}
+                  onChange={(e) => patchBilling({ city: e.target.value })}
+                  placeholder="City"
+                  className="h-7 text-[12px]"
+                />
+                <Input
+                  value={state.billing.state}
+                  onChange={(e) => patchBilling({ state: e.target.value })}
+                  placeholder="State"
+                  className="h-7 text-[12px]"
+                />
+                <Input
+                  value={state.billing.pin}
+                  onChange={(e) => patchBilling({ pin: e.target.value })}
+                  placeholder="PIN"
+                  className="h-7 text-[12px]"
+                />
+              </div>
+              <Input
+                value={state.billing.country}
+                onChange={(e) => patchBilling({ country: e.target.value })}
+                placeholder="Country"
+                className="h-7 text-[12px]"
+              />
+            </div>
+          ) : null}
         </div>
 
         {noAddress && state.party_id ? (
-          <p className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs text-amber-600 dark:text-amber-400">
-            This {label.toLowerCase()} has no billing address on file. What you enter here is saved
-            on this document only.
+          <p className="rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] leading-snug text-amber-600 dark:text-amber-400">
+            No billing address on file for this {label.toLowerCase()}; it is saved on this document only.
           </p>
         ) : null}
         {isNewParty && !state.party_id ? (
-          <p className="text-xs text-muted-foreground">
-            Free-text party: it will not be added to the master. Save it through{' '}
+          <p className="text-[11px] leading-snug text-muted-foreground">
+            Free-text party: save it through{' '}
             <Link to={newPartyPath} className="text-primary hover:underline">
               {label}s
             </Link>{' '}
@@ -331,6 +385,9 @@ export function ShipToBlock({
   onChange: (next: BillingPartyState) => void;
   savedShipping: Address | null;
 }) {
+  // The delivery address only opens up when the user actually edits it.
+  const [showAddress, setShowAddress] = useState(false);
+
   function patch(partial: Partial<BillingPartyState>) {
     onChange({ ...state, ...partial });
   }
@@ -338,27 +395,30 @@ export function ShipToBlock({
     onChange({ ...state, shipping: { ...state.shipping, ...partial } });
   }
 
+  const shippingSummary = addressToString(state.shipping) || 'No delivery address';
+
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+    <Card className="rounded-lg">
+      <CardHeader className={HEADER}>
+        <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Ship To / Delivery Address
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 pt-0">
-        <div className="flex flex-wrap items-center gap-3">
-          <label className="flex cursor-pointer items-center gap-2 text-sm">
+      <CardContent className={`${BODY} space-y-1.5`}>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <label className="flex cursor-pointer items-center gap-2 text-[12px]">
             <input
               type="checkbox"
               id="sameAsBilling"
               checked={state.same_as_billing}
-              onChange={(e) =>
+              onChange={(e) => {
                 patch({
                   same_as_billing: e.target.checked,
                   ...(e.target.checked ? { shipping: { ...state.billing } } : {}),
-                })
-              }
-              className="h-4 w-4 rounded border-input"
+                });
+                if (!e.target.checked) setShowAddress(true);
+              }}
+              className="h-3.5 w-3.5 rounded border-input"
             />
             Same as billing address
           </label>
@@ -367,7 +427,7 @@ export function ShipToBlock({
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 px-2 text-xs"
+              className="h-6 px-2 text-[11px]"
               onClick={() =>
                 patch({
                   shipping: savedShipping,
@@ -383,54 +443,80 @@ export function ShipToBlock({
         </div>
 
         {state.same_as_billing ? (
-          <div className="rounded border border-border bg-muted/40 p-2 text-sm">
-            <p className="font-medium">{state.name || '—'}</p>
-            <p className="whitespace-pre-line text-muted-foreground">
+          <div className="rounded border border-border bg-muted/40 px-2 py-1.5 leading-snug">
+            <p className="truncate font-medium">{state.name || '—'}</p>
+            <p className="line-clamp-2 whitespace-pre-line text-muted-foreground">
               {addressToMultiline(state.billing) || 'No billing address'}
             </p>
-            {state.phone ? <p className="text-muted-foreground">Phone: {state.phone}</p> : null}
-            {state.gstin ? <p className="text-muted-foreground">GSTIN: {state.gstin}</p> : null}
+            <p className="truncate text-muted-foreground">
+              {[state.phone ? `Ph ${state.phone}` : '', state.gstin ? `GSTIN ${state.gstin}` : '']
+                .filter(Boolean)
+                .join('  ·  ')}
+            </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1.5">
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
               <Field label="Recipient" value={state.shipping_recipient} onChange={(v) => patch({ shipping_recipient: v })} />
               <Field label="Contact person" value={state.shipping_contact} onChange={(v) => patch({ shipping_contact: v })} />
               <Field label="Phone" value={state.shipping_phone} onChange={(v) => patch({ shipping_phone: v })} />
               <Field label="Email" value={state.shipping_email} onChange={(v) => patch({ shipping_email: v })} />
             </div>
-            <Input
-              value={state.shipping.line1}
-              onChange={(e) => patchShipping({ line1: e.target.value })}
-              placeholder="Address line 1"
-            />
-            <Input
-              value={state.shipping.line2 || ''}
-              onChange={(e) => patchShipping({ line2: e.target.value || null })}
-              placeholder="Address line 2"
-            />
-            <div className="grid grid-cols-3 gap-2">
-              <Input
-                value={state.shipping.city}
-                onChange={(e) => patchShipping({ city: e.target.value })}
-                placeholder="City"
-              />
-              <Input
-                value={state.shipping.state}
-                onChange={(e) => patchShipping({ state: e.target.value })}
-                placeholder="State"
-              />
-              <Input
-                value={state.shipping.pin}
-                onChange={(e) => patchShipping({ pin: e.target.value })}
-                placeholder="PIN"
-              />
-            </div>
-            <Input
-              value={state.shipping.country}
-              onChange={(e) => patchShipping({ country: e.target.value })}
-              placeholder="Country"
-            />
+
+            <button
+              type="button"
+              onClick={() => setShowAddress((prev) => !prev)}
+              className="flex w-full items-center justify-between gap-2 rounded border border-border bg-muted/40 px-2 py-1 text-left text-[11px] leading-tight text-muted-foreground hover:bg-muted"
+            >
+              <span className="truncate">{showAddress ? 'Delivery address' : shippingSummary}</span>
+              <span className="flex shrink-0 items-center gap-1 text-primary">
+                {showAddress ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+                {showAddress ? 'Hide' : 'Edit'}
+              </span>
+            </button>
+
+            {showAddress ? (
+              <div className="space-y-1.5">
+                <Input
+                  value={state.shipping.line1}
+                  onChange={(e) => patchShipping({ line1: e.target.value })}
+                  placeholder="Address line 1"
+                  className="h-7 text-[12px]"
+                />
+                <Input
+                  value={state.shipping.line2 || ''}
+                  onChange={(e) => patchShipping({ line2: e.target.value || null })}
+                  placeholder="Address line 2"
+                  className="h-7 text-[12px]"
+                />
+                <div className="grid grid-cols-3 gap-1.5">
+                  <Input
+                    value={state.shipping.city}
+                    onChange={(e) => patchShipping({ city: e.target.value })}
+                    placeholder="City"
+                    className="h-7 text-[12px]"
+                  />
+                  <Input
+                    value={state.shipping.state}
+                    onChange={(e) => patchShipping({ state: e.target.value })}
+                    placeholder="State"
+                    className="h-7 text-[12px]"
+                  />
+                  <Input
+                    value={state.shipping.pin}
+                    onChange={(e) => patchShipping({ pin: e.target.value })}
+                    placeholder="PIN"
+                    className="h-7 text-[12px]"
+                  />
+                </div>
+                <Input
+                  value={state.shipping.country}
+                  onChange={(e) => patchShipping({ country: e.target.value })}
+                  placeholder="Country"
+                  className="h-7 text-[12px]"
+                />
+              </div>
+            ) : null}
           </div>
         )}
       </CardContent>
@@ -452,13 +538,13 @@ function Field({
   placeholder?: string;
 }) {
   return (
-    <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+    <div className="space-y-0.5">
+      <Label className="block truncate text-[10px] leading-none text-muted-foreground">{label}</Label>
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder || label}
-        className="h-8"
+        className="h-7 text-[12px]"
       />
     </div>
   );

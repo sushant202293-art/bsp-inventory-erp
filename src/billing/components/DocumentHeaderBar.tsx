@@ -20,7 +20,11 @@ interface Props {
   status?: string;
 }
 
-/** Document identity strip: number preview, dates, reference, status. */
+/**
+ * Document identity strip: number, dates, reference and status on a single
+ * compact horizontal row (~58px) so the party blocks and the items grid keep
+ * the viewport.
+ */
 export function DocumentHeaderBar({
   title,
   docNumber,
@@ -33,42 +37,53 @@ export function DocumentHeaderBar({
   status,
 }: Props) {
   return (
-    <Card>
-      <CardContent className="grid grid-cols-1 gap-4 p-5 md:grid-cols-4">
-        <div className="space-y-2">
-          <Label>Document Number</Label>
-          <div className="flex h-9 items-center gap-2 rounded border border-dashed border-input bg-muted/40 px-3 font-mono text-sm">
-            {docNumberLoading ? 'Generating...' : docNumber || '—'}
-            {!docNumberLoading ? <Eye className="h-3 w-3 text-muted-foreground" /> : null}
+    <Card className="rounded-lg">
+      <CardContent className="grid grid-cols-1 gap-x-3 gap-y-1.5 p-2 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="min-w-0">
+          <Label className="block text-[10px] leading-none text-muted-foreground">Document Number</Label>
+          <div
+            title="Preview only. The final number is issued when the document is saved."
+            className="mt-1 flex h-7 items-center gap-2 overflow-hidden rounded border border-dashed border-input bg-muted/40 px-2 font-mono text-[12px] whitespace-nowrap"
+          >
+            <span className="truncate">{docNumberLoading ? 'Generating...' : docNumber || '—'}</span>
+            {!docNumberLoading ? <Eye className="h-3 w-3 shrink-0 text-muted-foreground" /> : null}
           </div>
-          <p className="text-[11px] text-muted-foreground">
-            Preview only. The final number is issued when the document is saved.
-          </p>
         </div>
 
-        <div className="space-y-2">
-          <Label>{title} Date</Label>
-          <Input type="date" value={docDate} onChange={(e) => onDocDateChange(e.target.value)} />
+        <div className="min-w-0">
+          <Label className="block text-[10px] leading-none text-muted-foreground">{title} Date</Label>
+          <Input
+            type="date"
+            value={docDate}
+            onChange={(e) => onDocDateChange(e.target.value)}
+            className="mt-1 h-7 text-[12px]"
+          />
         </div>
 
         {extraDate ? (
-          <div className="space-y-2">
-            <Label>{extraDate.label}</Label>
-            <Input type="date" value={extraDate.value} onChange={(e) => extraDate.onChange(e.target.value)} />
+          <div className="min-w-0">
+            <Label className="block text-[10px] leading-none text-muted-foreground">{extraDate.label}</Label>
+            <Input
+              type="date"
+              value={extraDate.value}
+              onChange={(e) => extraDate.onChange(e.target.value)}
+              className="mt-1 h-7 text-[12px]"
+            />
           </div>
         ) : null}
 
-        <div className="space-y-2">
-          <Label>Reference No.</Label>
+        <div className="min-w-0">
+          <Label className="flex items-center justify-between gap-2 text-[10px] leading-none text-muted-foreground">
+            <span>Reference No.</span>
+            {status ? <span className="truncate uppercase">{status}</span> : null}
+          </Label>
           <Input
             value={referenceNumber ?? ''}
             onChange={(e) => onReferenceNumberChange?.(e.target.value)}
             placeholder="PO / copy ref (optional)"
             disabled={!onReferenceNumberChange}
+            className="mt-1 h-7 text-[12px]"
           />
-          {status ? (
-            <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Status: {status}</p>
-          ) : null}
         </div>
       </CardContent>
     </Card>

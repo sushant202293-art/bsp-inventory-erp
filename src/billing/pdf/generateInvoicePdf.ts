@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { isAddressEmpty } from '@/lib/address';
 import type { BillingPrintModel } from '../billing.types';
 
 /**
@@ -83,65 +84,70 @@ export function generateInvoicePdf(model: BillingPrintModel): void {
 
   /* ---------------- Parties ---------------- */
   const halfWidth = (pageWidth - margin * 2 - 4) / 2;
-  const partyHeight = 34;
+
+  // Same source of truth as InvoicePrintTemplate: checked -> Bill To customer's
+  // billing address; unchecked -> the manual delivery address; never the
+  // Place of Supply alone.
+  const ship = model.shipTo;
+  const hasShipAddress = Boolean(ship && !isAddressEmpty(ship.address));
+
+  const billText = [
+    addressLine(model.billTo.address),
+    model.billTo.contact_person ? `Contact: ${model.billTo.contact_person}` : '',
+    model.billTo.phone ? `Phone: ${model.billTo.phone}` : '',
+    model.billTo.email ? `Email: ${model.billTo.email}` : '',
+    model.billTo.gstin ? `GSTIN: ${model.billTo.gstin}` : '',
+    `Place of Supply: ${model.billTo.state || '-'}`,
+    model.interState ? 'Inter-state supply - IGST applies' : 'Intra-state supply - CGST + SGST apply',
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const shipText =
+    hasShipAddress && ship
+      ? [
+          addressLine(ship.address),
+          ship.contact_person ? `Contact: ${ship.contact_person}` : '',
+          ship.phone ? `Phone: ${ship.phone}` : '',
+          ship.email ? `Email: ${ship.email}` : '',
+          ship.gstin ? `GSTIN: ${ship.gstin}` : '',
+          ship.state ? `State: ${ship.state}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n')
+      : 'No delivery address provided. Tick "Same as billing address" or enter a delivery address manually.';
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  const billBody = doc.splitTextToSize(billText, halfWidth - 6) as string[];
+  const shipBody = doc.splitTextToSize(shipText, halfWidth - 6) as string[];
+  const partyHeight = Math.max(30, Math.max(billBody.length, shipBody.length) * 3.5 + 17);
 
   drawBox(doc, margin, y, halfWidth, partyHeight);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
   doc.text(`BILL TO / ${model.billTo.label.toUpperCase()}`, margin + 3, y + 5);
-  doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
   doc.text(doc.splitTextToSize(model.billTo.name || '-', halfWidth - 6)[0], margin + 3, y + 10);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8.5);
-  doc.text(
-    doc.splitTextToSize(
-      [
-        addressLine(model.billTo.address),
-        model.billTo.phone ? `Phone: ${model.billTo.phone}` : '',
-        model.billTo.gstin ? `GSTIN: ${model.billTo.gstin}` : '',
-        `State: ${model.billTo.state || '-'}`,
-      ]
-        .filter(Boolean)
-        .join('\n'),
-      halfWidth - 6
-    ),
-    margin + 3,
-    y + 14
-  );
+  doc.text(billBody, margin + 3, y + 14);
 
   const shipX = margin + halfWidth + 4;
   drawBox(doc, shipX, y, halfWidth, partyHeight);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(8);
-  if (model.shipTo) {
-    doc.text('SHIP TO / DELIVERY ADDRESS', shipX + 3, y + 5);
-    doc.setFontSize(10);
-    doc.text(doc.splitTextToSize(model.shipTo.name || '-', halfWidth - 6)[0], shipX + 3, y + 10);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.text(
-      doc.splitTextToSize(
-        [addressLine(model.shipTo.address), model.shipTo.phone ? `Phone: ${model.shipTo.phone}` : '']
-          .filter(Boolean)
-          .join('\n'),
-        halfWidth - 6
-      ),
-      shipX + 3,
-      y + 14
-    );
-  } else {
-    doc.text('PLACE OF SUPPLY', shipX + 3, y + 5);
-    doc.setFontSize(10);
-    doc.text(model.billTo.state || '-', shipX + 3, y + 11);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.text(
-      model.interState ? 'Inter-state supply - IGST applies' : 'Intra-state supply - CGST + SGST apply',
-      shipX + 3,
-      y + 16
-    );
-  }
+  doc.text('SHIP TO / DELIVERY ADDRESS', shipX + 3, y + 5);
+  doc.setFontSize(10);
+  doc.text(
+    doc.splitTextToSize((hasShipAddress && ship ? ship.name : model.billTo.name) || '-', halfWidth - 6)[0],
+    shipX + 3,
+    y + 10
+  );
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8.5);
+  doc.text(shipBody, shipX + 3, y + 14);
   y += partyHeight + 5;
 
   /* ---------------- Items ---------------- */

@@ -76,17 +76,17 @@ export function InvoiceItemsTable({
         <table className="w-full min-w-[64rem] border-collapse text-sm">
           <thead>
             <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <th className="w-8 px-2 py-2">#</th>
-              <th className="px-2 py-2">Product</th>
-              <th className="w-28 px-2 py-2">Code</th>
-              <th className="w-20 px-2 py-2 text-right">Qty</th>
-              <th className="w-20 px-2 py-2">Unit</th>
-              <th className="w-28 px-2 py-2 text-right">Rate</th>
-              <th className="w-20 px-2 py-2 text-right">Disc %</th>
-              <th className="w-28 px-2 py-2 text-right">Taxable</th>
-              <th className="w-24 px-2 py-2 text-right">GST</th>
-              <th className="w-32 px-2 py-2 text-right">Total</th>
-              <th className="w-24 px-2 py-2 text-right">Actions</th>
+              <th className="w-8 px-2 py-1">#</th>
+              <th className="px-2 py-1">Product</th>
+              <th className="w-28 px-2 py-1">Code</th>
+              <th className="w-20 px-2 py-1 text-right">Qty</th>
+              <th className="w-20 px-2 py-1">Unit</th>
+              <th className="w-28 px-2 py-1 text-right">Rate</th>
+              <th className="w-20 px-2 py-1 text-right">Disc %</th>
+              <th className="w-28 px-2 py-1 text-right">Taxable</th>
+              <th className="w-24 px-2 py-1 text-right">GST</th>
+              <th className="w-32 px-2 py-1 text-right">Total</th>
+              <th className="w-20 px-2 py-1 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -94,12 +94,12 @@ export function InvoiceItemsTable({
               const invalidQty = toNumber(item.quantity) <= 0;
               return (
                 <tr key={item.key} className="border-b align-top">
-                  <td className="px-2 py-2 text-muted-foreground">{index + 1}</td>
-                  <td className="px-2 py-2">
+                  <td className="px-2 py-1 text-muted-foreground">{index + 1}</td>
+                  <td className="px-2 py-1">
                     <ProductAutocomplete
                       value={item.product_name}
                       priceField={priceField}
-                      className="min-w-[14rem]"
+                      className="min-w-[16rem]"
                       onChange={(text) => patch(index, { product_name: text, product_id: null })}
                       onSelect={(product) => {
                         const price = Number(product[priceField] || 0);
@@ -122,13 +122,13 @@ export function InvoiceItemsTable({
                       }}
                     />
                     {!item.product_id && item.product_name.trim().length > 0 ? (
-                      <p className="mt-1 text-xs text-amber-500">
+                      <p className="mt-0.5 text-[11px] text-amber-500">
                         Select this product from the dropdown to bill it.
                       </p>
                     ) : null}
                   </td>
-                  <td className="px-2 py-2 text-muted-foreground">{item.product_code || '—'}</td>
-                  <td className="px-2 py-2">
+                  <td className="px-2 py-1 text-muted-foreground">{item.product_code || '—'}</td>
+                  <td className="px-2 py-1">
                     <Input
                       value={display(item, 'quantity', item.quantity)}
                       onChange={(e) => {
@@ -136,15 +136,15 @@ export function InvoiceItemsTable({
                         patch(index, { quantity: parseAmount(e.target.value) });
                       }}
                       inputMode="decimal"
-                      className={`h-8 text-right ${invalidQty ? 'border-red-500' : ''}`}
+                      className={`h-7 text-right ${invalidQty ? 'border-red-500' : ''}`}
                       disabled={readOnly}
                     />
                     {invalidQty ? (
-                      <p className="mt-1 text-xs text-red-500">Qty must be &gt; 0</p>
+                      <p className="mt-0.5 text-[11px] text-red-500">Qty must be &gt; 0</p>
                     ) : null}
                   </td>
-                  <td className="px-2 py-2 text-muted-foreground">{item.unit || '—'}</td>
-                  <td className="px-2 py-2">
+                  <td className="px-2 py-1 text-muted-foreground">{item.unit || '—'}</td>
+                  <td className="px-2 py-1">
                     <Input
                       value={display(item, 'rate', item.rate)}
                       onChange={(e) => {
@@ -152,11 +152,11 @@ export function InvoiceItemsTable({
                         patch(index, { rate: parseAmount(e.target.value) });
                       }}
                       inputMode="decimal"
-                      className="h-8 text-right"
+                      className="h-7 text-right"
                       disabled={readOnly}
                     />
                   </td>
-                  <td className="px-2 py-2">
+                  <td className="px-2 py-1">
                     <Input
                       value={display(item, 'discount_percent', item.discount_percent)}
                       onChange={(e) => {
@@ -164,19 +164,19 @@ export function InvoiceItemsTable({
                         patch(index, { discount_percent: parseAmount(e.target.value) });
                       }}
                       inputMode="decimal"
-                      className="h-8 text-right"
+                      className="h-7 text-right"
                       disabled={readOnly}
                     />
                   </td>
-                  <td className="px-2 py-2 text-right tabular-nums">
+                  <td className="px-2 py-1 text-right tabular-nums">
                     {item.taxable_value.toFixed(2)}
                   </td>
-                  <td className="px-2 py-2 text-right">
+                  <td className="px-2 py-1 text-right">
                     <select
                       value={String(item.gst_rate)}
                       onChange={(e) => patch(index, { gst_rate: Number(e.target.value) })}
                       disabled={readOnly}
-                      className="h-8 w-full rounded border border-input bg-transparent px-1 text-right text-sm"
+                      className="h-7 w-full rounded border border-input bg-transparent px-1 text-right text-sm"
                     >
                       {GST_RATES.includes(Number(item.gst_rate)) ? null : (
                         <option value={String(item.gst_rate)}>{item.gst_rate}%</option>
@@ -191,15 +191,16 @@ export function InvoiceItemsTable({
                       {interState ? `IGST ${item.igst_amount.toFixed(2)}` : `C ${item.cgst_amount.toFixed(2)} / S ${item.sgst_amount.toFixed(2)}`}
                     </p>
                   </td>
-                  <td className="px-2 py-2 text-right font-semibold tabular-nums">
+                  <td className="px-2 py-1 text-right font-semibold tabular-nums">
                     {item.total_amount.toFixed(2)}
                   </td>
-                  <td className="px-2 py-2">
-                    <div className="flex justify-end gap-1">
+                  <td className="px-2 py-1">
+                    <div className="flex justify-end gap-0.5">
                       <Button
                         size="sm"
                         variant="ghost"
                         title="Duplicate row"
+                        className="h-7 w-7"
                         disabled={readOnly}
                         onClick={() => duplicateItem(index)}
                       >
@@ -209,6 +210,7 @@ export function InvoiceItemsTable({
                         size="sm"
                         variant="ghost"
                         title="Remove row"
+                        className="h-7 w-7"
                         disabled={readOnly}
                         onClick={() => removeItem(index)}
                       >
@@ -223,7 +225,7 @@ export function InvoiceItemsTable({
         </table>
       </div>
 
-      <Button variant="outline" size="sm" className="mt-3" onClick={addItem} disabled={readOnly}>
+      <Button variant="outline" size="sm" className="mt-1.5" onClick={addItem} disabled={readOnly}>
         <Plus className="mr-1 h-3 w-3" /> Add Item
       </Button>
     </div>

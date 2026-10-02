@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -7,8 +7,6 @@ import {
   Plus,
   Trash2,
   Search,
-  X,
-  FileText,
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
@@ -32,14 +30,13 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import {
-  getTransactions,
   getTransaction,
   createTransaction,
   updateTransaction,
   getNextDocumentNumber,
   printTransaction,
 } from '@/services/transaction.service';
-import { getProducts } from '@/services/product.service';
+import { ProductAutocomplete } from '@/billing/components/ProductAutocomplete';
 import { getSuppliers, createSupplier } from '@/services/supplier.service';
 import type { TransactionItemFormData } from '@/types/transaction.types';
 import type { ProductWithRelations } from '@/types/product.types';
@@ -49,8 +46,6 @@ import {
   formatDate,
   amountInWords,
   isSameState,
-  generateId,
-  getCurrentFinancialYear,
 } from '@/lib/utils';
 
 const DEFAULT_TERMS = `1. Goods must be delivered as per the purchase order specifications.
@@ -69,10 +64,7 @@ export default function PurchaseOrderFormPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [suppliers, setSuppliers] = useState<SupplierWithRelations[]>([]);
-  const [products, setProducts] = useState<ProductWithRelations[]>([]);
-  const [productSearch, setProductSearch] = useState('');
   const [supplierSearch, setSupplierSearch] = useState('');
-  const [showProductSearch, setShowProductSearch] = useState(false);
   const [showSupplierSearch, setShowSupplierSearch] = useState(false);
   const [showNewSupplier, setShowNewSupplier] = useState(false);
   const [printLoading, setPrintLoading] = useState(false);
@@ -143,14 +135,12 @@ export default function PurchaseOrderFormPage() {
 
   async function loadInitialData() {
     try {
-      const [docNum, supplierResult, productResult] = await Promise.all([
+      const [docNum, supplierResult] = await Promise.all([
         getNextDocumentNumber('purchase_order'),
         getSuppliers({}, 1, 500),
-        getProducts({}, 1, 500),
       ]);
       setFormData((prev) => ({ ...prev, document_number: docNum }));
       setSuppliers(supplierResult.suppliers);
-      setProducts(productResult.products);
     } catch (error) {
       toast({
         title: 'Error',
@@ -240,8 +230,13 @@ export default function PurchaseOrderFormPage() {
       unit: (product.unit as unknown as { short_name?: string })?.short_name || 'NOS',
     };
     setItems(updatedItems);
-    setShowProductSearch(false);
-    setProductSearch('');
+  }
+
+  /** Free typing invalidates the link to the product master, as in billing. */
+  function setProductName(index: number, text: string) {
+    const updatedItems = [...items];
+    updatedItems[index] = { ...updatedItems[index], product_name: text, product_id: null };
+    setItems(updatedItems);
   }
 
   function updateItem(index: number, field: keyof TransactionItemFormData, value: unknown) {
@@ -456,11 +451,6 @@ export default function PurchaseOrderFormPage() {
     (s.code && s.code.toLowerCase().includes(supplierSearch.toLowerCase()))
   );
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
-    p.code.toLowerCase().includes(productSearch.toLowerCase())
-  );
-
   const intraState = isSameState(company.state, formData.supplier_state);
 
   if (loading) {
@@ -479,7 +469,7 @@ export default function PurchaseOrderFormPage() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-6"
+      className="space-y-2"
     >
       <PageHeader
         title={isEdit ? 'Edit Purchase Order' : 'New Purchase Order'}
@@ -507,125 +497,134 @@ export default function PurchaseOrderFormPage() {
       />
 
       {/* Document Header */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-x-3 gap-y-1.5 md:grid-cols-4">
         <div>
-          <label className="text-sm font-medium text-muted-foreground">PO Number</label>
-          <Input value={formData.document_number} disabled className="mt-1 bg-muted" />
+          <label className="block text-[10px] leading-none text-muted-foreground">PO Number</label>
+          <Input value={formData.document_number} disabled className="mt-1 h-7 bg-muted text-[12px]" />
         </div>
         <div>
-          <label className="text-sm font-medium text-muted-foreground">PO Date *</label>
+          <label className="block text-[10px] leading-none text-muted-foreground">PO Date *</label>
           <Input
             type="date"
             value={formData.document_date}
             onChange={(e) => setFormData({ ...formData, document_date: e.target.value })}
-            className="mt-1"
+            className="mt-1 h-7 text-[12px]"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-muted-foreground">Expected Delivery Date</label>
+          <label className="block text-[10px] leading-none text-muted-foreground">Expected Delivery Date</label>
           <Input
             type="date"
             value={formData.expected_delivery_date}
             onChange={(e) => setFormData({ ...formData, expected_delivery_date: e.target.value })}
-            className="mt-1"
+            className="mt-1 h-7 text-[12px]"
           />
         </div>
         <div>
-          <label className="text-sm font-medium text-muted-foreground">Reference</label>
+          <label className="block text-[10px] leading-none text-muted-foreground">Reference</label>
           <Input
             value={formData.reference_number}
             onChange={(e) => setFormData({ ...formData, reference_number: e.target.value })}
             placeholder="Reference number"
-            className="mt-1"
+            className="mt-1 h-7 text-[12px]"
           />
         </div>
       </div>
 
-      {/* Consignee */}
-      <Card className="p-4">
-        <h3 className="text-sm font-semibold mb-3">Consignee (Company)</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="font-medium">{company.name}</p>
-            <p className="text-muted-foreground">{company.address}</p>
-            <p className="text-muted-foreground">{company.city}, {company.state} - {company.pincode}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">GSTIN: {company.gstin}</p>
-            <p className="text-muted-foreground">Phone: {company.phone}</p>
-            <p className="text-muted-foreground">Email: {company.email}</p>
-          </div>
-        </div>
-      </Card>
-
-      {/* Supplier */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold">Supplier</h3>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setShowSupplierSearch(true)}>
-              <Search className="mr-2 h-4 w-4" />
-              Select Supplier
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setShowNewSupplier(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Supplier
-            </Button>
-          </div>
-        </div>
-
-        {formData.supplier_name ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="font-medium">{formData.supplier_name}</p>
-              <p className="text-muted-foreground">{formData.supplier_address || 'No address provided'}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">GSTIN: {formData.supplier_gstin || 'N/A'}</p>
-              <p className="text-muted-foreground">State: {formData.supplier_state || 'N/A'}</p>
-              <p className="text-muted-foreground">
-                Tax Type: {intraState ? 'Intra-State (CGST + SGST)' : 'Inter-State (IGST)'}
+      {/* Consignee + Supplier, side by side so the items grid starts early */}
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+        <Card className="p-2.5">
+          <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Consignee (Company)
+          </h3>
+          <div className="grid grid-cols-1 gap-x-3 text-[12px] leading-snug md:grid-cols-2">
+            <div className="min-w-0">
+              <p className="truncate font-medium">{company.name}</p>
+              <p className="truncate text-muted-foreground">{company.address}</p>
+              <p className="truncate text-muted-foreground">
+                {company.city}, {company.state} - {company.pincode}
               </p>
             </div>
+            <div className="min-w-0">
+              <p className="truncate text-muted-foreground">GSTIN: {company.gstin}</p>
+              <p className="truncate text-muted-foreground">Phone: {company.phone}</p>
+              <p className="truncate text-muted-foreground">Email: {company.email}</p>
+            </div>
           </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">No supplier selected. Click "Select Supplier" to choose.</p>
-        )}
-      </Card>
+        </Card>
+
+        <Card className="p-2.5">
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Supplier</h3>
+            <div className="flex gap-1.5">
+              <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]" onClick={() => setShowSupplierSearch(true)}>
+                <Search className="mr-1 h-3 w-3" />
+                Select Supplier
+              </Button>
+              <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]" onClick={() => setShowNewSupplier(true)}>
+                <Plus className="mr-1 h-3 w-3" />
+                New Supplier
+              </Button>
+            </div>
+          </div>
+
+          {formData.supplier_name ? (
+            <div className="grid grid-cols-1 gap-x-3 text-[12px] leading-snug md:grid-cols-2">
+              <div className="min-w-0">
+                <p className="truncate font-medium">{formData.supplier_name}</p>
+                <p className="truncate text-muted-foreground">
+                  {formData.supplier_address || 'No address provided'}
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-muted-foreground">GSTIN: {formData.supplier_gstin || 'N/A'}</p>
+                <p className="truncate text-muted-foreground">State: {formData.supplier_state || 'N/A'}</p>
+                <p className="truncate text-muted-foreground">
+                  Tax: {intraState ? 'Intra-State (CGST + SGST)' : 'Inter-State (IGST)'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-[12px] text-muted-foreground">
+              No supplier selected. Click &ldquo;Select Supplier&rdquo; to choose.
+            </p>
+          )}
+        </Card>
+      </div>
 
       {/* Items Grid */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold">Items</h3>
-          <Button variant="outline" size="sm" onClick={addItem}>
-            <Plus className="mr-2 h-4 w-4" />
+      <Card className="p-2.5">
+        <div className="mb-1.5 flex items-center justify-between">
+          <h3 className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Items</h3>
+          <Button variant="outline" size="sm" className="h-7 px-2 text-[11px]" onClick={addItem}>
+            <Plus className="mr-1 h-3 w-3" />
             Add Item
           </Button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto lg:min-h-[600px]">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground w-10">Sl</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground w-28">Code</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground">Item Name</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground w-20">Brand</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-16">Qty</th>
-                <th className="px-2 py-2 text-left text-xs font-medium text-muted-foreground w-14">Unit</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-24">Rate</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-16">Disc%</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-24">Disc Amt</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-28">Taxable</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-16">GST%</th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-20">
+                <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground w-10">Sl</th>
+                <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground w-28">Code</th>
+                <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground">Item Name</th>
+                <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground w-20">Brand</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-16">Qty</th>
+                <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground w-14">Unit</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-24">Rate</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-16">Disc%</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-24">Disc Amt</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-28">Taxable</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-16">GST%</th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-20">
                   {intraState ? 'CGST' : 'IGST'}
                 </th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-20">
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-20">
                   {intraState ? 'SGST' : ''}
                 </th>
-                <th className="px-2 py-2 text-right text-xs font-medium text-muted-foreground w-28">Total</th>
-                <th className="px-2 py-2 w-10"></th>
+                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-28">Total</th>
+                <th className="px-2 py-1.5 w-10"></th>
               </tr>
             </thead>
             <tbody>
@@ -633,105 +632,60 @@ export default function PurchaseOrderFormPage() {
                 const totals = calculateItemTotals(item);
                 return (
                   <tr key={index} className="border-b border-border last:border-0">
-                    <td className="px-2 py-2 text-center text-muted-foreground">{index + 1}</td>
-                    <td className="px-2 py-2">
-                      <div className="relative">
-                        <Input
-                          value={item.product_code}
-                          onChange={(e) => updateItem(index, 'product_code', e.target.value)}
-                          className="h-8 text-xs"
-                          placeholder="Code"
-                          onFocus={() => {
-                            setShowProductSearch(true);
-                            setProductSearch('');
-                          }}
-                        />
-                      </div>
+                    <td className="px-2 py-1.5 text-center text-muted-foreground">{index + 1}</td>
+                    <td className="px-2 py-1.5">
+                      <Input
+                        value={item.product_code}
+                        onChange={(e) => updateItem(index, 'product_code', e.target.value)}
+                        className="h-7 text-xs"
+                        placeholder="Code"
+                      />
                     </td>
-                    <td className="px-2 py-2">
-                      <div className="relative">
-                        <Input
-                          value={item.product_name}
-                          onChange={(e) => updateItem(index, 'product_name', e.target.value)}
-                          className="h-8 text-xs"
-                          placeholder="Product name"
-                          onFocus={() => {
-                            setShowProductSearch(true);
-                            setProductSearch('');
-                          }}
-                        />
-                        {showProductSearch && (
-                          <div className="absolute z-50 top-full left-0 w-80 bg-card border border-border rounded-lg shadow-lg mt-1">
-                            <div className="p-2">
-                              <Input
-                                placeholder="Search products..."
-                                value={productSearch}
-                                onChange={(e) => setProductSearch(e.target.value)}
-                                className="h-8"
-                                autoFocus
-                              />
-                            </div>
-                            <div className="max-h-48 overflow-y-auto">
-                              {filteredProducts.map((product) => (
-                                <button
-                                  key={product.id}
-                                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm"
-                                  onClick={() => selectProduct(product, index)}
-                                >
-                                  <p className="font-medium">{product.name}</p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {product.code} | {product.brand?.name || 'No Brand'} | {formatCurrency(product.purchase_price)}
-                                  </p>
-                                </button>
-                              ))}
-                              {filteredProducts.length === 0 && (
-                                <p className="px-3 py-2 text-sm text-muted-foreground">No products found</p>
-                              )}
-                            </div>
-                            <div className="p-2 border-t">
-                              <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowProductSearch(false)}>
-                                Close
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                    <td className="px-2 py-1.5">
+                      <ProductAutocomplete
+                        value={item.product_name}
+                        priceField="purchase_price"
+                        placeholder="Search product by name, code or brand..."
+                        className="min-w-[16rem]"
+                        onChange={(text) => setProductName(index, text)}
+                        onSelect={(product) => selectProduct(product, index)}
+                      />
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Input
                         value={item.brand_name}
                         onChange={(e) => updateItem(index, 'brand_name', e.target.value)}
-                        className="h-8 text-xs"
+                        className="h-7 text-xs"
                       />
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Input
                         type="number"
                         min="0"
                         step="0.01"
                         value={item.quantity}
                         onChange={(e) => updateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                        className="h-8 text-xs text-right"
+                        className="h-7 text-xs text-right"
                       />
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Input
                         value={item.unit}
                         onChange={(e) => updateItem(index, 'unit', e.target.value)}
-                        className="h-8 text-xs"
+                        className="h-7 text-xs"
                       />
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Input
                         type="number"
                         min="0"
                         step="0.01"
                         value={item.rate}
                         onChange={(e) => updateItem(index, 'rate', parseFloat(e.target.value) || 0)}
-                        className="h-8 text-xs text-right"
+                        className="h-7 text-xs text-right"
                       />
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Input
                         type="number"
                         min="0"
@@ -739,21 +693,21 @@ export default function PurchaseOrderFormPage() {
                         step="0.01"
                         value={item.discount_percent}
                         onChange={(e) => updateItem(index, 'discount_percent', parseFloat(e.target.value) || 0)}
-                        className="h-8 text-xs text-right"
+                        className="h-7 text-xs text-right"
                       />
                     </td>
-                    <td className="px-2 py-2 text-right text-xs text-muted-foreground">
+                    <td className="px-2 py-1.5 text-right text-xs text-muted-foreground">
                       {formatCurrency(totals.discountAmt)}
                     </td>
-                    <td className="px-2 py-2 text-right text-xs">
+                    <td className="px-2 py-1.5 text-right text-xs">
                       {formatCurrency(totals.taxableValue)}
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Select
                         value={String(item.gst_rate)}
                         onValueChange={(val) => updateItem(index, 'gst_rate', parseFloat(val))}
                       >
-                        <SelectTrigger className="h-8 text-xs w-16">
+                        <SelectTrigger className="h-7 text-xs w-16">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -765,16 +719,16 @@ export default function PurchaseOrderFormPage() {
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="px-2 py-2 text-right text-xs text-muted-foreground">
+                    <td className="px-2 py-1.5 text-right text-xs text-muted-foreground">
                       {formatCurrency(intraState ? totals.cgst : totals.igst)}
                     </td>
-                    <td className="px-2 py-2 text-right text-xs text-muted-foreground">
+                    <td className="px-2 py-1.5 text-right text-xs text-muted-foreground">
                       {intraState ? formatCurrency(totals.sgst) : ''}
                     </td>
-                    <td className="px-2 py-2 text-right text-xs font-semibold">
+                    <td className="px-2 py-1.5 text-right text-xs font-semibold">
                       {formatCurrency(totals.totalAmount)}
                     </td>
-                    <td className="px-2 py-2">
+                    <td className="px-2 py-1.5">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -794,10 +748,10 @@ export default function PurchaseOrderFormPage() {
       </Card>
 
       {/* Totals & Notes */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Notes */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card className="p-4">
+        <div className="lg:col-span-2 space-y-3">
+          <Card className="p-3">
             <h3 className="text-sm font-semibold mb-2">Notes</h3>
             <textarea
               value={formData.notes}
@@ -807,7 +761,7 @@ export default function PurchaseOrderFormPage() {
             />
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-3">
             <h3 className="text-sm font-semibold mb-2">Terms & Conditions</h3>
             <textarea
               value={formData.terms}
@@ -819,9 +773,9 @@ export default function PurchaseOrderFormPage() {
         </div>
 
         {/* Summary */}
-        <div className="space-y-4">
-          <Card className="p-4">
-            <h3 className="text-sm font-semibold mb-3">Summary</h3>
+        <div className="space-y-3">
+          <Card className="p-3">
+            <h3 className="text-sm font-semibold mb-2">Summary</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Total Qty</span>
@@ -876,14 +830,14 @@ export default function PurchaseOrderFormPage() {
             </div>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-3">
             <p className="text-xs text-muted-foreground">
               <strong>Amount in Words:</strong><br />
               {amountInWords(totals.grandTotal)}
             </p>
           </Card>
 
-          <Card className="p-4">
+          <Card className="p-3">
             <div className="flex justify-between text-sm">
               <div>
                 <p className="font-medium">For {company.name}</p>
