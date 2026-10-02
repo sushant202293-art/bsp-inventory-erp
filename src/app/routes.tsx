@@ -150,6 +150,8 @@ export default function AppRoutes() {
           <Route path="proforma-invoices/:id/edit" element={<ProformaInvoiceFormPage />} />
 
           <Route path="stock" element={<StockOverviewPage />} />
+          {/* Alias: the stock listing is also known as the stock statement. */}
+          <Route path="stock/statement" element={<StockOverviewPage />} />
           <Route path="stock/movements" element={<StockMovementPage />} />
           <Route path="stock/adjustment" element={<StockAdjustmentPage />} />
           <Route path="stock/transfer" element={<StockTransferPage />} />

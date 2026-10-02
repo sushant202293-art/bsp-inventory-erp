@@ -144,7 +144,7 @@ export const menuConfig: MenuSection[] = [
         children: [
           {
             id: 'stock-overview',
-            label: 'Stock Overview',
+            label: 'Stock Statement',
             icon: Warehouse,
             path: '/stock',
             module: 'stock',
