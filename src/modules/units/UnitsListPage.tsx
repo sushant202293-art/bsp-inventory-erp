@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Search, Pencil, Trash2, LayoutGrid, List, Loader2, Ruler, Layers,
 } from 'lucide-react';
@@ -183,9 +182,9 @@ export function UnitPanel() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -223,10 +222,10 @@ export function UnitPanel() {
       </Card>
 
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Card key={i}>
-              <CardContent className="p-4">
+              <CardContent className="p-3">
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-12 w-12 rounded-lg" />
                   <div className="flex-1 space-y-2">
@@ -250,19 +249,12 @@ export function UnitPanel() {
           </CardContent>
         </Card>
       ) : viewMode === 'grid' ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <AnimatePresence>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <>
             {filteredUnits.map((unit) => (
-              <motion.div
-                key={unit.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div key={unit.id} >
                 <Card className="group transition-all hover:shadow-md">
-                  <CardContent className="p-4">
+                  <CardContent className="p-3">
                     <div className="flex items-start gap-3">
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border bg-muted">
                         <Ruler className="h-5 w-5 text-muted-foreground/60" />
@@ -300,24 +292,17 @@ export function UnitPanel() {
                     </div>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
+          </>
         </div>
       ) : (
         <Card>
           <CardContent className="p-0">
             <div className="divide-y divide-border">
-              <AnimatePresence>
+              <>
                 {filteredUnits.map((unit) => (
-                  <motion.div
-                    key={unit.id}
-                    layout
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/50"
-                  >
+                  <div key={unit.id}  className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-muted">
                       <Ruler className="h-4 w-4 text-muted-foreground/60" />
                     </div>
@@ -351,9 +336,9 @@ export function UnitPanel() {
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </AnimatePresence>
+              </>
             </div>
           </CardContent>
         </Card>
@@ -364,7 +349,7 @@ export function UnitPanel() {
           <DialogHeader>
             <DialogTitle>{editingUnit ? 'Edit Unit' : 'Add Unit'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-3 py-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Name *</label>
               <Input
@@ -459,7 +444,7 @@ export function UnitPanel() {
 export default function UnitsListPage() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Units"
         description="Manage units of measurement and their conversions"

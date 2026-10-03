@@ -278,7 +278,7 @@ export default function SalesReportPage() {
         </div>
       }
       summary={
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-right">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-right">
           <div>
             <p className="text-xs text-muted-foreground">Invoices</p>
             <p className="text-lg font-bold">{summary.count}</p>

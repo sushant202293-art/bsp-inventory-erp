@@ -251,7 +251,7 @@ export default function PurchaseReportPage() {
         </div>
       }
       summary={
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-right">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-right">
           <div><p className="text-xs text-muted-foreground">Invoices</p><p className="text-lg font-bold">{summary.count}</p></div>
           <div><p className="text-xs text-muted-foreground">Subtotal</p><p className="text-lg font-bold">{formatCurrency(summary.subtotal)}</p></div>
           <div><p className="text-xs text-muted-foreground">Tax</p><p className="text-lg font-bold">{formatCurrency(summary.tax)}</p></div>

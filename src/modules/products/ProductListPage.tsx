@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Search, Download, FileText, Printer, Eye, Pencil, Copy, Archive,
   MoreHorizontal, ChevronDown, Package, AlertTriangle, X, Boxes,
@@ -395,8 +394,8 @@ export function ProductListPanel() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="space-y-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           icon={<Package className="h-5 w-5" />}
           title="Total Products"
@@ -530,9 +529,9 @@ export function ProductListPanel() {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-6 space-y-4">
+            <div className="p-4 space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4">
+                <div key={i} className="flex items-center gap-3">
                   <Skeleton className="h-10 w-10 rounded" />
                   <Skeleton className="h-4 flex-1" />
                   <Skeleton className="h-4 w-20" />
@@ -575,16 +574,9 @@ export function ProductListPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <AnimatePresence>
+                  <>
                     {products.map((product, index) => (
-                      <motion.tr
-                        key={product.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="cursor-pointer border-b transition-colors hover:bg-muted/50"
-                        onClick={() => navigate(`/products/${product.id}`)}
-                      >
+                      <tr key={product.id} className="cursor-pointer border-b transition-colors hover:bg-muted/50" onClick={() => navigate(`/products/${product.id}`)}>
                         <TableCell className="text-muted-foreground">
                           {(page - 1) * pageSize + index + 1}
                         </TableCell>
@@ -639,9 +631,9 @@ export function ProductListPanel() {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
-                      </motion.tr>
+                      </tr>
                     ))}
-                  </AnimatePresence>
+                  </>
                 </TableBody>
               </Table>
             </div>
@@ -709,7 +701,7 @@ export function ProductListPanel() {
 export default function ProductListPage() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Products"
         description="Manage your product inventory"

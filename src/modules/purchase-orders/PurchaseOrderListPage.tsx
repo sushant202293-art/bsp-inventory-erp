@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Plus,
   Eye,
@@ -293,12 +292,7 @@ export default function PurchaseOrderListPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
+    <div className="space-y-3">
       <PageHeader
         title="Purchase Orders"
         description={`Manage all purchase orders (${total} total)`}
@@ -347,6 +341,6 @@ export default function PurchaseOrderListPage() {
         onConfirm={handleCancel}
         loading={cancelling}
       />
-    </motion.div>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Pencil, Trash2, ArrowLeft, Package, TrendingUp, TrendingDown,
   DollarSign, Box, AlertTriangle, Copy, Truck, Users, Receipt, FileClock,
@@ -83,7 +82,7 @@ function CounterpartyTable({
   if (loading) {
     return (
       <Card>
-        <CardContent className="space-y-3 p-6">
+        <CardContent className="space-y-3 p-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-12 w-full" />
           ))}
@@ -251,9 +250,9 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-3">
         <Skeleton className="h-8 w-48" />
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-3 lg:grid-cols-3">
           <Skeleton className="h-64 lg:col-span-2" />
           <Skeleton className="h-64" />
         </div>
@@ -285,7 +284,7 @@ export default function ProductDetailPage() {
     .sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title={product.name}
         description={`Product code: ${product.code}`}
@@ -316,15 +315,11 @@ export default function ProductDetailPage() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="lg:col-span-2 space-y-6"
-        >
+      <div className="grid gap-3 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-3">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex flex-col sm:flex-row gap-6">
+            <CardContent className="p-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <div className="h-40 w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
@@ -394,7 +389,7 @@ export default function ProductDetailPage() {
             </CardContent>
           </Card>
 
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-3">
             <div className="overflow-x-auto pb-1">
               <TabsList className="inline-flex w-max min-w-full">
                 {DETAIL_TABS.map((tab) => (
@@ -405,8 +400,8 @@ export default function ProductDetailPage() {
               </TabsList>
             </div>
 
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <TabsContent value="overview" className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {[
                   { label: 'Purchase Price', value: formatCurrency(product.purchase_price), icon: DollarSign, color: 'text-blue-500' },
                   { label: 'Selling Price', value: formatCurrency(product.selling_price), icon: DollarSign, color: 'text-green-500' },
@@ -414,7 +409,7 @@ export default function ProductDetailPage() {
                   { label: 'Reorder Level', value: String(product.reorder_level), icon: TrendingDown, color: 'text-purple-500' },
                 ].map((stat) => (
                   <Card key={stat.label}>
-                    <CardContent className="p-4">
+                    <CardContent className="p-3">
                       <div className="flex items-center gap-3">
                         <div className={`rounded-lg bg-muted p-2`}>
                           <stat.icon className={`h-4 w-4 ${stat.color}`} />
@@ -534,7 +529,7 @@ export default function ProductDetailPage() {
               <Card>
                 <CardContent className="p-0">
                   {txLoading ? (
-                    <div className="space-y-3 p-6">
+                    <div className="space-y-3 p-4">
                       {Array.from({ length: 4 }).map((_, i) => (
                         <Skeleton key={i} className="h-10 w-full" />
                       ))}
@@ -587,9 +582,9 @@ export default function ProductDetailPage() {
             </TabsContent>
 
             <TabsContent value="pricing">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <Card>
-                  <CardContent className="space-y-3 p-5">
+                  <CardContent className="space-y-3 p-4">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Cost &amp; Revenue
                     </p>
@@ -613,7 +608,7 @@ export default function ProductDetailPage() {
                 </Card>
 
                 <Card>
-                  <CardContent className="space-y-3 p-5">
+                  <CardContent className="space-y-3 p-4">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Tax
                     </p>
@@ -637,7 +632,7 @@ export default function ProductDetailPage() {
                 </Card>
 
                 <Card>
-                  <CardContent className="space-y-3 p-5">
+                  <CardContent className="space-y-3 p-4">
                     <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                       Stock Valuation
                     </p>
@@ -694,7 +689,7 @@ export default function ProductDetailPage() {
               <Card>
                 <CardContent className="p-0">
                   {txLoading ? (
-                    <div className="space-y-3 p-6">
+                    <div className="space-y-3 p-4">
                       {Array.from({ length: 4 }).map((_, i) => (
                         <Skeleton key={i} className="h-10 w-full" />
                       ))}
@@ -715,7 +710,7 @@ export default function ProductDetailPage() {
                         </div>
                       ))}
                       {activityEvents.length === 0 && (
-                        <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+                        <p className="px-4 py-4 text-center text-sm text-muted-foreground">
                           No activity recorded yet.
                         </p>
                       )}
@@ -725,20 +720,16 @@ export default function ProductDetailPage() {
               </Card>
             </TabsContent>
           </Tabs>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="space-y-6"
-        >
+        <div className="space-y-3">
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Stock Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="rounded-lg border border-border bg-muted/30 p-4 text-center">
-                <p className="text-3xl font-bold text-foreground">{totalStock}</p>
+                <p className="text-xl font-bold text-foreground">{totalStock}</p>
                 <p className="text-sm text-muted-foreground">Total Units in Stock</p>
               </div>
               <div className="space-y-3 text-sm">
@@ -807,7 +798,7 @@ export default function ProductDetailPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
 
       <ConfirmDialog

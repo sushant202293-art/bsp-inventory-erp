@@ -232,7 +232,7 @@ export function ProductAutocomplete({
               id={listId}
               role="listbox"
               aria-label="Product matches"
-              className="fixed z-[9999] flex flex-col overflow-hidden rounded-lg border bg-popover shadow-xl"
+              className="fixed z-[9999] flex flex-col overflow-hidden rounded border bg-popover shadow-lg"
               style={{
                 top: placement?.top,
                 bottom: placement?.bottom,
@@ -263,8 +263,8 @@ export function ProductAutocomplete({
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => choose(product)}
                       onMouseEnter={() => setActive(index)}
-                      className={`flex w-full items-center justify-between gap-3 border-l-2 px-3 py-1.5 text-left text-sm hover:bg-accent ${
-                        index === active ? 'border-l-primary bg-accent' : 'border-l-transparent'
+                      className={`flex w-full items-center justify-between gap-3 border-l-2 px-3 py-1.5 text-left text-[13px] hover:bg-primary/10 ${
+                        index === active ? 'border-l-primary bg-primary/10' : 'border-l-transparent'
                       }`}
                     >
                       <span className="min-w-0 flex-1 truncate">

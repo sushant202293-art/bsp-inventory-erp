@@ -25,22 +25,23 @@ function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center py-12 text-center",
+        "flex flex-col items-center justify-center py-10 text-center",
         className
       )}
     >
-      <div className="rounded-full bg-muted p-4 mb-4">
-        {icon || <Inbox className="h-8 w-8 text-muted-foreground/60" />}
+      <div className="rounded border border-border bg-sidebar p-3 mb-3">
+        {icon || <Inbox className="h-6 w-6 text-muted-foreground/60" />}
       </div>
-      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
+      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
       {description && (
-        <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>
+        <p className="mt-1 max-w-sm text-xs text-muted-foreground">{description}</p>
       )}
       {action && (
         <Button
           onClick={action.onClick}
           variant={action.variant || "default"}
-          className="mt-4"
+          size="sm"
+          className="mt-3"
         >
           {action.label}
         </Button>

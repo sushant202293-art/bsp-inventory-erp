@@ -184,7 +184,7 @@ export default function StockReportPage() {
         </div>
       }
       summary={
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-right">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-right">
           <div><p className="text-xs text-muted-foreground">Products</p><p className="text-lg font-bold">{summary.totalProducts}</p></div>
           <div><p className="text-xs text-muted-foreground">Total Qty</p><p className="text-lg font-bold">{summary.totalQty}</p></div>
           <div><p className="text-xs text-muted-foreground">Total Value</p><p className="text-lg font-bold text-primary">{formatCurrency(summary.totalValue)}</p></div>

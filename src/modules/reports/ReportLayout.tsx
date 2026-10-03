@@ -63,10 +63,10 @@ export function ReportLayout({
   }, [title, description, onPrint]);
 
   return (
-    <div className={cn('space-y-6', className)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className={cn('space-y-3', className)}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
+          <h1 className="text-lg font-bold tracking-tight text-foreground">{title}</h1>
           {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
         </div>
         <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function ReportLayout({
       </div>
 
       {filters && (
-        <Card className="p-4">
+        <Card className="p-3">
           {filters}
         </Card>
       )}

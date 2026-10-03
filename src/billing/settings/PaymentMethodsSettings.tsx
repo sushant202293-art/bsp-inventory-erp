@@ -120,7 +120,7 @@ export function PaymentMethodsSettings() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Payment Methods</CardTitle>
@@ -182,7 +182,7 @@ export function PaymentMethodsSettings() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
             These are printed on invoices and offered in the payment rows. Account numbers are
             masked on the printed document.

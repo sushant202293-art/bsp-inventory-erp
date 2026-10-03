@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Pencil,
   BookOpen,
@@ -24,11 +23,6 @@ import { cn, formatCurrency, formatDate } from '@/lib/utils';
 import { getCustomer, getCustomerLedger } from '@/services/customer.service';
 import type { CustomerWithRelations } from '@/types/customer.types';
 import type { CustomerLedgerResponse } from '@/types/customer.types';
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
 
 export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -80,9 +74,9 @@ export default function CustomerDetailPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-3">
         <Skeleton className="h-10 w-[300px]" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           <Skeleton className="h-[400px] rounded-xl" />
           <Skeleton className="h-[400px] rounded-xl lg:col-span-2" />
         </div>
@@ -96,7 +90,7 @@ export default function CustomerDetailPage() {
   const bankDetails = customer.bank_details;
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title={customer.name}
         description={`Customer Code: ${customer.code || 'N/A'}`}
@@ -128,12 +122,12 @@ export default function CustomerDetailPage() {
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary text-xl font-bold">
                 {customer.name.charAt(0).toUpperCase()}
@@ -199,8 +193,8 @@ export default function CustomerDetailPage() {
               <TabsTrigger value="payments">Payments</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className="space-y-6 mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <TabsContent value="overview" className="space-y-3 mt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-base">Address</CardTitle>
@@ -277,7 +271,7 @@ export default function CustomerDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className={cn(
-                      'text-3xl font-bold',
+                      'text-xl font-bold',
                       (customer.opening_balance || 0) > 0 ? 'text-red-500' : (customer.opening_balance || 0) < 0 ? 'text-green-500' : 'text-foreground'
                     )}>
                       {formatCurrency(customer.opening_balance || 0)}
@@ -305,7 +299,7 @@ export default function CustomerDetailPage() {
               )}
             </TabsContent>
 
-            <TabsContent value="ledger" className="mt-4">
+            <TabsContent value="ledger" className="mt-2">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Account Ledger</CardTitle>
@@ -321,8 +315,8 @@ export default function CustomerDetailPage() {
                       ))}
                     </div>
                   ) : ledger ? (
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-3">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <div className="rounded-lg border p-3">
                           <p className="text-xs text-muted-foreground">Opening Balance</p>
                           <p className="text-lg font-semibold">{formatCurrency(ledger.opening_balance)}</p>
@@ -348,25 +342,25 @@ export default function CustomerDetailPage() {
 
                       {ledger.entries.length > 0 ? (
                         <div className="rounded-md border overflow-x-auto">
-                          <table className="w-full text-sm">
+                          <table className="w-full text-[13px]">
                             <thead className="bg-muted">
                               <tr>
-                                <th className="px-4 py-2 text-left">Date</th>
-                                <th className="px-4 py-2 text-left">Description</th>
-                                <th className="px-4 py-2 text-right">Debit</th>
-                                <th className="px-4 py-2 text-right">Credit</th>
-                                <th className="px-4 py-2 text-right">Balance</th>
+                                <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Date</th>
+                                <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Description</th>
+                                <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Debit</th>
+                                <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Credit</th>
+                                <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Balance</th>
                               </tr>
                             </thead>
                             <tbody>
                               {ledger.entries.map((entry) => (
                                 <tr key={entry.id} className="border-t">
-                                  <td className="px-4 py-2">{formatDate(entry.date)}</td>
-                                  <td className="px-4 py-2">{entry.description}</td>
-                                  <td className="px-4 py-2 text-right">
+                                  <td className="px-2.5 py-1.5">{formatDate(entry.date)}</td>
+                                  <td className="px-2.5 py-1.5">{entry.description}</td>
+                                  <td className="px-2.5 py-1.5 text-right">
                                     {entry.debit > 0 ? formatCurrency(entry.debit) : '-'}
                                   </td>
-                                  <td className="px-4 py-2 text-right">
+                                  <td className="px-2.5 py-1.5 text-right">
                                     {entry.credit > 0 ? formatCurrency(entry.credit) : '-'}
                                   </td>
                                   <td className={cn(
@@ -391,7 +385,7 @@ export default function CustomerDetailPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="transactions" className="mt-4">
+            <TabsContent value="transactions" className="mt-2">
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Transactions</CardTitle>
@@ -404,7 +398,7 @@ export default function CustomerDetailPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="payments" className="mt-4">
+            <TabsContent value="payments" className="mt-2">
               <Card>
                 <CardHeader>
                   <CardTitle>Payment History</CardTitle>
@@ -419,6 +413,6 @@ export default function CustomerDetailPage() {
           </Tabs>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

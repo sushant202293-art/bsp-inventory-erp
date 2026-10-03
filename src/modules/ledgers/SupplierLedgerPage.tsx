@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Search,
   Download,
@@ -177,7 +176,7 @@ export default function SupplierLedgerPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Supplier Ledger"
         description="View supplier account statements and transaction history"
@@ -209,8 +208,8 @@ export default function SupplierLedgerPage() {
       />
 
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+        <CardContent className="p-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-2">
               <label className="text-sm font-medium">Supplier</label>
               <div className="relative">
@@ -259,39 +258,39 @@ export default function SupplierLedgerPage() {
         />
       ) : ledgerData ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
               <Card className="border-info/20 bg-info/5">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-xs text-muted-foreground">Opening Balance</p>
                   <p className="text-lg font-bold">{formatCurrency(ledgerData.opening_balance)}</p>
                 </CardContent>
               </Card>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            </div>
+            <div>
               <Card className="border-danger/20 bg-danger/5">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><ArrowUpCircle className="h-3 w-3" /> Total Debit</p>
                   <p className="text-lg font-bold text-danger">{formatCurrency(ledgerData.total_debit)}</p>
                 </CardContent>
               </Card>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            </div>
+            <div>
               <Card className="border-success/20 bg-success/5">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-xs text-muted-foreground flex items-center gap-1"><ArrowDownCircle className="h-3 w-3" /> Total Credit</p>
                   <p className="text-lg font-bold text-success">{formatCurrency(ledgerData.total_credit)}</p>
                 </CardContent>
               </Card>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            </div>
+            <div>
               <Card className="border-primary/20 bg-primary/5">
-                <CardContent className="p-4">
+                <CardContent className="p-3">
                   <p className="text-xs text-muted-foreground">Closing Balance</p>
                   <p className="text-lg font-bold text-primary">{formatCurrency(ledgerData.closing_balance)}</p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </div>
 
           <Card>
@@ -317,13 +316,7 @@ export default function SupplierLedgerPage() {
                     ) : (
                       <>
                         {ledgerData.entries.map((entry, index) => (
-                          <motion.tr
-                            key={entry.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.02 }}
-                            className="border-b border-border hover:bg-muted/30"
-                          >
+                          <tr key={entry.id} className="border-b border-border hover:bg-muted/30">
                             <TableCell>{formatDate(entry.date)}</TableCell>
                             <TableCell>{entry.description || '-'}</TableCell>
                             <TableCell className="text-right font-medium text-danger">
@@ -335,7 +328,7 @@ export default function SupplierLedgerPage() {
                             <TableCell className="text-right font-semibold">
                               {formatCurrency(entry.balance)}
                             </TableCell>
-                          </motion.tr>
+                          </tr>
                         ))}
                         <TableRow className="bg-muted/50 font-semibold">
                           <TableCell colSpan={2}>Total</TableCell>

@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
 import {
   Save, X, Loader2, Upload, Tag, DollarSign, Package, Settings, Sparkles,
   Plus, Image as ImageIcon, Percent, FileCode, Boxes,
@@ -339,7 +338,7 @@ export default function ProductFormPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title={isEditing ? 'Edit Product' : 'Add New Product'}
         description={isEditing ? 'Update product information' : 'Add a new product to your inventory'}
@@ -362,9 +361,9 @@ export default function ProductFormPage() {
         }
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         {/* ---------------------------------------------- 1. Basic */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -372,8 +371,8 @@ export default function ProductFormPage() {
                 Basic Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <CardContent className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Product Name *</label>
                   <Input
@@ -401,7 +400,7 @@ export default function ProductFormPage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Category</label>
                   <div className="relative">
@@ -464,7 +463,7 @@ export default function ProductFormPage() {
                 </div>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Color</label>
                   <Input {...register('color')} placeholder="e.g., Red, Blue" />
@@ -476,10 +475,10 @@ export default function ProductFormPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* --------------------------------------------- 2. Pricing */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -487,8 +486,8 @@ export default function ProductFormPage() {
                 Pricing
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-3">
+            <CardContent className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Purchase Price *</label>
                   <Input
@@ -543,10 +542,10 @@ export default function ProductFormPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* -------------------------------------------- 3. Inventory */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -554,8 +553,8 @@ export default function ProductFormPage() {
                 Inventory &amp; Thresholds
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <CardContent className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Low Stock Level</label>
                   <Input
@@ -599,10 +598,10 @@ export default function ProductFormPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* ---------------------------------------------- 4. Details */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -621,10 +620,10 @@ export default function ProductFormPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* ---------------------------------------------- 5. Images */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -633,7 +632,7 @@ export default function ProductFormPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="h-32 w-32 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
                   {imageUrl ? (
                     <img src={imageUrl} alt="Product preview" className="h-full w-full object-cover" />
@@ -660,10 +659,10 @@ export default function ProductFormPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         {/* ------------------------------------------ Status toggle */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -686,7 +685,7 @@ export default function ProductFormPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
         <div className="flex flex-col gap-3 pb-6 sm:flex-row sm:justify-end">
           <Button type="button" variant="outline" onClick={() => navigate('/products')}>
@@ -728,7 +727,7 @@ export default function ProductFormPage() {
               from the {quickCreate} tab in Product Management.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-3 py-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Name *</label>
               <Input

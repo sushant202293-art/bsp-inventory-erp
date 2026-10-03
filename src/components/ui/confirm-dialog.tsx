@@ -74,7 +74,7 @@ function ConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className={cn("rounded-full p-3", config.iconBg)}>
               {config.icon}
             </div>

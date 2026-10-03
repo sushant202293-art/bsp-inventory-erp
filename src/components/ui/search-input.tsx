@@ -67,7 +67,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 
     return (
       <div className="relative w-full">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
         <input
           ref={ref}
           type="text"
@@ -75,8 +75,8 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={handleChange}
           placeholder={placeholder}
           className={cn(
-            "flex h-10 w-full rounded-md border border-border bg-transparent pl-9 pr-9 py-2 text-sm text-foreground shadow-sm transition-all duration-200 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50",
-            error && "border-danger focus-visible:ring-danger/30 focus-visible:border-danger",
+            "flex h-8 w-full rounded border border-border bg-card pl-8 pr-8 text-[13px] text-foreground transition-colors duration-100 placeholder:text-muted-foreground focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:border-primary focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60",
+            error && "border-danger focus-visible:border-danger focus-visible:outline-danger",
             className
           )}
           {...props}
@@ -84,14 +84,15 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         {internalValue && (
           <button
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             type="button"
+            aria-label="Clear search"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         )}
         {errorMessage && (
-          <p className="mt-1 text-xs text-danger">{errorMessage}</p>
+          <p className="mt-1 text-[11px] text-danger">{errorMessage}</p>
         )}
       </div>
     );

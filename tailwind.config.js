@@ -56,6 +56,11 @@ export default {
         },
         background: "rgb(var(--color-background) / <alpha-value>)",
         card: "rgb(var(--color-card) / <alpha-value>)",
+        // Dropdown / popover surfaces follow the card surface so floating
+        // menus are never transparent (bg-popover previously resolved to
+        // nothing because this token did not exist).
+        popover: "rgb(var(--color-card) / <alpha-value>)",
+        "popover-foreground": "rgb(var(--color-text) / <alpha-value>)",
         sidebar: "rgb(var(--color-sidebar) / <alpha-value>)",
         border: "rgb(var(--color-border) / <alpha-value>)",
         // `text-foreground` and `text-text` are both used in components;
@@ -88,9 +93,23 @@ export default {
         info: "rgb(var(--color-info) / <alpha-value>)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-        mono: ["JetBrains Mono", "Fira Code", "monospace"],
-        display: ["Poppins", "Inter", "sans-serif"],
+        sans: [
+          "Inter",
+          "Segoe UI",
+          "system-ui",
+          "-apple-system",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
+        mono: [
+          "JetBrains Mono",
+          "Consolas",
+          "SF Mono",
+          "Fira Code",
+          "monospace",
+        ],
+        display: ["Inter", "Segoe UI", "system-ui", "sans-serif"],
       },
       fontSize: {
         "2xs": ["0.625rem", { lineHeight: "0.875rem" }],
@@ -185,22 +204,39 @@ export default {
         },
       },
       boxShadow: {
-        neon: "0 0 5px var(--color-primary), 0 0 10px var(--color-primary), 0 0 20px var(--color-primary)",
-        "neon-sm": "0 0 3px var(--color-primary), 0 0 6px var(--color-primary)",
-        "neon-lg": "0 0 10px var(--color-primary), 0 0 20px var(--color-primary), 0 0 40px var(--color-primary)",
-        "neon-accent": "0 0 5px var(--color-accent), 0 0 10px var(--color-accent), 0 0 20px var(--color-accent)",
-        card: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-        "card-hover": "0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-        elevated: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
-        "elevated-lg": "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-        glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
-        "inner-glow": "inset 0 0 20px rgba(255, 255, 255, 0.1)",
+        // Sharp, flat business UI: no neon, no glow, no lift.
+        none: "none",
+        sm: "0 1px 1px rgba(15, 23, 42, 0.04)",
+        DEFAULT: "0 1px 2px rgba(15, 23, 42, 0.06)",
+        md: "0 1px 3px rgba(15, 23, 42, 0.08)",
+        lg: "0 4px 12px rgba(15, 23, 42, 0.10)",
+        neon: "none",
+        "neon-sm": "none",
+        "neon-lg": "none",
+        "neon-accent": "none",
+        card: "none",
+        "card-hover": "0 1px 2px rgba(15, 23, 42, 0.06)",
+        elevated: "0 4px 16px rgba(15, 23, 42, 0.12)",
+        "elevated-lg": "0 8px 32px rgba(15, 23, 42, 0.16)",
+        glass: "none",
+        "inner-glow": "none",
       },
       backdropBlur: {
         xs: "2px",
       },
+      // Sharp corners everywhere: accounting/spreadsheet software uses
+      // straight edges, not pill-shaped cards. `rounded-full` is untouched
+      // so avatars and status dots stay circular.
       borderRadius: {
-        "4xl": "2rem",
+        none: "0px",
+        sm: "2px",
+        DEFAULT: "2px",
+        md: "3px",
+        lg: "4px",
+        xl: "4px",
+        "2xl": "6px",
+        "3xl": "8px",
+        "4xl": "10px",
       },
       spacing: {
         "18": "4.5rem",

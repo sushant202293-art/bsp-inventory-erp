@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, Search, ChevronRight, ChevronDown, Pencil, Trash2, FolderTree, Loader2,
 } from 'lucide-react';
@@ -91,14 +90,9 @@ function CategoryTreeNode({
           <Trash2 className="h-3 w-3" />
         </Button>
       </div>
-      <AnimatePresence>
+      <>
         {expanded && hasChildren && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
+          <div>
             {cat.children!.map((child) => (
               <CategoryTreeNode
                 key={child.id}
@@ -109,9 +103,9 @@ function CategoryTreeNode({
                 onDelete={onDelete}
               />
             ))}
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </>
     </div>
   );
 }
@@ -280,9 +274,9 @@ export function CategoryPanel() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -302,7 +296,7 @@ export function CategoryPanel() {
       </Card>
 
       <Card>
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -342,7 +336,7 @@ export function CategoryPanel() {
           <DialogHeader>
             <DialogTitle>{editingCategory ? 'Edit Category' : 'Add Category'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-3 py-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Name *</label>
               <Input
@@ -419,7 +413,7 @@ export function CategoryPanel() {
 export default function CategoryListPage() {
   const navigate = useNavigate();
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Categories"
         description="Organize your products with categories"

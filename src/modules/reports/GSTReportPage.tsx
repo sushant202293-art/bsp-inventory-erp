@@ -48,15 +48,15 @@ export default function GSTReportPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold">GST Summary Report</h1><p className="text-sm text-muted-foreground">Tax collected vs tax paid</p></div>
+        <div><h1 className="text-lg font-bold">GST Summary Report</h1><p className="text-sm text-muted-foreground">Tax collected vs tax paid</p></div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handlePrint}><Printer className="mr-2 h-4 w-4" /> Print</Button>
         </div>
       </div>
 
-      <Card><CardContent className="p-4 flex gap-4">
+      <Card><CardContent className="p-4 flex gap-3">
         <div className="space-y-1"><Label>Date From</Label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
         <div className="space-y-1"><Label>Date To</Label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></div>
       </CardContent></Card>
@@ -64,11 +64,11 @@ export default function GSTReportPage() {
       <div ref={printRef}>
         <Card className="print:shadow-none">
           <CardHeader><CardTitle className="text-lg">{company?.name || 'Company'} — GST Summary</CardTitle><p className="text-sm text-muted-foreground">Period: {formatDate(from)} to {formatDate(to)}</p></CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-3">
             <div>
               <h3 className="mb-2 font-semibold">Sales (Output Tax)</h3>
-              <table className="w-full text-sm">
-                <thead><tr className="border-b"><th className="p-2 text-left">Description</th><th className="p-2 text-right">Amount</th></tr></thead>
+              <table className="w-full text-[13px]">
+                <thead><tr className="border-b"><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Description</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Amount</th></tr></thead>
                 <tbody>
                   <tr className="border-b"><td className="p-2">Taxable Sales</td><td className="p-2 text-right">{formatCurrency(sales.total)}</td></tr>
                   <tr className="border-b"><td className="p-2">CGST Collected</td><td className="p-2 text-right">{formatCurrency(sales.cgst)}</td></tr>
@@ -81,8 +81,8 @@ export default function GSTReportPage() {
 
             <div>
               <h3 className="mb-2 font-semibold">Purchases (Input Tax)</h3>
-              <table className="w-full text-sm">
-                <thead><tr className="border-b"><th className="p-2 text-left">Description</th><th className="p-2 text-right">Amount</th></tr></thead>
+              <table className="w-full text-[13px]">
+                <thead><tr className="border-b"><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Description</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Amount</th></tr></thead>
                 <tbody>
                   <tr className="border-b"><td className="p-2">Taxable Purchases</td><td className="p-2 text-right">{formatCurrency(purchases.total)}</td></tr>
                   <tr className="border-b"><td className="p-2">CGST Paid</td><td className="p-2 text-right">{formatCurrency(purchases.cgst)}</td></tr>
@@ -95,7 +95,7 @@ export default function GSTReportPage() {
 
             <div>
               <h3 className="mb-2 font-semibold">Net Tax Payable</h3>
-              <table className="w-full text-sm">
+              <table className="w-full text-[13px]">
                 <tbody>
                   <tr className="border-b"><td className="p-2">Net CGST Payable</td><td className="p-2 text-right font-bold">{formatCurrency(netPayable.cgst)}</td></tr>
                   <tr className="border-b"><td className="p-2">Net SGST Payable</td><td className="p-2 text-right font-bold">{formatCurrency(netPayable.sgst)}</td></tr>

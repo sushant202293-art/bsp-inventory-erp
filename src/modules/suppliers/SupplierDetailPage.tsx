@@ -1,5 +1,4 @@
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Edit, Phone, Mail, MapPin, BookOpen } from 'lucide-react';
 import { containerVariants, itemVariants } from '@/styles/animations';
 
@@ -26,14 +25,14 @@ export default function SupplierDetailPage() {
   const navigate = useNavigate();
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="rounded-lg p-2 hover:bg-[rgb(var(--color-border))]">
             <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-muted))]" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-[rgb(var(--color-text))]">{supplierData.name}</h1>
+            <h1 className="text-lg font-bold text-[rgb(var(--color-text))]">{supplierData.name}</h1>
             <p className="text-sm text-[rgb(var(--color-muted))]">Contact: {supplierData.contact}</p>
           </div>
         </div>
@@ -45,10 +44,10 @@ export default function SupplierDetailPage() {
             <Edit className="h-4 w-4" /> Edit
           </Link>
         </div>
-      </motion.div>
+      </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <motion.div variants={itemVariants} className="card space-y-4 lg:col-span-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <div className="card space-y-3 lg:col-span-2">
           <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">Contact Information</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="flex items-start gap-3 rounded-lg border border-[rgb(var(--color-border))] p-3">
@@ -83,13 +82,13 @@ export default function SupplierDetailPage() {
               <p className="text-sm font-medium text-[rgb(var(--color-text))]">{supplierData.ifsc}</p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div variants={itemVariants} className="card space-y-4">
+        <div className="card space-y-3">
           <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">Summary</h2>
           <div className="space-y-3">
             <div className="rounded-lg bg-[rgb(var(--color-background))] p-3 text-center">
-              <p className="text-2xl font-bold text-[rgb(var(--color-text))]">{supplierData.balance}</p>
+              <p className="text-lg font-bold text-[rgb(var(--color-text))]">{supplierData.balance}</p>
               <p className="text-xs text-[rgb(var(--color-muted))]">Outstanding Payable</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -103,8 +102,8 @@ export default function SupplierDetailPage() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

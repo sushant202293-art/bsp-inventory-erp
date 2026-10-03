@@ -25,13 +25,13 @@ export default function ForgotPasswordPage() {
 
   return (
     <div>
-      <div className="mb-6 text-center">
+      <div className="mb-3 text-center">
         <h2 className="text-xl font-bold">Reset Password</h2>
         <p className="mt-1 text-sm text-muted-foreground">Enter your email to receive a reset link</p>
       </div>
 
       {sent ? (
-        <div className="space-y-4 text-center">
+        <div className="space-y-3 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-green-500" />
           <div>
             <p className="font-medium">Reset link sent</p>
@@ -44,12 +44,12 @@ export default function ForgotPasswordPage() {
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="pl-10" required autoComplete="email" />
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" className="pl-8" required autoComplete="email" />
             </div>
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}

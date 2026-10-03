@@ -77,9 +77,9 @@ export default function UserListPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold flex items-center gap-2"><Users className="h-6 w-6" /> User Management</h1><p className="text-sm text-muted-foreground">{users.length} registered users</p></div>
+        <div><h1 className="text-lg font-bold flex items-center gap-2"><Users className="h-4 w-4" /> User Management</h1><p className="text-sm text-muted-foreground">{users.length} registered users</p></div>
         <Button onClick={() => { setEditUser(null); setFormData({ full_name: '', email: '', contact: '', role: 'viewer', department: '' }); setShowForm(true); }}>
           <Plus className="mr-2 h-4 w-4" /> Add User
         </Button>
@@ -91,18 +91,18 @@ export default function UserListPage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead><tr className="border-b"><th className="p-3 text-left font-medium">Name</th><th className="p-3 text-left font-medium">Email</th><th className="p-3 text-left font-medium">Role</th><th className="p-3 text-left font-medium">Department</th><th className="p-3 text-center font-medium">Status</th><th className="p-3 text-left font-medium">Last Login</th><th className="p-3 text-center font-medium">Actions</th></tr></thead>
+            <table className="w-full text-[13px]">
+              <thead><tr className="border-b"><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Name</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Email</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Role</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Department</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-center">Status</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Last Login</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-center">Actions</th></tr></thead>
               <tbody>
                 {filtered.map((user) => (
                   <tr key={user.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3 font-medium">{user.full_name}</td>
-                    <td className="p-3 text-muted-foreground">{user.email}</td>
-                    <td className="p-3"><Badge variant={(roleColors[user.role] as any) || 'secondary'}>{user.role}</Badge></td>
-                    <td className="p-3 text-muted-foreground">{user.department || '-'}</td>
-                    <td className="p-3 text-center"><Badge variant={user.is_active ? 'success' : 'destructive'}>{user.is_active ? 'Active' : 'Inactive'}</Badge></td>
-                    <td className="p-3 text-muted-foreground">{user.last_login ? formatDate(user.last_login) : 'Never'}</td>
-                    <td className="p-3 text-center">
+                    <td className="px-2.5 py-1.5 font-medium">{user.full_name}</td>
+                    <td className="px-2.5 py-1.5 text-muted-foreground">{user.email}</td>
+                    <td className="px-2.5 py-1.5"><Badge variant={(roleColors[user.role] as any) || 'secondary'}>{user.role}</Badge></td>
+                    <td className="px-2.5 py-1.5 text-muted-foreground">{user.department || '-'}</td>
+                    <td className="px-2.5 py-1.5 text-center"><Badge variant={user.is_active ? 'success' : 'destructive'}>{user.is_active ? 'Active' : 'Inactive'}</Badge></td>
+                    <td className="px-2.5 py-1.5 text-muted-foreground">{user.last_login ? formatDate(user.last_login) : 'Never'}</td>
+                    <td className="px-2.5 py-1.5 text-center">
                       <div className="flex justify-center gap-1">
                         <Button size="sm" variant="ghost" onClick={() => openEdit(user)}><Edit className="h-3 w-3" /></Button>
                         <Button size="sm" variant="ghost" onClick={() => toggleActive(user)}>
@@ -121,7 +121,7 @@ export default function UserListPage() {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>{editUser ? 'Edit User' : 'Create User'}</DialogTitle></DialogHeader>
-          <form onSubmit={handleSave} className="space-y-4">
+          <form onSubmit={handleSave} className="space-y-3">
             <div className="space-y-2"><Label>Full Name *</Label><Input value={formData.full_name} onChange={(e) => setFormData({ ...formData, full_name: e.target.value })} required /></div>
             {!editUser && <div className="space-y-2"><Label>Email *</Label><Input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required /></div>}
             <div className="space-y-2"><Label>Contact</Label><Input value={formData.contact} onChange={(e) => setFormData({ ...formData, contact: e.target.value })} /></div>

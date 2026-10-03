@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Save,
   Printer,
@@ -465,12 +464,7 @@ export default function PurchaseOrderFormPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-2"
-    >
+    <div className="space-y-2">
       <PageHeader
         title={isEdit ? 'Edit Purchase Order' : 'New Purchase Order'}
         description={`${isEdit ? 'Update' : 'Create'} a purchase order`}
@@ -603,7 +597,7 @@ export default function PurchaseOrderFormPage() {
         </div>
 
         <div className="overflow-x-auto lg:min-h-[600px]">
-          <table className="w-full text-sm">
+          <table className="w-full text-[13px]">
             <thead>
               <tr className="border-b border-border">
                 <th className="px-2 py-1.5 text-left text-xs font-medium text-muted-foreground w-10">Sl</th>
@@ -846,7 +840,7 @@ export default function PurchaseOrderFormPage() {
                 <p className="text-muted-foreground">Authorized Signatory</p>
               </div>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground text-center">
+            <p className="mt-2 text-xs text-muted-foreground text-center">
               This is a computer generated Purchase Order and does not require a signature.
             </p>
           </Card>
@@ -968,6 +962,6 @@ export default function PurchaseOrderFormPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 }

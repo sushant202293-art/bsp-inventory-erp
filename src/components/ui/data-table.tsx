@@ -124,14 +124,14 @@ export function DataTable<TData, TValue>({
 
   if (loading) {
     return (
-      <div className="w-full space-y-3">
+      <div className="w-full space-y-2">
         <div className="flex items-center justify-between">
           <Skeleton className="h-10 w-[250px]" />
           <Skeleton className="h-10 w-[120px]" />
         </div>
-        <div className="rounded-md border border-border">
+        <div className="rounded border border-border bg-card">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="flex items-center space-x-4 p-4">
+            <div key={i} className="flex items-center space-x-4 p-3">
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
               <Skeleton className="h-4 flex-1" />
@@ -144,12 +144,12 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="w-full space-y-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           {searchKey && (
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={searchPlaceholder}
                 value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
@@ -161,7 +161,7 @@ export function DataTable<TData, TValue>({
               {(table.getColumn(searchKey)?.getFilterValue() as string) && (
                 <button
                   onClick={() => table.getColumn(searchKey)?.setFilterValue("")}
-                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                  className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -170,7 +170,7 @@ export function DataTable<TData, TValue>({
           )}
           {!searchKey && globalFilter !== undefined && (
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={searchPlaceholder}
                 value={globalFilter}
@@ -180,7 +180,7 @@ export function DataTable<TData, TValue>({
               {globalFilter && (
                 <button
                   onClick={() => setGlobalFilter("")}
-                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                  className="absolute right-2 top-2 text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -272,15 +272,15 @@ export function DataTable<TData, TValue>({
         </div>
       )}
 
-      <div className="rounded-md border border-border">
-        <table className="w-full caption-bottom text-sm">
+      <div className="rounded border border-border bg-card">
+        <table className="w-full caption-bottom border-collapse text-[13px] tabular-nums">
           <thead className="[&_tr]:border-b">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0"
+                    className="h-[30px] px-2.5 text-left align-middle text-[11px] font-semibold uppercase tracking-wide text-muted-foreground [&:has([role=checkbox])]:pr-0"
                   >
                     {header.isPlaceholder
                       ? null
@@ -310,13 +310,13 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+                    "border-b border-border transition-colors hover:bg-primary/5 [&:nth-child(even)]:bg-sidebar/40 data-[state=selected]:bg-primary/10",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                      className="h-8 px-2.5 py-1 align-middle [&:has([role=checkbox])]:pr-0"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -338,7 +338,7 @@ export function DataTable<TData, TValue>({
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <p className="text-sm text-muted-foreground">Rows per page</p>
             <Select

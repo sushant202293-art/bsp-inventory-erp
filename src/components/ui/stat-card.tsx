@@ -78,16 +78,14 @@ function StatCard({
 }: StatCardProps) {
   if (loading) {
     return (
-      <Card className={cn("p-6", className)}>
-        <div className="flex items-start justify-between">
-          <div className="space-y-3 flex-1">
-            <Skeleton className="h-4 w-[120px]" />
-            <Skeleton className="h-8 w-[100px]" />
-            <Skeleton className="h-4 w-[80px]" />
+      <Card className={cn("p-3", className)}>
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-3 w-[100px]" />
+            <Skeleton className="h-6 w-[90px]" />
           </div>
-          <Skeleton className="h-12 w-12 rounded-xl" />
+          <Skeleton className="h-8 w-8 rounded" />
         </div>
-        <Skeleton className="mt-4 h-10 w-full" />
       </Card>
     );
   }
@@ -97,26 +95,30 @@ function StatCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-0.5",
-        variant === "neon" && "border-primary/30 shadow-neon-sm hover:shadow-neon",
-        variant === "gradient" && "bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20",
+        "group relative overflow-hidden p-3",
+        variant === "neon" && "border-primary/40",
+        variant === "gradient" && "bg-primary/5 border-primary/20",
         className
       )}
     >
-      <div className="flex items-start justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold tracking-tight text-foreground">{value}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <p className="truncate text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            {title}
+          </p>
+          <p className="truncate text-xl font-bold tabular-nums tracking-tight text-foreground">
+            {value}
+          </p>
           {change !== undefined && (
             <div className="flex items-center gap-1.5">
               {isPositive ? (
-                <TrendingUp className="h-4 w-4 text-success" />
+                <TrendingUp className="h-3.5 w-3.5 text-success" />
               ) : (
-                <TrendingDown className="h-4 w-4 text-danger" />
+                <TrendingDown className="h-3.5 w-3.5 text-danger" />
               )}
               <span
                 className={cn(
-                  "text-sm font-medium",
+                  "text-[11px] font-semibold tabular-nums",
                   isPositive ? "text-success" : "text-danger"
                 )}
               >
@@ -124,24 +126,24 @@ function StatCard({
                 {change}%
               </span>
               {changeLabel && (
-                <span className="text-xs text-muted-foreground">{changeLabel}</span>
+                <span className="truncate text-[11px] text-muted-foreground">{changeLabel}</span>
               )}
             </div>
           )}
         </div>
         <div
           className={cn(
-            "rounded-xl p-3 transition-colors",
-            variant === "default" && "bg-primary/10 text-primary",
-            variant === "neon" && "bg-primary/15 text-primary shadow-neon-sm",
-            variant === "gradient" && "bg-gradient-to-br from-primary to-accent text-white"
+            "shrink-0 rounded border p-1.5",
+            variant === "default" && "border-primary/20 bg-primary/10 text-primary",
+            variant === "neon" && "border-primary/30 bg-primary/15 text-primary",
+            variant === "gradient" && "border-primary/30 bg-primary text-primary-foreground"
           )}
         >
           {icon}
         </div>
       </div>
       {sparkline && sparkline.length > 1 && (
-        <div className="mt-4 h-10 text-primary/60">
+        <div className="mt-2 h-8 text-primary/60">
           <MiniSparkline data={sparkline} className="h-full w-full" />
         </div>
       )}

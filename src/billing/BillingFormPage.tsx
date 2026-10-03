@@ -463,8 +463,7 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
   return (
     <div className="pb-6">
       <div
-        className="sticky top-0 z-20 -mx-4 flex flex-wrap items-center justify-between gap-2 border-b border-border/60 px-4 py-1.5 md:-mx-6 md:px-6"
-        style={{ background: 'rgb(var(--color-sidebar))' }}
+        className="sticky top-0 z-20 -mx-3 flex flex-wrap items-center justify-between gap-2 border-b border-border/60 bg-card px-3 py-1.5 shadow-sm md:-mx-4 md:px-4"
       >
         <div className="min-w-0">
           <h1 className="truncate text-lg font-bold leading-tight">

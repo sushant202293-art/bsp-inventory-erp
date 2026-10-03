@@ -226,7 +226,7 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
             className="h-7 pl-7 text-[12px]"
           />
           {open && (
-            <div className="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border bg-popover shadow-lg">
+            <div className="absolute z-40 mt-1 max-h-56 w-full overflow-y-auto rounded border bg-popover shadow-lg">
               {searching ? (
                 <p className="px-3 py-2 text-sm text-muted-foreground">Searching...</p>
               ) : results.length === 0 ? (
@@ -240,7 +240,7 @@ export function BillToBlock({ kind, label, state, onChange, newPartyPath }: Part
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => select(row)}
-                    className="block w-full px-3 py-1.5 text-left text-sm hover:bg-accent"
+                    className="block w-full px-3 py-1.5 text-left text-sm hover:bg-primary/10"
                   >
                     <span className="font-medium">{row.name as string}</span>
                     <span className="ml-2 text-xs text-muted-foreground">

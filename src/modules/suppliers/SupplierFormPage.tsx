@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
 import { Save, X, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
@@ -96,11 +95,6 @@ const supplierFormSchema = z.object({
 });
 
 type FormValues = z.input<typeof supplierFormSchema>;
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
 
 export default function SupplierFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -241,11 +235,11 @@ export default function SupplierFormPage() {
 
   if (fetching) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-3">
         <div className="h-10 w-[300px] animate-pulse rounded-md bg-muted" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-3">
               <div className="h-6 w-[200px] animate-pulse rounded bg-muted" />
               {Array.from({ length: 4 }).map((_, j) => (
                 <div key={j} className="h-10 w-full animate-pulse rounded bg-muted" />
@@ -258,7 +252,7 @@ export default function SupplierFormPage() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title={isEditing ? 'Edit Supplier' : 'New Supplier'}
         description={isEditing ? 'Update supplier information' : 'Add a new supplier to your records'}
@@ -282,13 +276,13 @@ export default function SupplierFormPage() {
       />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="name"
@@ -315,7 +309,7 @@ export default function SupplierFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="gstin"
@@ -367,7 +361,7 @@ export default function SupplierFormPage() {
               <CardHeader>
                 <CardTitle>Contact Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="contact_person"
@@ -381,7 +375,7 @@ export default function SupplierFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="phone"
@@ -426,12 +420,12 @@ export default function SupplierFormPage() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Card>
               <CardHeader>
                 <CardTitle>Billing Address</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="billing_address.line1"
@@ -458,7 +452,7 @@ export default function SupplierFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="billing_address.city"
@@ -486,7 +480,7 @@ export default function SupplierFormPage() {
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="billing_address.pin"
@@ -533,7 +527,7 @@ export default function SupplierFormPage() {
                   )}
                 />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 {!sameAsBilling && (
                   <>
                     <FormField
@@ -562,7 +556,7 @@ export default function SupplierFormPage() {
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <FormField
                         control={form.control}
                         name="shipping_address.city"
@@ -590,7 +584,7 @@ export default function SupplierFormPage() {
                         )}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <FormField
                         control={form.control}
                         name="shipping_address.pin"
@@ -629,13 +623,13 @@ export default function SupplierFormPage() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Card>
               <CardHeader>
                 <CardTitle>Credit & Payment Settings</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="credit_limit"
@@ -673,7 +667,7 @@ export default function SupplierFormPage() {
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="opening_balance"
@@ -733,7 +727,7 @@ export default function SupplierFormPage() {
               <CardHeader>
                 <CardTitle>Bank Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="bank_details.bank_name"
@@ -760,7 +754,7 @@ export default function SupplierFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="bank_details.ifsc_code"
@@ -824,6 +818,6 @@ export default function SupplierFormPage() {
           </div>
         </form>
       </Form>
-    </motion.div>
+    </div>
   );
 }

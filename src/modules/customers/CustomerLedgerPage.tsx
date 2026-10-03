@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Printer, Download, Search as SearchIcon, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
@@ -19,11 +18,6 @@ import { useToast } from '@/components/ui/use-toast';
 import { cn, formatCurrency, formatDate } from '@/lib/utils';
 import { getCustomers, getCustomerLedger } from '@/services/customer.service';
 import type { CustomerWithRelations, CustomerLedgerResponse, CustomerLedgerEntry } from '@/types/customer.types';
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
 
 export default function CustomerLedgerPage() {
   const navigate = useNavigate();
@@ -122,7 +116,7 @@ export default function CustomerLedgerPage() {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Customer Ledger"
         description="View detailed account ledger for any customer"
@@ -140,8 +134,8 @@ export default function CustomerLedgerPage() {
       />
 
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
+        <CardContent className="pt-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-2">
               <label className="text-sm font-medium">Select Customer</label>
               <Select
@@ -201,8 +195,8 @@ export default function CustomerLedgerPage() {
           description="Choose a customer from the dropdown above to view their ledger."
         />
       ) : loadingLedger ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-[88px] rounded-xl" />
             ))}
@@ -210,31 +204,31 @@ export default function CustomerLedgerPage() {
           <Skeleton className="h-[400px] rounded-xl" />
         </div>
       ) : ledger ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Opening Balance</p>
-                <p className="text-2xl font-bold mt-1">{formatCurrency(ledger.opening_balance)}</p>
+                <p className="text-xl font-bold mt-1">{formatCurrency(ledger.opening_balance)}</p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Debit</p>
-                <p className="text-2xl font-bold mt-1 text-red-500">{formatCurrency(ledger.total_debit)}</p>
+                <p className="text-xl font-bold mt-1 text-red-500">{formatCurrency(ledger.total_debit)}</p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Credit</p>
-                <p className="text-2xl font-bold mt-1 text-green-500">{formatCurrency(ledger.total_credit)}</p>
+                <p className="text-xl font-bold mt-1 text-green-500">{formatCurrency(ledger.total_credit)}</p>
               </CardContent>
             </Card>
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="pt-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-wider">Closing Balance</p>
                 <p className={cn(
-                  'text-2xl font-bold mt-1',
+                  'text-xl font-bold mt-1',
                   ledger.closing_balance > 0 ? 'text-red-500' : ledger.closing_balance < 0 ? 'text-green-500' : ''
                 )}>
                   {formatCurrency(ledger.closing_balance)}
@@ -262,26 +256,26 @@ export default function CustomerLedgerPage() {
                 />
               ) : (
                 <div className="rounded-md border overflow-x-auto">
-                  <table className="w-full text-sm">
+                  <table className="w-full text-[13px]">
                     <thead className="bg-muted">
                       <tr>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Date</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Doc No</th>
-                        <th className="px-4 py-3 text-left font-medium text-muted-foreground">Description</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Debit (₹)</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Credit (₹)</th>
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground">Balance (₹)</th>
+                        <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Date</th>
+                        <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Doc No</th>
+                        <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Description</th>
+                        <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Debit (₹)</th>
+                        <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Credit (₹)</th>
+                        <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Balance (₹)</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr className="border-t bg-muted/50 font-medium">
-                        <td className="px-4 py-3">{dateFrom ? formatDate(dateFrom) : '-'}</td>
-                        <td className="px-4 py-3">-</td>
-                        <td className="px-4 py-3">Opening Balance</td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-2.5 py-1.5">{dateFrom ? formatDate(dateFrom) : '-'}</td>
+                        <td className="px-2.5 py-1.5">-</td>
+                        <td className="px-2.5 py-1.5">Opening Balance</td>
+                        <td className="px-2.5 py-1.5 text-right">
                           {ledger.opening_balance > 0 ? formatCurrency(ledger.opening_balance) : '-'}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-2.5 py-1.5 text-right">
                           {ledger.opening_balance < 0 ? formatCurrency(Math.abs(ledger.opening_balance)) : '-'}
                         </td>
                         <td className={cn(
@@ -293,17 +287,17 @@ export default function CustomerLedgerPage() {
                       </tr>
                       {ledger.entries.map((entry: CustomerLedgerEntry) => (
                         <tr key={entry.id} className="border-t hover:bg-muted/30 transition-colors">
-                          <td className="px-4 py-3">{formatDate(entry.date)}</td>
-                          <td className="px-4 py-3 font-mono text-xs">{entry.reference_id?.slice(0, 8) || '-'}</td>
-                          <td className="px-4 py-3">{entry.description}</td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-2.5 py-1.5">{formatDate(entry.date)}</td>
+                          <td className="px-2.5 py-1.5 font-mono text-xs">{entry.reference_id?.slice(0, 8) || '-'}</td>
+                          <td className="px-2.5 py-1.5">{entry.description}</td>
+                          <td className="px-2.5 py-1.5 text-right">
                             {entry.debit > 0 ? (
                               <span className="text-red-500">{formatCurrency(entry.debit)}</span>
                             ) : (
                               '-'
                             )}
                           </td>
-                          <td className="px-4 py-3 text-right">
+                          <td className="px-2.5 py-1.5 text-right">
                             {entry.credit > 0 ? (
                               <span className="text-green-500">{formatCurrency(entry.credit)}</span>
                             ) : (
@@ -319,9 +313,9 @@ export default function CustomerLedgerPage() {
                         </tr>
                       ))}
                       <tr className="border-t bg-muted/50 font-medium">
-                        <td className="px-4 py-3" colSpan={3}>Closing Balance</td>
-                        <td className="px-4 py-3 text-right text-red-500">{formatCurrency(ledger.total_debit)}</td>
-                        <td className="px-4 py-3 text-right text-green-500">{formatCurrency(ledger.total_credit)}</td>
+                        <td className="px-2.5 py-1.5" colSpan={3}>Closing Balance</td>
+                        <td className="px-2.5 py-1.5 text-right text-red-500">{formatCurrency(ledger.total_debit)}</td>
+                        <td className="px-2.5 py-1.5 text-right text-green-500">{formatCurrency(ledger.total_credit)}</td>
                         <td className={cn(
                           'px-4 py-3 text-right',
                           ledger.closing_balance > 0 ? 'text-red-500' : ledger.closing_balance < 0 ? 'text-green-500' : ''
@@ -337,6 +331,6 @@ export default function CustomerLedgerPage() {
           </Card>
         </div>
       ) : null}
-    </motion.div>
+    </div>
   );
 }

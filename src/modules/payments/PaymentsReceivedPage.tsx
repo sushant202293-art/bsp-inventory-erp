@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
   Search,
@@ -291,7 +290,7 @@ export default function PaymentsReceivedPage() {
     .reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Payments Received"
         description="Track and manage customer payments"
@@ -314,14 +313,14 @@ export default function PaymentsReceivedPage() {
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div>
           <Card className="border-success/20 bg-success/5">
-            <CardContent className="p-6">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Today's Received</p>
-                  <p className="text-2xl font-bold text-success">{formatCurrency(todayTotal)}</p>
+                  <p className="text-lg font-bold text-success">{formatCurrency(todayTotal)}</p>
                 </div>
                 <div className="rounded-xl bg-success/10 p-3">
                   <ArrowDownCircle className="h-6 w-6 text-success" />
@@ -329,14 +328,14 @@ export default function PaymentsReceivedPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+        </div>
+        <div>
           <Card className="border-primary/20 bg-primary/5">
-            <CardContent className="p-6">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">This Month</p>
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(monthTotal)}</p>
+                  <p className="text-lg font-bold text-primary">{formatCurrency(monthTotal)}</p>
                 </div>
                 <div className="rounded-xl bg-primary/10 p-3">
                   <TrendingUp className="h-6 w-6 text-primary" />
@@ -344,14 +343,14 @@ export default function PaymentsReceivedPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        </div>
+        <div>
           <Card className="border-warning/20 bg-warning/5">
-            <CardContent className="p-6">
+            <CardContent className="p-3">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Outstanding</p>
-                  <p className="text-2xl font-bold text-warning">{formatCurrency(summary?.pending_amount || 0)}</p>
+                  <p className="text-lg font-bold text-warning">{formatCurrency(summary?.pending_amount || 0)}</p>
                 </div>
                 <div className="rounded-xl bg-warning/10 p-3">
                   <Wallet className="h-6 w-6 text-warning" />
@@ -359,12 +358,12 @@ export default function PaymentsReceivedPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
 
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <CardContent className="p-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -421,13 +420,7 @@ export default function PaymentsReceivedPage() {
                 {payments.map((payment, index) => {
                   const customer = customers.find((c) => c.id === payment.customer_id);
                   return (
-                    <motion.tr
-                      key={payment.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.03 }}
-                      className="border-b border-border hover:bg-muted/50"
-                    >
+                    <tr key={payment.id} className="border-b border-border hover:bg-muted/50">
                       <TableCell>{formatDate(payment.date)}</TableCell>
                       <TableCell className="font-medium">{customer?.name || 'Unknown'}</TableCell>
                       <TableCell>
@@ -456,7 +449,7 @@ export default function PaymentsReceivedPage() {
                           </Button>
                         </div>
                       </TableCell>
-                    </motion.tr>
+                    </tr>
                   );
                 })}
               </TableBody>
@@ -470,7 +463,7 @@ export default function PaymentsReceivedPage() {
           <DialogHeader>
             <DialogTitle>{editingPayment ? 'Edit Payment' : 'Receive Payment'}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="space-y-2">
               <label className="text-sm font-medium">Customer *</label>
               <Select
@@ -488,7 +481,7 @@ export default function PaymentsReceivedPage() {
               </Select>
               {formErrors.customer_id && <p className="text-xs text-danger">{formErrors.customer_id}</p>}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Date *</label>
                 <Input
@@ -511,7 +504,7 @@ export default function PaymentsReceivedPage() {
                 {formErrors.amount && <p className="text-xs text-danger">{formErrors.amount}</p>}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Payment Mode *</label>
                 <Select

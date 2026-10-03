@@ -57,9 +57,9 @@ export default function BackupPage() {
   const modules = ['Products', 'Customers', 'Suppliers', 'Transactions', 'Stock Movements', 'Payments', 'Settings'];
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div>
-        <h1 className="text-2xl font-bold">Backup & Import/Export</h1>
+        <h1 className="text-lg font-bold">Backup & Import/Export</h1>
         <p className="text-sm text-muted-foreground">Export, import, and backup your business data</p>
       </div>
 
@@ -70,7 +70,7 @@ export default function BackupPage() {
           <TabsTrigger value="history"><Clock className="mr-1 h-4 w-4" /> History</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="export" className="space-y-4">
+        <TabsContent value="export" className="space-y-3">
           <Card>
             <CardHeader><CardTitle>Full Backup</CardTitle></CardHeader>
             <CardContent className="flex gap-3">
@@ -93,7 +93,7 @@ export default function BackupPage() {
         <TabsContent value="import">
           <Card>
             <CardHeader><CardTitle>Import Data</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <p className="text-sm text-muted-foreground">Upload a JSON backup file to import data. The system validates before importing.</p>
               <label className="cursor-pointer">
                 <input type="file" accept=".json" className="hidden" onChange={importFile} />
@@ -111,16 +111,16 @@ export default function BackupPage() {
                 <p className="text-sm text-muted-foreground">No backup history yet.</p>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="border-b"><th className="p-3 text-left">Date</th><th className="p-3 text-left">Type</th><th className="p-3 text-left">Format</th><th className="p-3 text-left">Status</th><th className="p-3 text-right">Records</th></tr></thead>
+                  <table className="w-full text-[13px]">
+                    <thead><tr className="border-b"><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Date</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Type</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Format</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Status</th><th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Records</th></tr></thead>
                     <tbody>
                       {logs.map((log) => (
                         <tr key={log.id} className="border-b">
-                          <td className="p-3">{formatDate(log.created_at)}</td>
-                          <td className="p-3 capitalize">{log.type}</td>
-                          <td className="p-3 uppercase">{log.format}</td>
-                          <td className="p-3"><Badge variant={log.status === 'success' ? 'success' : 'destructive'}>{log.status}</Badge></td>
-                          <td className="p-3 text-right">{log.records_count || '-'}</td>
+                          <td className="px-2.5 py-1.5">{formatDate(log.created_at)}</td>
+                          <td className="px-2.5 py-1.5 capitalize">{log.type}</td>
+                          <td className="px-2.5 py-1.5 uppercase">{log.format}</td>
+                          <td className="px-2.5 py-1.5"><Badge variant={log.status === 'success' ? 'success' : 'destructive'}>{log.status}</Badge></td>
+                          <td className="px-2.5 py-1.5 text-right">{log.records_count || '-'}</td>
                         </tr>
                       ))}
                     </tbody>

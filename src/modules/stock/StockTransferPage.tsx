@@ -66,9 +66,9 @@ export default function StockTransferPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div>
-        <h1 className="text-2xl font-bold">Stock Transfer</h1>
+        <h1 className="text-lg font-bold">Stock Transfer</h1>
         <p className="text-sm text-muted-foreground">Transfer stock between warehouses</p>
       </div>
 
@@ -77,14 +77,14 @@ export default function StockTransferPage() {
           <CardTitle className="flex items-center gap-2"><ArrowRightLeft className="h-5 w-5" /> Transfer Stock</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-2">
               <Label>Product *</Label>
               <Input placeholder="Search product..." value={product} onChange={(e) => searchProducts(e.target.value)} />
               {productResults.length > 0 && (
                 <div className="rounded-lg border bg-popover p-1 shadow-md max-h-48 overflow-y-auto">
                   {productResults.map((p) => (
-                    <button key={p.id} type="button" className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-accent" onClick={() => { setProduct(p.name); setProductId(p.id); setProductResults([]); }}>
+                    <button key={p.id} type="button" className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-primary/10" onClick={() => { setProduct(p.name); setProductId(p.id); setProductResults([]); }}>
                       {p.name} ({p.code})
                     </button>
                   ))}
@@ -92,7 +92,7 @@ export default function StockTransferPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label>From Warehouse *</Label>
                 <Select value={fromWarehouse} onValueChange={setFromWarehouse}>

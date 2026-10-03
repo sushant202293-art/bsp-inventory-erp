@@ -131,7 +131,7 @@ function FileUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={cn(
-          "relative flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-all duration-200 cursor-pointer",
+          "relative flex flex-col items-center justify-center rounded border border-dashed p-4 transition-all duration-200 cursor-pointer",
           isDragOver
             ? "border-primary bg-primary/5"
             : "border-border hover:border-primary/50 hover:bg-muted/50",

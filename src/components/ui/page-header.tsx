@@ -26,13 +26,13 @@ function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn("space-y-2", className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Home className="h-4 w-4" />
+        <nav className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
+          <Home className="h-3 w-3" />
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={index}>
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="h-3 w-3 opacity-60" />
               {crumb.href || crumb.onClick ? (
                 <button
                   onClick={crumb.onClick}
@@ -41,7 +41,7 @@ function PageHeader({
                   {crumb.label}
                 </button>
               ) : (
-                <span className={cn(index === breadcrumbs.length - 1 && "text-foreground font-medium")}>
+                <span className={cn(index === breadcrumbs.length - 1 && "text-foreground font-semibold")}>
                   {crumb.label}
                 </span>
               )}
@@ -50,16 +50,16 @@ function PageHeader({
         </nav>
       )}
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 space-y-0.5">
+          <h1 className="truncate text-lg font-bold leading-tight tracking-tight text-foreground">
             {title}
           </h1>
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="truncate text-xs text-muted-foreground">{description}</p>
           )}
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </div>
       {children}
     </div>

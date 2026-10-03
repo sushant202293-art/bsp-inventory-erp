@@ -44,15 +44,15 @@ export default function StockMovementPage() {
   const isIn = (type: string) => ['purchase', 'stock_in', 'adjustment_in', 'transfer_in', 'opening', 'sales_return', 'purchase_return'].includes(type);
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div>
-        <h1 className="text-2xl font-bold">Stock Movements</h1>
+        <h1 className="text-lg font-bold">Stock Movements</h1>
         <p className="text-sm text-muted-foreground">Track all inventory movements</p>
       </div>
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input placeholder="Search by product..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
@@ -74,38 +74,38 @@ export default function StockMovementPage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b">
-                  <th className="p-3 text-left font-medium">Date</th>
-                  <th className="p-3 text-left font-medium">Product</th>
-                  <th className="p-3 text-left font-medium">Type</th>
-                  <th className="p-3 text-left font-medium">Reference</th>
-                  <th className="p-3 text-right font-medium">Qty In</th>
-                  <th className="p-3 text-right font-medium">Qty Out</th>
-                  <th className="p-3 text-right font-medium">Balance</th>
-                  <th className="p-3 text-right font-medium">Value</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Date</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Product</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Type</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Reference</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Qty In</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Qty Out</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Balance</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Value</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((m: any) => (
                   <tr key={m.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3">{formatDate(m.created_at)}</td>
-                    <td className="p-3 font-medium">{m.product_name}</td>
-                    <td className="p-3"><Badge variant={(typeColors[m.type] as any) || 'secondary'}>{m.type}</Badge></td>
-                    <td className="p-3 text-muted-foreground">{m.reference_type || '-'}</td>
-                    <td className="p-3 text-right">
+                    <td className="px-2.5 py-1.5">{formatDate(m.created_at)}</td>
+                    <td className="px-2.5 py-1.5 font-medium">{m.product_name}</td>
+                    <td className="px-2.5 py-1.5"><Badge variant={(typeColors[m.type] as any) || 'secondary'}>{m.type}</Badge></td>
+                    <td className="px-2.5 py-1.5 text-muted-foreground">{m.reference_type || '-'}</td>
+                    <td className="px-2.5 py-1.5 text-right">
                       {isIn(m.type) ? <span className="flex items-center justify-end gap-1 text-green-600"><ArrowDown className="h-3 w-3" />{Math.abs(m.quantity)}</span> : '-'}
                     </td>
-                    <td className="p-3 text-right">
+                    <td className="px-2.5 py-1.5 text-right">
                       {!isIn(m.type) ? <span className="flex items-center justify-end gap-1 text-red-600"><ArrowUp className="h-3 w-3" />{Math.abs(m.quantity)}</span> : '-'}
                     </td>
-                    <td className="p-3 text-right font-semibold">{m.balance_after}</td>
-                    <td className="p-3 text-right">{m.total_value ? `₹${m.total_value.toLocaleString()}` : '-'}</td>
+                    <td className="px-2.5 py-1.5 text-right font-semibold">{m.balance_after}</td>
+                    <td className="px-2.5 py-1.5 text-right">{m.total_value ? `₹${m.total_value.toLocaleString()}` : '-'}</td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">No movements found</td></tr>
+                  <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">No movements found</td></tr>
                 )}
               </tbody>
             </table>

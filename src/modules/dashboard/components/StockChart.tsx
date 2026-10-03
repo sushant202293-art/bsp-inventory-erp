@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
@@ -38,7 +37,7 @@ export default function StockChart({ data, loading }: StockChartProps) {
   if (loading) {
     return (
       <Card>
-        <CardContent className="p-6">
+        <CardContent className="p-3">
           <div className="h-[350px] flex items-center justify-center">
             <div className="animate-pulse text-muted-foreground">Loading chart...</div>
           </div>
@@ -58,11 +57,7 @@ export default function StockChart({ data, loading }: StockChartProps) {
             No stock data available
           </div>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <div>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -94,7 +89,7 @@ export default function StockChart({ data, loading }: StockChartProps) {
               <p className="text-sm text-muted-foreground">Total Stock Value</p>
               <p className="text-xl font-bold text-foreground">{formatCurrency(totalValue)}</p>
             </div>
-          </motion.div>
+          </div>
         )}
       </CardContent>
     </Card>

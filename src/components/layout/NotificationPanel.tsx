@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell,
   Check,
@@ -113,36 +112,26 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={onClose} />
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full z-50 mt-2 w-96 rounded-xl border shadow-xl"
-            style={{
-              background: 'rgb(var(--color-card))',
-              borderColor: 'rgb(var(--color-border))',
-            }}
-          >
+          <div className="absolute right-0 top-full z-50 mt-2 w-96 rounded border shadow-lg" style={{ background: 'rgb(var(--color-card))', borderColor: 'rgb(var(--color-border))', }}>
             <div
-              className="flex items-center justify-between border-b px-4 py-3"
+              className="flex items-center justify-between border-b px-3 py-2"
               style={{ borderColor: 'rgb(var(--color-border))' }}
             >
               <div className="flex items-center gap-2">
-                <Bell size={18} style={{ color: 'rgb(var(--color-text))' }} />
+                <Bell size={15} style={{ color: 'rgb(var(--color-text))' }} />
                 <h3
-                  className="font-semibold"
+                  className="text-[13px] font-semibold"
                   style={{ color: 'rgb(var(--color-text))' }}
                 >
                   Notifications
                 </h3>
                 {unreadCount > 0 && (
                   <span
-                    className="flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-white"
+                    className="flex h-4 min-w-[16px] items-center justify-center rounded-sm px-1 text-[10px] font-bold text-white"
                     style={{ background: 'rgb(var(--color-error))' }}
                   >
                     {unreadCount}
@@ -271,9 +260,9 @@ export default function NotificationPanel({ isOpen, onClose }: NotificationPanel
                 View All Notifications
               </button>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    </>
   );
 }

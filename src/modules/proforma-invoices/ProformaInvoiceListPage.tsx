@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Plus,
   Eye,
@@ -292,12 +291,7 @@ export default function ProformaInvoiceListPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
+    <div className="space-y-3">
       <PageHeader
         title="Proforma Invoices"
         description={`Manage all proforma invoices (${total} total)`}
@@ -346,6 +340,6 @@ export default function ProformaInvoiceListPage() {
         onConfirm={handleCancel}
         loading={cancelling}
       />
-    </motion.div>
+    </div>
   );
 }

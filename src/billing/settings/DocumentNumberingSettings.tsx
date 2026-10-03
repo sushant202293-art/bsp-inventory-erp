@@ -150,13 +150,13 @@ export function DocumentNumberingSettings() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
         Numbers are issued by the database when a document is saved. Previewing a form or printing
         never consumes a number.
       </p>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         {DOC_TYPES.map((docType) => {
           const draft = drafts[docType];
           if (!draft) return null;

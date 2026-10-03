@@ -15,7 +15,7 @@ export function InvoicePrintTemplate({ model }: { model: BillingPrintModel }) {
   return (
     <div className="billing-print-doc">
       {/* ---------------- Header ---------------- */}
-      <header className="flex items-start justify-between gap-6 border-b-2 border-neutral-800 pb-3">
+      <header className="flex items-start justify-between gap-3 border-b-2 border-neutral-800 pb-3">
         <div className="flex gap-3">
           {model.company.logo_url ? (
             <img
@@ -266,7 +266,7 @@ export function InvoicePrintTemplate({ model }: { model: BillingPrintModel }) {
       </section>
 
       {/* ---------------- Signature ---------------- */}
-      <section className="mt-6 flex items-end justify-between border-t border-neutral-300 pt-3">
+      <section className="mt-3 flex items-end justify-between border-t border-neutral-300 pt-3">
         <p className="muted">Receiver&rsquo;s Signature</p>
         <div style={{ textAlign: 'right' }}>
           <p style={{ fontWeight: 600 }}>For {model.company.name || 'Company'}</p>

@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   BarChart3, ShoppingCart, Package, Users, Truck, CreditCard,
   Receipt, FileText, Search, TrendingUp, PieChart, DollarSign,
@@ -123,16 +122,6 @@ const reports: ReportItem[] = [
 
 const categories = [...new Set(reports.map((r) => r.category))];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
-
 export default function ReportsListPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -158,9 +147,9 @@ export default function ReportsListPage() {
   }, [filtered]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">Reports</h1>
+        <h1 className="text-lg font-bold tracking-tight text-foreground">Reports</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Generate and view detailed business reports
         </p>
@@ -179,30 +168,24 @@ export default function ReportsListPage() {
       {filtered.length === 0 && (
         <div className="text-center py-12">
           <Search className="mx-auto h-12 w-12 text-muted-foreground/40" />
-          <p className="mt-4 text-sm text-muted-foreground">No reports found matching "{search}"</p>
+          <p className="mt-2 text-sm text-muted-foreground">No reports found matching "{search}"</p>
         </div>
       )}
 
       {Array.from(grouped.entries()).map(([category, items]) => (
         <div key={category} className="space-y-3">
           <h2 className="text-lg font-semibold text-foreground">{category}</h2>
-          <motion.div
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((report) => (
-              <motion.div key={report.id} variants={itemVariants}>
+              <div key={report.id}>
                 <Card
                   className={cn(
-                    'group cursor-pointer p-5 transition-all duration-200',
-                    'hover:shadow-lg hover:-translate-y-0.5 border-border',
-                    'hover:border-primary/30'
+                    'group cursor-pointer p-3 transition-colors',
+                    'border-border hover:border-primary/50'
                   )}
                   onClick={() => navigate(report.path)}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3">
                     <div className={cn('rounded-lg bg-muted p-2.5 transition-colors group-hover:bg-primary/10', report.color)}>
                       {report.icon}
                     </div>
@@ -216,9 +199,9 @@ export default function ReportsListPage() {
                     </div>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       ))}
     </div>

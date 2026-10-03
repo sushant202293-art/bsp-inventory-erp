@@ -101,11 +101,11 @@ export default function CompanySettingsPage() {
   const hasLogo = Boolean(displayLogo) && !previewFailed;
 
   return (
-    <div className="space-y-6 p-6">
-      <div><h1 className="text-2xl font-bold flex items-center gap-2"><Building className="h-6 w-6" /> Company Profile</h1><p className="text-sm text-muted-foreground">Manage your company information</p></div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2"><CardHeader><CardTitle>Company Details</CardTitle></CardHeader><CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="space-y-3">
+      <div><h1 className="text-lg font-bold flex items-center gap-2"><Building className="h-4 w-4" /> Company Profile</h1><p className="text-sm text-muted-foreground">Manage your company information</p></div>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <Card className="lg:col-span-2"><CardHeader><CardTitle>Company Details</CardTitle></CardHeader><CardContent className="space-y-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="space-y-2"><Label>Company Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
             <div className="space-y-2"><Label>Tagline</Label><Input value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} /></div>
             <div className="space-y-2 md:col-span-2"><Label>Address</Label><Textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} rows={2} /></div>
@@ -124,7 +124,7 @@ export default function CompanySettingsPage() {
           </Button>
         </CardContent></Card>
 
-        <Card><CardHeader><CardTitle>Company Logo</CardTitle></CardHeader><CardContent className="flex flex-col items-center gap-4">
+        <Card><CardHeader><CardTitle>Company Logo</CardTitle></CardHeader><CardContent className="flex flex-col items-center gap-3">
           <div className="flex h-40 w-full items-center justify-center rounded-lg border-2 border-dashed bg-muted/40 p-4">
             {loading ? (
               <Skeleton className="h-24 w-24 rounded-md" />

@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --color-background: 255 255 255;
+    --color-background: 244 246 249;
     --color-card: 255 255 255;
     --color-sidebar: 248 250 252;
     --color-border: 226 232 240;
@@ -560,7 +560,7 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 
   ::selection {
@@ -573,416 +573,419 @@
 }
 
 @layer components {
-  /* Glassmorphism */
-  .glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  /* ===================== *
+   *  DESIGN TOKENS        *
+   *  Single source of     *
+   *  truth for the size   *
+   *  of every repeated    *
+   *  control in the app.  *
+   * ===================== */
+  :root {
+    --ui-input-h: 32px;   /* inputs, selects, small form fields */
+    --ui-field-h: 30px;   /* dense voucher-entry cells          */
+    --ui-row-h: 32px;     /* table body rows                    */
+    --ui-head-h: 30px;    /* table header row                   */
+    --ui-btn-h: 32px;     /* default button height              */
+    --ui-header-h: 48px;  /* slim top navigation bar            */
+    --ui-sidebar-w: 232px;
+    --ui-sidebar-collapsed-w: 56px;
+    --ui-radius: 3px;     /* 0-4px everywhere                   */
+    --ui-gap: 8px;        /* standard inline gap                */
   }
 
-  .dark .glass {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  /* Legacy utility names kept so older markup still resolves, but the
+     decorative glass / neon / 3D treatments are gone: the interface is
+     now flat, sharp and print-friendly. */
+  .glass,
+  .glass-card,
+  .glass-sidebar,
+  .glass-input,
+  .card-3d,
+  .card-3d-tilt,
+  .neon-glow,
+  .neon-glow-sm,
+  .neon-glow-lg,
+  .neon-text,
+  .neon-border,
+  .neon-border-animated {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transform: none;
+    box-shadow: none;
   }
 
+  .glass,
   .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  }
-
-  .dark .glass-card {
-    background: rgba(15, 15, 25, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    background: var(--color-card);
+    border: 1px solid rgb(var(--color-border));
   }
 
   .glass-sidebar {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
-  }
-
-  .dark .glass-sidebar {
-    background: rgba(10, 10, 18, 0.85);
-    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgb(var(--color-sidebar));
+    border-right: 1px solid rgb(var(--color-border));
   }
 
   .glass-input {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.2s ease;
-  }
-
-  .dark .glass-input {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgb(var(--color-card));
+    border: 1px solid rgb(var(--color-border));
   }
 
   .glass-input:focus {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 0, 212, 255), 0.1);
+    background: rgb(var(--color-card));
+    border-color: rgb(var(--color-primary));
+    box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.15);
   }
 
-  /* 3D Card Effects */
-  .card-3d {
-    transform-style: preserve-3d;
-    perspective: 1000px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .card-3d:hover {
-    transform: translateY(-4px) rotateX(2deg);
-    box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.15),
-      0 10px 20px rgba(0, 0, 0, 0.1);
-  }
-
-  .card-3d:active {
-    transform: translateY(-2px) rotateX(1deg);
-  }
-
-  .card-3d-tilt {
-    transform-style: preserve-3d;
-    transition: transform 0.15s ease-out;
-  }
-
-  /* Neon Glow Effects */
-  .neon-glow {
-    box-shadow:
-      0 0 5px var(--color-primary),
-      0 0 10px var(--color-primary),
-      0 0 20px var(--color-primary),
-      0 0 40px var(--color-primary);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .neon-glow-sm {
-    box-shadow:
-      0 0 3px var(--color-primary),
-      0 0 6px var(--color-primary);
-  }
-
-  .neon-glow-lg {
-    box-shadow:
-      0 0 10px var(--color-primary),
-      0 0 20px var(--color-primary),
-      0 0 40px var(--color-primary),
-      0 0 80px var(--color-primary);
-  }
-
-  .neon-text {
-    text-shadow:
-      0 0 7px var(--color-primary),
-      0 0 10px var(--color-primary),
-      0 0 21px var(--color-primary),
-      0 0 42px var(--color-primary);
-  }
-
-  .neon-border {
-    border: 2px solid var(--color-primary);
-    box-shadow:
-      0 0 5px var(--color-primary),
-      inset 0 0 5px var(--color-primary);
-  }
-
-  .neon-border-animated {
-    border: 2px solid var(--color-primary);
-    animation: borderGlow 2s ease-in-out infinite alternate;
-  }
-
-  /* Gradient Effects */
   .gradient-primary {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    background: rgb(var(--color-primary));
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: rgb(var(--color-primary));
   }
 
   .gradient-border {
     position: relative;
     background: var(--color-card);
-    border-radius: 0.75rem;
+    border: 1px solid rgb(var(--color-border));
+    border-radius: var(--ui-radius);
   }
 
   .gradient-border::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent));
-    z-index: -1;
+    content: none;
   }
 
-  /* Button Styles */
+  /* ===================== *
+   *  BUTTONS              *
+   * ===================== */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
-    background: var(--color-primary);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
+    background: rgb(var(--color-primary));
+    color: rgb(var(--color-primary-foreground));
   }
 
   .btn-primary:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
+    filter: brightness(0.94);
   }
 
   .btn-primary:active {
-    transform: translateY(0);
+    filter: brightness(0.88);
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
-    background: var(--color-secondary);
-    color: white;
+    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
+    background: rgb(var(--color-secondary));
+    color: rgb(var(--color-secondary-foreground));
   }
 
   .btn-secondary:hover {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
+    filter: brightness(0.94);
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
-    background: transparent;
-    border: 2px solid var(--color-primary);
-    color: var(--color-primary);
+    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded border px-3 text-[13px] font-medium transition-colors;
+    background: rgb(var(--color-card));
+    border-color: rgb(var(--color-border));
+    color: rgb(var(--color-text));
   }
 
   .btn-outline:hover {
-    background: var(--color-primary);
-    color: white;
+    background: rgb(var(--color-sidebar));
+    border-color: rgb(var(--color-muted) / 0.5);
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
+    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
     background: transparent;
-    color: var(--color-primary);
+    color: rgb(var(--color-text-secondary));
   }
 
   .btn-ghost:hover {
-    background: var(--color-primary);
-    background: rgba(0, 0, 0, 0.05);
-  }
-
-  .dark .btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgb(var(--color-sidebar));
+    color: rgb(var(--color-text));
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200;
-    background: var(--color-danger);
-    color: white;
+    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
+    background: rgb(var(--color-danger));
+    color: #fff;
   }
 
   .btn-danger:hover {
-    filter: brightness(1.1);
+    filter: brightness(0.94);
   }
 
-  /* Card Styles */
+  /* ===================== *
+   *  PANELS / CARDS       *
+   * ===================== */
   .card {
-    @apply rounded-xl border p-6 transition-all duration-200;
-    background: var(--color-card);
-    border-color: var(--color-border);
+    @apply rounded border;
+    background: rgb(var(--color-card));
+    border-color: rgb(var(--color-border));
+    box-shadow: none;
   }
 
   .card-hover {
     @apply card;
-    transition: all 0.2s ease;
   }
 
   .card-hover:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    border-color: rgb(var(--color-border));
+    box-shadow: none;
   }
 
-  /* Input Styles */
+  /* Compact section shell used across list/report pages. */
+  .panel {
+    @apply rounded border;
+    background: rgb(var(--color-card));
+    border-color: rgb(var(--color-border));
+  }
+
+  .panel-header {
+    @apply flex items-center justify-between gap-2 border-b px-3 py-2;
+    border-color: rgb(var(--color-border));
+    background: rgb(var(--color-sidebar));
+  }
+
+  .panel-title {
+    @apply text-[11px] font-semibold uppercase tracking-wide;
+    color: rgb(var(--color-muted));
+  }
+
+  /* ===================== *
+   *  FORM CONTROLS        *
+   * ===================== */
   .input {
-    @apply w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm transition-all duration-200 outline-none;
-    border-color: var(--color-border);
-    color: var(--color-text);
+    @apply w-full rounded border bg-card px-2.5 text-[13px] transition-colors outline-none;
+    height: var(--ui-input-h);
+    border-color: rgb(var(--color-border));
+    color: rgb(var(--color-text));
   }
 
   .input:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-  }
-
-  .dark .input:focus {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+    border-color: rgb(var(--color-primary));
+    box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.15);
   }
 
   .input::placeholder {
-    color: var(--color-muted);
+    color: rgb(var(--color-muted));
   }
 
-  /* Table Styles */
+  .input:disabled {
+    background: rgb(var(--color-sidebar));
+    color: rgb(var(--color-muted));
+    cursor: not-allowed;
+  }
+
+  /* Read-only values must not look editable. */
+  .input-readonly,
+  .field-readonly {
+    background: rgb(var(--color-sidebar));
+    color: rgb(var(--color-text-secondary));
+    border-style: dashed;
+  }
+
+  .field-label {
+    @apply mb-1 block text-[11px] font-semibold uppercase tracking-wide;
+    color: rgb(var(--color-muted));
+  }
+
+  /* ===================== *
+   *  TABLES (spreadsheet) *
+   * ===================== */
   .table-container {
-    @apply w-full overflow-auto rounded-xl border;
-    border-color: var(--color-border);
+    @apply w-full overflow-auto rounded border;
+    border-color: rgb(var(--color-border));
+    background: rgb(var(--color-card));
   }
 
   .table {
-    @apply w-full caption-bottom text-sm;
+    @apply w-full caption-bottom text-[13px];
+    border-collapse: separate;
+    border-spacing: 0;
   }
 
-  .table thead {
-    @apply border-b;
-    border-color: var(--color-border);
+  .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    height: var(--ui-head-h);
+    padding: 0 10px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: rgb(var(--color-sidebar));
+    color: rgb(var(--color-muted));
+    border-bottom: 1px solid rgb(var(--color-border));
   }
 
-  .table th {
-    @apply h-12 px-4 text-left align-middle font-medium;
-    color: var(--color-muted);
+  .table tbody td {
+    height: var(--ui-row-h);
+    padding: 4px 10px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgb(var(--color-border-light));
+    color: rgb(var(--color-text));
   }
 
-  .table td {
-    @apply h-12 px-4 align-middle;
+  .table tbody tr:last-child td {
+    border-bottom: 0;
   }
 
-  .table tbody tr {
-    @apply border-b transition-colors;
-    border-color: var(--color-border);
+  .table tbody tr:hover td {
+    background: rgb(var(--color-primary) / 0.05);
   }
 
-  .table tbody tr:hover {
-    background: rgba(0, 0, 0, 0.02);
+  .table tbody tr:nth-child(even) td {
+    background: rgb(var(--color-sidebar) / 0.45);
   }
 
-  .dark .table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+  .table tbody tr:nth-child(even):hover td {
+    background: rgb(var(--color-primary) / 0.05);
   }
 
-  /* Badge Styles */
+  /* Numeric / money columns always line up on the right. */
+  .num,
+  .text-right,
+  th.text-right,
+  td.text-right {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .table tfoot td {
+    height: var(--ui-row-h);
+    padding: 4px 10px;
+    font-weight: 600;
+    background: rgb(var(--color-sidebar));
+    border-top: 1px solid rgb(var(--color-border));
+  }
+
+  /* ===================== *
+   *  BADGES / STATUS      *
+   * ===================== */
   .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center gap-1 rounded-sm px-1.5 py-px text-[11px] font-semibold leading-4;
+    border: 1px solid transparent;
+    white-space: nowrap;
   }
 
   .badge-primary {
     @apply badge;
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--color-primary);
+    background: rgb(var(--color-primary) / 0.12);
+    color: rgb(var(--color-primary-700));
   }
 
   .dark .badge-primary {
-    background: rgba(255, 255, 255, 0.1);
+    color: rgb(var(--color-primary-300));
   }
 
   .badge-success {
     @apply badge;
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
+    background: rgb(var(--color-success) / 0.14);
+    color: rgb(var(--color-success));
   }
 
   .badge-warning {
     @apply badge;
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--color-warning);
+    background: rgb(var(--color-warning) / 0.16);
+    color: rgb(var(--color-warning));
   }
 
   .badge-danger {
     @apply badge;
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--color-danger);
+    background: rgb(var(--color-danger) / 0.14);
+    color: rgb(var(--color-danger));
   }
 
   .badge-info {
     @apply badge;
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--color-info);
+    background: rgb(var(--color-info) / 0.14);
+    color: rgb(var(--color-info));
   }
 
-  /* Status Indicators */
   .status-dot {
     @apply inline-block h-2 w-2 rounded-full;
   }
 
   .status-active {
-    @apply status-dot bg-success;
-    box-shadow: 0 0 6px var(--color-success);
+    @apply status-dot;
+    background: rgb(var(--color-success));
   }
 
   .status-inactive {
-    @apply status-dot bg-danger;
-    box-shadow: 0 0 6px var(--color-danger);
+    @apply status-dot;
+    background: rgb(var(--color-danger));
   }
 
   .status-pending {
-    @apply status-dot bg-warning;
-    box-shadow: 0 0 6px var(--color-warning);
+    @apply status-dot;
+    background: rgb(var(--color-warning));
   }
 
-  /* Skeleton Loading */
+  /* ===================== *
+   *  FEEDBACK             *
+   * ===================== */
   .skeleton {
-    @apply relative overflow-hidden rounded;
-    background: linear-gradient(90deg, var(--color-border) 25%, var(--color-muted) 50%, var(--color-border) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+    @apply relative overflow-hidden rounded-sm;
+    background: rgb(var(--color-border));
+    animation: none;
   }
 
-  /* Tooltip */
   .tooltip {
-    @apply invisible absolute z-50 rounded-lg px-3 py-1.5 text-xs font-medium;
-    background: var(--color-text);
-    color: var(--color-background);
+    @apply invisible absolute z-50 rounded px-2 py-1 text-[11px] font-medium;
+    background: rgb(var(--color-text));
+    color: rgb(var(--color-background));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   .tooltip-trigger:hover + .tooltip {
     @apply visible;
   }
 
-  /* Dialog / Modal */
   .dialog-overlay {
-    @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
-    animation: fadeIn 0.2s ease-out;
+    @apply fixed inset-0 z-50 bg-black/40;
+    animation: fadeIn 0.15s ease-out;
   }
 
   .dialog-content {
-    @apply fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border p-6 shadow-2xl;
+    @apply fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded border p-4 shadow-lg;
     background: var(--color-card);
     border-color: var(--color-border);
-    animation: scaleIn 0.2s ease-out;
+    animation: scaleIn 0.15s ease-out;
   }
 
-  /* Scrollbar */
+  /* ===================== *
+   *  SCROLLBARS           *
+   * ===================== */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
-    border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--color-muted);
-    border-radius: 4px;
+    background: rgb(var(--color-muted) / 0.4);
+    border-radius: 0;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
+    background: rgb(var(--color-muted) / 0.7);
     background-clip: padding-box;
   }
 
   .thin-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -1461,8 +1464,8 @@
 
 /* Focus Visible */
 *:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+  outline: 1px solid rgb(var(--color-primary));
+  outline-offset: 1px;
 }
 
 /* Reduced Motion */
@@ -1482,9 +1485,9 @@
   --color-primary-rgb: 0, 212, 255;
   --color-secondary-rgb: 168, 85, 247;
   --color-accent-rgb: 0, 255, 136;
-  --sidebar-width: 280px;
-  --sidebar-collapsed-width: 72px;
-  --header-height: 64px;
+  --sidebar-width: 232px;
+  --sidebar-collapsed-width: 56px;
+  --header-height: 48px;
 }
 
 /* ============================================================ *

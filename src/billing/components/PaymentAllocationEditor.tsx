@@ -76,10 +76,10 @@ export function PaymentAllocationEditor({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+          className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
             status === 'Paid'
               ? 'bg-green-500/15 text-green-600 dark:text-green-400'
               : status === 'Partially Paid'
@@ -97,7 +97,7 @@ export function PaymentAllocationEditor({
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[40rem] text-sm">
+          <table className="w-full min-w-[40rem] text-[13px]">
             <thead>
               <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <th className="py-1.5 pr-2">Method</th>
@@ -126,7 +126,7 @@ export function PaymentAllocationEditor({
                             bank_label: next?.requires_bank ? row.bank_label : null,
                           });
                         }}
-                        className="h-8 w-36 rounded border border-input bg-transparent px-2"
+                        className="h-7 w-36 rounded border border-input bg-transparent px-2"
                       >
                         {enabled.map((m) => (
                           <option key={m.key} value={m.key}>
@@ -149,7 +149,7 @@ export function PaymentAllocationEditor({
                                 : null,
                             });
                           }}
-                          className="h-8 w-48 rounded border border-input bg-transparent px-2"
+                          className="h-7 w-48 rounded border border-input bg-transparent px-2"
                         >
                           <option value="">Select bank...</option>
                           {activeBanks.map((account) => (
@@ -177,7 +177,7 @@ export function PaymentAllocationEditor({
                               ? 'Cheque no.'
                               : 'Reference'
                         }
-                        className="h-8 w-40"
+                        className="h-7 w-40"
                       />
                     </td>
                     <td className="py-1.5 pr-2">
@@ -190,7 +190,7 @@ export function PaymentAllocationEditor({
                             amount: Number(e.target.value.replace(/[^0-9.]/g, '')) || 0,
                           })
                         }
-                        className="h-8 w-32 text-right"
+                        className="h-7 w-32 text-right"
                       />
                     </td>
                     <td className="py-2">
@@ -224,11 +224,11 @@ export function PaymentAllocationEditor({
         </Button>
 
         <div className="space-y-1 text-sm">
-          <div className="flex justify-between gap-6">
+          <div className="flex justify-between gap-3">
             <span className="text-muted-foreground">Total allocated</span>
             <span className="tabular-nums">{formatCurrency(allocated)}</span>
           </div>
-          <div className="flex justify-between gap-6">
+          <div className="flex justify-between gap-3">
             <span className="text-muted-foreground">Outstanding</span>
             <span className="tabular-nums">{formatCurrency(outstanding)}</span>
           </div>

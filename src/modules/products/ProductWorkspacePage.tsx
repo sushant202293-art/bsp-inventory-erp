@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Plus, Package, Tags, Building2, Ruler, Lock } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
@@ -101,7 +100,7 @@ export default function ProductWorkspacePage() {
   const hasNoAccess = !permissionsLoading && visibleTabs.length === 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Product Management"
         description="Manage products, categories, brands and units from one place"
@@ -130,7 +129,7 @@ export default function ProductWorkspacePage() {
           </CardContent>
         </Card>
       ) : (
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-3">
           {/*
             Horizontally scrollable on small screens instead of wrapping or
             overflowing the viewport.
@@ -148,16 +147,12 @@ export default function ProductWorkspacePage() {
 
           {visibleTabs.map((tab) => (
             <TabsContent key={tab.value} value={tab.value}>
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.15 }}
-              >
+              <div>
                 {tab.value === 'products' && <ProductListPanel />}
                 {tab.value === 'categories' && <CategoryPanel />}
                 {tab.value === 'brands' && <BrandPanel />}
                 {tab.value === 'units' && <UnitPanel />}
-              </motion.div>
+              </div>
             </TabsContent>
           ))}
         </Tabs>

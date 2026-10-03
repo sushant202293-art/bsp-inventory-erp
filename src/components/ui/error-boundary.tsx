@@ -42,7 +42,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
       return (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-danger/10 p-4 mb-4">
+          <div className="rounded-full bg-danger/10 p-4 mb-2">
             <AlertTriangle className="h-8 w-8 text-danger" />
           </div>
           <h3 className="text-lg font-semibold text-foreground">
@@ -51,7 +51,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             {this.state.error?.message || "An unexpected error occurred."}
           </p>
-          <Button onClick={this.handleReset} variant="outline" className="mt-4">
+          <Button onClick={this.handleReset} variant="outline" className="mt-2">
             Try again
           </Button>
         </div>

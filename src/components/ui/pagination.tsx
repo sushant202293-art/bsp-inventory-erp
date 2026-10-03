@@ -60,8 +60,8 @@ function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
   return (
-    <div className={cn("flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between", className)}>
-      <div className="flex items-center gap-4">
+    <div className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", className)}>
+      <div className="flex items-center gap-3">
         {showTotalItems && (
           <p className="text-sm text-muted-foreground">
             Showing {startItem} to {endItem} of {totalItems} entries

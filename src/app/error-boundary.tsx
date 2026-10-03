@@ -39,9 +39,9 @@ export class AppErrorBoundary extends React.Component<AppErrorBoundaryProps, App
     if (this.state.hasError) {
       return (
         <div className="flex min-h-screen items-center justify-center bg-background p-4">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-lg">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card p-4 shadow-lg">
             <div className="flex flex-col items-center text-center">
-              <div className="mb-4 rounded-full bg-destructive/10 p-4">
+              <div className="mb-2 rounded-full bg-destructive/10 p-4">
                 <AlertTriangle className="h-10 w-10 text-destructive" />
               </div>
               <h1 className="mb-2 text-xl font-semibold text-foreground">
@@ -51,7 +51,7 @@ export class AppErrorBoundary extends React.Component<AppErrorBoundaryProps, App
                 The application encountered an unexpected error and could not recover.
               </p>
               {this.state.error && (
-                <div className="mb-4 w-full rounded-md bg-muted p-3 text-left">
+                <div className="mb-2 w-full rounded-md bg-muted p-3 text-left">
                   <p className="mb-1 text-xs font-medium text-muted-foreground">Error Message:</p>
                   <p className="break-all font-mono text-xs text-destructive">
                     {this.state.error.message || 'Unknown error'}

@@ -40,10 +40,10 @@ export default function LowStockPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><AlertTriangle className="h-6 w-6 text-amber-500" /> Low Stock Items</h1>
+          <h1 className="text-lg font-bold flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-amber-500" /> Low Stock Items</h1>
           <p className="text-sm text-muted-foreground">{items.length} products below reorder level</p>
         </div>
       </div>
@@ -57,17 +57,17 @@ export default function LowStockPage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b">
-                  <th className="p-3 text-left font-medium">Product</th>
-                  <th className="p-3 text-left font-medium">Code</th>
-                  <th className="p-3 text-right font-medium">Current Stock</th>
-                  <th className="p-3 text-right font-medium">Low Level</th>
-                  <th className="p-3 text-right font-medium">Reorder Level</th>
-                  <th className="p-3 text-right font-medium">Suggested Qty</th>
-                  <th className="p-3 text-center font-medium">Status</th>
-                  <th className="p-3 text-center font-medium">Action</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Product</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Code</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Current Stock</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Low Level</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Reorder Level</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Suggested Qty</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-center">Status</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -76,14 +76,14 @@ export default function LowStockPage() {
                   const suggested = Math.max(0, (item.reorder_level || 0) - item.current_stock);
                   return (
                     <tr key={item.id} className="border-b hover:bg-muted/50">
-                      <td className="p-3 font-medium">{item.name}</td>
-                      <td className="p-3 font-mono text-xs">{item.code}</td>
-                      <td className="p-3 text-right font-semibold">{item.current_stock}</td>
-                      <td className="p-3 text-right text-muted-foreground">{item.low_stock_level}</td>
-                      <td className="p-3 text-right text-muted-foreground">{item.reorder_level}</td>
-                      <td className="p-3 text-right font-semibold">{suggested}</td>
-                      <td className="p-3 text-center"><Badge variant={severity.variant}>{severity.label}</Badge></td>
-                      <td className="p-3 text-center">
+                      <td className="px-2.5 py-1.5 font-medium">{item.name}</td>
+                      <td className="px-2.5 py-1.5 font-mono text-xs">{item.code}</td>
+                      <td className="px-2.5 py-1.5 text-right font-semibold">{item.current_stock}</td>
+                      <td className="px-2.5 py-1.5 text-right text-muted-foreground">{item.low_stock_level}</td>
+                      <td className="px-2.5 py-1.5 text-right text-muted-foreground">{item.reorder_level}</td>
+                      <td className="px-2.5 py-1.5 text-right font-semibold">{suggested}</td>
+                      <td className="px-2.5 py-1.5 text-center"><Badge variant={severity.variant}>{severity.label}</Badge></td>
+                      <td className="px-2.5 py-1.5 text-center">
                         <Link to={`/purchase-orders/new?product=${item.id}`}>
                           <Button size="sm" variant="outline"><ShoppingCart className="mr-1 h-3 w-3" /> Create PO</Button>
                         </Link>
@@ -92,7 +92,7 @@ export default function LowStockPage() {
                   );
                 })}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">No low stock items found</td></tr>
+                  <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">No low stock items found</td></tr>
                 )}
               </tbody>
             </table>

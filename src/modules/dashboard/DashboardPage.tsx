@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Package, AlertTriangle, TrendingUp, DollarSign, ShoppingCart, BarChart3 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -82,7 +81,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-96 items-center justify-center">
+      <div className="flex py-16 items-center justify-center">
         <LoadingSpinner size="lg" text="Loading dashboard..." />
       </div>
     );
@@ -102,7 +101,6 @@ export default function DashboardPage() {
       value: formatCurrency(salesSummary?.today_sales),
       sub: `${salesSummary?.total_invoices ?? 0} invoices`,
       icon: TrendingUp,
-      color: 'from-blue-500 to-cyan-400',
       link: '/reports/sales',
     },
     {
@@ -110,7 +108,6 @@ export default function DashboardPage() {
       value: formatCurrency(purchaseSummary?.total_purchases),
       sub: `${purchaseSummary?.total_invoices ?? 0} invoices`,
       icon: ShoppingCart,
-      color: 'from-purple-500 to-pink-400',
       link: '/reports/purchases',
     },
     {
@@ -118,7 +115,6 @@ export default function DashboardPage() {
       value: formatCurrency(stockSummary?.total_stock_value),
       sub: `${stockSummary?.total_stock_quantity ?? 0} units`,
       icon: Package,
-      color: 'from-green-500 to-emerald-400',
       link: '/stock',
     },
     {
@@ -126,26 +122,25 @@ export default function DashboardPage() {
       value: formatCurrency(totalReceivables),
       sub: `${overLimitCount} over limit`,
       icon: DollarSign,
-      color: 'from-amber-500 to-orange-400',
       link: '/ledgers/customer',
     },
   ];
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-3 pb-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Welcome back. Here is your business overview.</p>
+          <h1 className="text-lg font-bold leading-tight">Dashboard</h1>
+          <p className="text-xs text-muted-foreground">Welcome back. Here is your business overview.</p>
         </div>
-        <div className="flex gap-1 rounded-lg bg-muted p-1">
+        <div className="flex gap-0.5 rounded border bg-muted/50 p-0.5">
           {dateButtons.map((btn) => (
             <button
               key={btn.key}
               onClick={() => setDateRange(btn.key)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`rounded px-2 py-1 text-[11px] font-medium transition-colors ${
                 dateRange === btn.key
-                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  ? 'bg-card text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -155,65 +150,60 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {kpiCards.map((card, i) => (
-          <motion.div
-            key={card.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <Link to={card.link}>
-              <Card className="group relative overflow-hidden transition-all hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5">
-                <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
-                <CardContent className="relative p-6">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
-                      <p className="mt-2 text-2xl font-bold">{card.value}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{card.sub}</p>
-                    </div>
-                    <div className={`rounded-lg bg-gradient-to-br ${card.color} p-3 text-white shadow-lg`}>
-                      <card.icon className="h-5 w-5" />
-                    </div>
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+        {kpiCards.map((card) => (
+          <Link key={card.title} to={card.link}>
+            <Card className="group rounded transition-colors hover:border-primary/50">
+              <CardContent className="p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                      {card.title}
+                    </p>
+                    <p className="mt-1 truncate text-xl font-semibold tabular-nums">{card.value}</p>
+                    <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{card.sub}</p>
                   </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
+                  <card.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary" />
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+        <Card className="rounded">
+          <CardHeader className="flex flex-row items-center gap-2 border-b px-3 py-2">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Low Stock Alert
-              {lowStockItems.length > 0 && (
-                <Badge variant="destructive">{lowStockItems.length}</Badge>
-              )}
             </CardTitle>
+            {lowStockItems.length > 0 && (
+              <Badge variant="destructive" className="ml-auto">{lowStockItems.length}</Badge>
+            )}
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {lowStockItems.length === 0 ? (
-              <p className="text-sm text-muted-foreground">All products are well stocked.</p>
+              <p className="px-3 py-3 text-xs text-muted-foreground">All products are well stocked.</p>
             ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="max-h-64 overflow-y-auto">
                 {lowStockItems.map((item) => (
-                  <div key={item.product_id} className="flex items-center justify-between rounded-lg border p-3">
-                    <div>
-                      <p className="text-sm font-medium">{item.product_name}</p>
-                      <p className="text-xs text-muted-foreground">
+                  <div
+                    key={item.product_id}
+                    className="flex items-center justify-between gap-2 border-b px-3 py-1.5 text-[13px] last:border-0 hover:bg-muted/40"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{item.product_name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">
                         {item.product_code}
                         {item.category_name ? ` · ${item.category_name}` : ''}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="shrink-0 text-right">
                       <Badge variant={item.current_stock === 0 ? 'destructive' : 'warning'}>
                         {item.current_stock} left
                       </Badge>
-                      <p className="mt-1 text-xs text-muted-foreground">Reorder: {item.low_stock_level}</p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">Reorder: {item.low_stock_level}</p>
                     </div>
                   </div>
                 ))}
@@ -222,30 +212,35 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-500" />
+        <Card className="rounded">
+          <CardHeader className="flex flex-row items-center gap-2 border-b px-3 py-2">
+            <TrendingUp className="h-3.5 w-3.5 text-green-500" />
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Fast Moving Items
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             {fastMoving.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No sales data available for this period.</p>
+              <p className="px-3 py-3 text-xs text-muted-foreground">No sales data available for this period.</p>
             ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="max-h-64 overflow-y-auto">
                 {fastMoving.map((item, idx) => (
-                  <div key={item.product_id} className="flex items-center gap-3 rounded-lg border p-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                  <div
+                    key={item.product_id}
+                    className="flex items-center gap-2 border-b px-3 py-1.5 text-[13px] last:border-0 hover:bg-muted/40"
+                  >
+                    <span className="w-5 shrink-0 text-center text-[11px] font-semibold text-muted-foreground tabular-nums">
                       {idx + 1}
                     </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.product_name}</p>
-                      <p className="text-xs text-muted-foreground">{item.product_code}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{item.product_name}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{item.product_code}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold">{item.total_quantity} sold</p>
-                      <p className="text-xs text-muted-foreground">{formatCurrency(item.total_revenue)}</p>
+                    <div className="shrink-0 text-right">
+                      <p className="font-medium tabular-nums">{item.total_quantity} sold</p>
+                      <p className="text-[11px] text-muted-foreground tabular-nums">
+                        {formatCurrency(item.total_revenue)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -256,31 +251,34 @@ export default function DashboardPage() {
       </div>
 
       {recentActivity.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-blue-500" />
+        <Card className="rounded">
+          <CardHeader className="flex flex-row items-center gap-2 border-b px-3 py-2">
+            <BarChart3 className="h-3.5 w-3.5 text-blue-500" />
+            <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Recent Activity
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2 max-h-72 overflow-y-auto">
+          <CardContent className="p-0">
+            <div className="max-h-72 overflow-y-auto">
               {recentActivity.map((act) => (
-                <div key={act.id} className="flex items-center gap-3 rounded-lg border p-3">
+                <div
+                  key={act.id}
+                  className="flex items-center gap-2 border-b px-3 py-1.5 text-[13px] last:border-0 hover:bg-muted/40"
+                >
                   <Badge variant={act.type === 'sale' ? 'success' : act.type === 'purchase' ? 'info' : 'secondary'}>
                     {act.type}
                   </Badge>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">
                       {act.document_number}
                       {act.party_name ? ` · ${act.party_name}` : ''}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="truncate text-[11px] text-muted-foreground">
                       {formatDate(act.document_date)}
                       {act.status ? ` · ${act.status}` : ''}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold">{formatCurrency(act.grand_total)}</p>
+                  <p className="shrink-0 font-medium tabular-nums">{formatCurrency(act.grand_total)}</p>
                 </div>
               ))}
             </div>
@@ -288,7 +286,7 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {[
           { label: '+ New Sale', to: '/transactions/sales/new' },
           { label: '+ New PO', to: '/purchase-orders/new' },
@@ -298,7 +296,7 @@ export default function DashboardPage() {
           { label: '+ New Supplier', to: '/suppliers/new' },
         ].map((action) => (
           <Link key={action.to} to={action.to}>
-            <Button variant="outline" className="w-full h-12 text-sm font-medium hover:bg-primary hover:text-primary-foreground transition-colors">
+            <Button variant="outline" className="h-9 w-full text-[13px] font-medium">
               {action.label}
             </Button>
           </Link>

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Plus,
   Pencil,
@@ -212,7 +211,7 @@ export default function PurchaseListPage() {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+    <div>
       <PageHeader
         title="Purchase Invoices"
         description="Manage all purchase invoices and supplier billing"
@@ -237,9 +236,9 @@ export default function PurchaseListPage() {
         }
       />
 
-      <Card className="mt-6">
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-4">
+      <Card className="mt-3">
+        <CardContent className="p-3">
+          <div className="flex flex-col gap-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <SearchInput
                 value={searchQuery}
@@ -282,12 +281,7 @@ export default function PurchaseListPage() {
             </div>
 
             {showFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="flex items-center gap-3"
-              >
+              <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <label className="text-sm text-muted-foreground">From:</label>
                   <Input
@@ -309,16 +303,16 @@ export default function PurchaseListPage() {
                 <Button variant="ghost" size="sm" onClick={() => { setDateFrom(''); setDateTo(''); }}>
                   Clear
                 </Button>
-              </motion.div>
+              </div>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="mt-4">
+      <Card className="mt-2">
         <CardContent className="p-0">
           {loading ? (
-            <div className="flex items-center justify-center py-20">
+            <div className="flex items-center justify-center py-10">
               <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             </div>
           ) : purchases.length === 0 ? (
@@ -427,8 +421,8 @@ export default function PurchaseListPage() {
               </div>
 
               <div className="border-t bg-muted/30 px-4 py-3">
-                <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
-                  <div className="flex items-center gap-6">
+                <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+                  <div className="flex items-center gap-3">
                     <span className="text-muted-foreground">
                       Subtotal: <span className="font-semibold text-foreground">{formatCurrency(summary.subtotal)}</span>
                     </span>
@@ -453,7 +447,7 @@ export default function PurchaseListPage() {
       </Card>
 
       {totalItems > 0 && (
-        <div className="mt-4">
+        <div className="mt-2">
           <Pagination
             currentPage={currentPage}
             totalPages={Math.ceil(totalItems / pageSize)}
@@ -486,6 +480,6 @@ export default function PurchaseListPage() {
         onConfirm={handleCancel}
         loading={actionLoading}
       />
-    </motion.div>
+    </div>
   );
 }

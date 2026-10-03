@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
 import { Save, X, Loader2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
@@ -95,11 +94,6 @@ const customerFormSchema = z.object({
 });
 
 type FormValues = z.input<typeof customerFormSchema>;
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
 
 export default function CustomerFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -238,15 +232,15 @@ export default function CustomerFormPage() {
 
   if (fetching) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-3">
         <Skeleton className="h-10 w-[300px]" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <Card key={i}>
               <CardHeader>
                 <Skeleton className="h-6 w-[200px]" />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 {Array.from({ length: 4 }).map((_, j) => (
                   <Skeleton key={j} className="h-10 w-full" />
                 ))}
@@ -259,7 +253,7 @@ export default function CustomerFormPage() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title={isEditing ? 'Edit Customer' : 'New Customer'}
         description={isEditing ? 'Update customer information' : 'Add a new customer to your records'}
@@ -283,13 +277,13 @@ export default function CustomerFormPage() {
       />
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="name"
@@ -316,7 +310,7 @@ export default function CustomerFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="gstin"
@@ -368,7 +362,7 @@ export default function CustomerFormPage() {
               <CardHeader>
                 <CardTitle>Contact Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="contact_person"
@@ -382,7 +376,7 @@ export default function CustomerFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="phone"
@@ -427,12 +421,12 @@ export default function CustomerFormPage() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Card>
               <CardHeader>
                 <CardTitle>Billing Address</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="billing_address.line1"
@@ -459,7 +453,7 @@ export default function CustomerFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="billing_address.city"
@@ -487,7 +481,7 @@ export default function CustomerFormPage() {
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="billing_address.pin"
@@ -534,7 +528,7 @@ export default function CustomerFormPage() {
                   )}
                 />
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 {!sameAsBilling && (
                   <>
                     <FormField
@@ -563,7 +557,7 @@ export default function CustomerFormPage() {
                         </FormItem>
                       )}
                     />
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <FormField
                         control={form.control}
                         name="shipping_address.city"
@@ -591,7 +585,7 @@ export default function CustomerFormPage() {
                         )}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <FormField
                         control={form.control}
                         name="shipping_address.pin"
@@ -630,13 +624,13 @@ export default function CustomerFormPage() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             <Card>
               <CardHeader>
                 <CardTitle>Credit Settings</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="credit_limit"
@@ -674,7 +668,7 @@ export default function CustomerFormPage() {
                     )}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="opening_balance"
@@ -721,7 +715,7 @@ export default function CustomerFormPage() {
               <CardHeader>
                 <CardTitle>Bank Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <FormField
                   control={form.control}
                   name="bank_details.bank_name"
@@ -748,7 +742,7 @@ export default function CustomerFormPage() {
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <FormField
                     control={form.control}
                     name="bank_details.ifsc_code"
@@ -812,7 +806,7 @@ export default function CustomerFormPage() {
           </div>
         </form>
       </Form>
-    </motion.div>
+    </div>
   );
 }
 

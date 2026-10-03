@@ -33,10 +33,10 @@ export default function ReorderPage() {
   if (loading) return <div className="flex h-96 items-center justify-center"><LoadingSpinner size="lg" text="Loading reorder data..." /></div>;
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><RefreshCw className="h-6 w-6 text-blue-500" /> Reorder Requirements</h1>
+          <h1 className="text-lg font-bold flex items-center gap-2"><RefreshCw className="h-4 w-4 text-blue-500" /> Reorder Requirements</h1>
           <p className="text-sm text-muted-foreground">{items.length} products require replenishment</p>
         </div>
       </div>
@@ -50,16 +50,16 @@ export default function ReorderPage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b">
-                  <th className="p-3 text-left font-medium">Product</th>
-                  <th className="p-3 text-left font-medium">Code</th>
-                  <th className="p-3 text-right font-medium">Current Stock</th>
-                  <th className="p-3 text-right font-medium">Reorder Level</th>
-                  <th className="p-3 text-right font-medium">Reorder Target</th>
-                  <th className="p-3 text-right font-medium">Suggested Qty</th>
-                  <th className="p-3 text-center font-medium">Action</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Product</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Code</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Current Stock</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Reorder Level</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Reorder Target</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Suggested Qty</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-center">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -67,13 +67,13 @@ export default function ReorderPage() {
                   const suggested = Math.max(0, (item.reorder_level || 0) - item.current_stock);
                   return (
                     <tr key={item.id} className="border-b hover:bg-muted/50">
-                      <td className="p-3 font-medium">{item.name}</td>
-                      <td className="p-3 font-mono text-xs">{item.code}</td>
-                      <td className="p-3 text-right font-semibold">{item.current_stock}</td>
-                      <td className="p-3 text-right text-muted-foreground">{item.reorder_level}</td>
-                      <td className="p-3 text-right text-muted-foreground">{item.reorder_level}</td>
-                      <td className="p-3 text-right font-bold text-primary">{suggested}</td>
-                      <td className="p-3 text-center">
+                      <td className="px-2.5 py-1.5 font-medium">{item.name}</td>
+                      <td className="px-2.5 py-1.5 font-mono text-xs">{item.code}</td>
+                      <td className="px-2.5 py-1.5 text-right font-semibold">{item.current_stock}</td>
+                      <td className="px-2.5 py-1.5 text-right text-muted-foreground">{item.reorder_level}</td>
+                      <td className="px-2.5 py-1.5 text-right text-muted-foreground">{item.reorder_level}</td>
+                      <td className="px-2.5 py-1.5 text-right font-bold text-primary">{suggested}</td>
+                      <td className="px-2.5 py-1.5 text-center">
                         <Link to={`/purchase-orders/new?product=${item.id}`}>
                           <Button size="sm"><ShoppingCart className="mr-1 h-3 w-3" /> Create PO</Button>
                         </Link>
@@ -82,7 +82,7 @@ export default function ReorderPage() {
                   );
                 })}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No reorder requirements found</td></tr>
+                  <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No reorder requirements found</td></tr>
                 )}
               </tbody>
             </table>

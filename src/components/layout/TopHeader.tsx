@@ -1,14 +1,6 @@
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Menu,
-  Search,
-  Bell,
-  Sun,
-  Moon,
-  ChevronDown,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useLocation } from 'react-router-dom';
+import { Menu, Search, Bell, Sun, Moon, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import NotificationPanel from './NotificationPanel';
@@ -19,112 +11,90 @@ interface TopHeaderProps {
   sidebarCollapsed: boolean;
 }
 
-export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHeaderProps) {
+export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
   const { user, profile } = useAuth();
-  const { theme, setTheme, isDark } = useTheme();
+  const { setTheme, isDark } = useTheme();
+  const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const toggleSearch = useCallback(() => {
-    setSearchOpen((prev) => !prev);
-    if (searchOpen) setSearchQuery('');
-  }, [searchOpen]);
-
-  const closePanels = useCallback(() => {
-    setNotificationOpen(false);
-    setProfileOpen(false);
-    setSearchOpen(false);
+    setSearchOpen((prev) => {
+      if (prev) setSearchQuery('');
+      return !prev;
+    });
   }, []);
 
   return (
-    <div className="flex h-full w-full items-center justify-between px-4">
-      <div className="flex items-center gap-3">
+    <div className="flex h-full w-full items-center justify-between gap-3 px-3">
+      <div className="flex min-w-0 items-center gap-2.5">
         <button
           onClick={onToggleSidebar}
-          className="rounded-lg p-2 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
-          style={{ color: 'rgb(var(--color-text))' }}
+          className="rounded p-1.5 transition-colors hover:bg-sidebar"
+          style={{ color: 'rgb(var(--color-text-secondary))' }}
           aria-label="Toggle sidebar"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <h2
-            className="text-lg font-semibold"
-            style={{ color: 'rgb(var(--color-text))' }}
-          >
-            {getPageTitle()}
-          </h2>
-        </div>
+        <span
+          className="hidden truncate text-[13px] font-semibold md:inline"
+          style={{ color: 'rgb(var(--color-text))' }}
+        >
+          {getPageTitle(location.pathname)}
+        </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <div className="relative">
           {searchOpen ? (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 280, opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              className="flex items-center"
-            >
+            <div className="flex items-center">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search anything... (Ctrl+K)"
+                placeholder="Search... (Ctrl+K)"
                 autoFocus
-                className="w-full rounded-lg border px-3 py-2 pr-10 text-sm outline-none transition-colors focus:ring-2"
-                style={{
-                  background: 'rgb(var(--color-input))',
-                  borderColor: 'rgb(var(--color-border))',
-                  color: 'rgb(var(--color-text))',
-                  
-                }}
+                className="h-8 w-44 rounded border border-border bg-card px-2.5 text-[13px] outline-none transition-colors focus:border-primary sm:w-64"
+                style={{ color: 'rgb(var(--color-text))' }}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') toggleSearch();
                 }}
               />
               <button
                 onClick={toggleSearch}
-                className="absolute right-2 rounded p-1 hover:bg-[rgb(var(--color-sidebar))]"
+                className="ml-1 rounded p-1 hover:bg-sidebar"
                 style={{ color: 'rgb(var(--color-muted))' }}
+                aria-label="Close search"
               >
-                Ãƒâ€”
+                <X size={14} />
               </button>
-            </motion.div>
+            </div>
           ) : (
             <button
               onClick={toggleSearch}
-              className="flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+              className="flex h-8 items-center gap-1.5 rounded border border-border px-2 text-[13px] transition-colors hover:bg-sidebar"
               style={{
-                borderColor: 'rgb(var(--color-border))',
                 color: 'rgb(var(--color-muted))',
               }}
               title="Search (Ctrl+K)"
             >
-              <Search size={16} />
-              <span className="hidden lg:inline">Search...</span>
-              <kbd className="hidden rounded border px-1.5 py-0.5 text-[10px] font-medium lg:inline"
-                style={{
-                  borderColor: 'rgb(var(--color-border))',
-                  color: 'rgb(var(--color-muted))',
-                }}
-              >
-                Ã¢Å’ËœK
-              </kbd>
+              <Search size={14} />
+              <span className="hidden lg:inline">Search</span>
             </button>
           )}
         </div>
 
         <button
           onClick={() => setTheme(isDark ? 'light-professional' : 'neon-blue')}
-          className="rounded-lg p-2 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+          className="rounded p-1.5 transition-colors hover:bg-sidebar"
           style={{ color: 'rgb(var(--color-text-secondary))' }}
           title={isDark ? 'Light Mode' : 'Dark Mode'}
+          aria-label="Toggle theme"
         >
-          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
         <div className="relative">
@@ -133,12 +103,13 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
               setNotificationOpen((prev) => !prev);
               setProfileOpen(false);
             }}
-            className="relative rounded-lg p-2 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+            className="relative rounded p-1.5 transition-colors hover:bg-sidebar"
             style={{ color: 'rgb(var(--color-text-secondary))' }}
+            aria-label="Notifications"
           >
-            <Bell size={18} />
+            <Bell size={16} />
             <span
-              className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white"
+              className="absolute right-0.5 top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold text-white"
               style={{ background: 'rgb(var(--color-error))' }}
             >
               3
@@ -156,33 +127,20 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
               setProfileOpen((prev) => !prev);
               setNotificationOpen(false);
             }}
-            className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+            className="flex h-8 items-center gap-1.5 rounded px-1.5 transition-colors hover:bg-sidebar"
           >
             <div
-              className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white"
+              className="flex h-6 w-6 items-center justify-center rounded-sm text-[11px] font-bold text-white"
               style={{ background: 'rgb(var(--color-primary))' }}
             >
-              {(profile?.full_name ?? user?.email ?? "User")?.charAt(0) || 'A'}
+              {(profile?.full_name ?? user?.email ?? 'User')?.charAt(0) || 'A'}
             </div>
-            <div className="hidden text-left md:block">
-              <p
-                className="text-sm font-medium leading-tight"
-                style={{ color: 'rgb(var(--color-text))' }}
-              >
-                {(profile?.full_name ?? user?.email ?? "User") || 'Admin'}
-              </p>
-              <p
-                className="text-xs capitalize"
-                style={{ color: 'rgb(var(--color-muted))' }}
-              >
-                {user?.role || 'admin'}
-              </p>
-            </div>
-            <ChevronDown
-              size={14}
-              className="hidden md:block"
-              style={{ color: 'rgb(var(--color-muted))' }}
-            />
+            <span
+              className="hidden max-w-[140px] truncate text-[13px] font-medium md:inline"
+              style={{ color: 'rgb(var(--color-text))' }}
+            >
+              {(profile?.full_name ?? user?.email ?? 'User') || 'Admin'}
+            </span>
           </button>
           <ProfileDropdown
             isOpen={profileOpen}
@@ -194,8 +152,7 @@ export default function TopHeader({ onToggleSidebar, sidebarCollapsed }: TopHead
   );
 }
 
-function getPageTitle(): string {
-  const path = window.location.pathname;
+function getPageTitle(path: string): string {
   if (path === '/dashboard') return 'Dashboard';
   if (path.startsWith('/products')) return 'Products';
   if (path.startsWith('/customers')) return 'Customers';
@@ -204,6 +161,7 @@ function getPageTitle(): string {
   if (path.startsWith('/transactions/quotations')) return 'Quotations';
   if (path.startsWith('/transactions/purchase-orders')) return 'Purchase Orders';
   if (path.startsWith('/transactions/proforma-invoices')) return 'Proforma Invoices';
+  if (path.startsWith('/transactions/purchases')) return 'Purchase Invoices';
   if (path.startsWith('/stock/overview')) return 'Stock Overview';
   if (path.startsWith('/stock/movements')) return 'Stock Movements';
   if (path.startsWith('/stock/adjustments')) return 'Stock Adjustments';

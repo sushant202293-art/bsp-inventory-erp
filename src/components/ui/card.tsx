@@ -12,10 +12,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-xl border border-border bg-card text-card-foreground shadow-card transition-all duration-300",
-        glass && "bg-background/60 backdrop-blur-xl border-white/10",
-        neon && "border-primary/30 shadow-neon-sm hover:shadow-neon",
-        hover3d && "hover:shadow-elevated hover:-translate-y-1",
+        "rounded border border-border bg-card text-card-foreground",
+        glass && "bg-background/60",
+        neon && "border-primary/40",
+        hover3d && "hover:border-primary/40",
         className
       )}
       {...props}
@@ -30,7 +30,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    className={cn("flex flex-col space-y-1 p-3", className)}
     {...props}
   />
 ));
@@ -42,7 +42,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-xl font-semibold leading-none tracking-tight text-foreground", className)}
+    className={cn("text-sm font-semibold leading-none tracking-tight text-foreground", className)}
     {...props}
   />
 ));
@@ -54,7 +54,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-xs text-muted-foreground", className)}
     {...props}
   />
 ));
@@ -64,7 +64,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-3 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -74,7 +74,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn("flex items-center border-t border-border p-3", className)}
     {...props}
   />
 ));

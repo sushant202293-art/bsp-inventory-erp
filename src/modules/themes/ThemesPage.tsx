@@ -20,15 +20,15 @@ export default function ThemesPage() {
   const { themeId, mode, setTheme, setMode } = useTheme();
 
   return (
-    <div className="space-y-6 p-6">
-      <div><h1 className="text-2xl font-bold flex items-center gap-2"><Palette className="h-6 w-6" /> Themes</h1><p className="text-sm text-muted-foreground">Customize the look and feel of your application</p></div>
+    <div className="space-y-3">
+      <div><h1 className="text-lg font-bold flex items-center gap-2"><Palette className="h-4 w-4" /> Themes</h1><p className="text-sm text-muted-foreground">Customize the look and feel of your application</p></div>
 
       <Card>
         <CardHeader><CardTitle>Appearance Mode</CardTitle></CardHeader>
         <CardContent>
           <div className="flex gap-3">
             {([ { key: 'dark', label: 'Dark', icon: Moon }, { key: 'light', label: 'Light', icon: Sun }, { key: 'system', label: 'System', icon: Monitor } ] as const).map(({ key, label, icon: Icon }) => (
-              <button key={key} onClick={() => setMode(key)} className={`flex items-center gap-2 rounded-lg border-2 px-6 py-3 text-sm font-medium transition-all ${mode === key ? 'border-primary bg-primary/10 text-primary' : 'border-muted hover:border-primary/50'}`}>
+              <button key={key} onClick={() => setMode(key)} className={`flex items-center gap-2 rounded border px-3 py-1.5 text-[13px] font-medium transition-all ${mode === key ? 'border-primary bg-primary/10 text-primary' : 'border-muted hover:border-primary/50'}`}>
                 <Icon className="h-4 w-4" /> {label}
               </button>
             ))}
@@ -39,9 +39,9 @@ export default function ThemesPage() {
       <Card>
         <CardHeader><CardTitle>Color Themes</CardTitle></CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {Object.entries(themePreviews).map(([name, colors]) => (
-              <button key={name} onClick={() => setTheme(name)} className={`group relative overflow-hidden rounded-xl border-2 p-4 text-left transition-all hover:shadow-lg ${themeId === name ? 'border-primary shadow-primary/20 ring-2 ring-primary/20' : 'border-muted hover:border-primary/50'}`}>
+              <button key={name} onClick={() => setTheme(name)} className={`group relative overflow-hidden rounded border p-3 text-left transition-colors-all hover:shadow-lg ${themeId === name ? 'border-primary shadow-primary/20 ring-2 ring-primary/20' : 'border-muted hover:border-primary/50'}`}>
                 <div className="flex gap-1 mb-3">
                   <div className="h-6 w-6 rounded-full" style={{ background: colors.primary }} />
                   <div className="h-6 w-6 rounded-full" style={{ background: colors.secondary }} />

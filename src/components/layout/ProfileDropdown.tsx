@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   LogOut,
   User,
@@ -79,21 +78,11 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={onClose} />
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border shadow-xl"
-            style={{
-              background: 'rgb(var(--color-card))',
-              borderColor: 'rgb(var(--color-border))',
-            }}
-          >
+          <div className="absolute right-0 top-full z-50 mt-2 w-60 rounded border shadow-lg" style={{ background: 'rgb(var(--color-card))', borderColor: 'rgb(var(--color-border))', }}>
             <div
               className="border-b px-4 py-3"
               style={{ borderColor: 'rgb(var(--color-border))' }}
@@ -111,9 +100,9 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
                 {user?.email || 'admin@bspinventory.com'}
               </p>
               <span
-                className="mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium uppercase"
+                className="mt-1 inline-block rounded-sm px-1.5 py-0.5 text-[10px] font-semibold uppercase"
                 style={{
-                  background: 'rgb(var(--color-primary))20',
+                  background: 'rgb(var(--color-primary) / 0.15)',
                   color: 'rgb(var(--color-primary))',
                 }}
               >
@@ -128,7 +117,7 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
                   <button
                     key={item.id}
                     onClick={item.action}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-[rgb(var(--color-sidebar))]"
+                    className="flex w-full items-center gap-2.5 px-3 py-1.5 text-[13px] transition-colors hover:bg-[rgb(var(--color-sidebar))]"
                     style={{ color: 'rgb(var(--color-text-secondary))' }}
                   >
                     <Icon size={16} />
@@ -154,9 +143,9 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
                 <span>Log Out</span>
               </button>
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-    </AnimatePresence>
+    </>
   );
 }

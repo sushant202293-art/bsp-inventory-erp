@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, UserPlus, AlertCircle, CheckCircle2, Building2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -83,14 +82,14 @@ export default function SignupPage() {
 
   return (
     <div>
-      <div className="mb-6 text-center">
+      <div className="mb-3 text-center">
         <h2 className="text-xl font-bold">Create your account</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Set up your company and start managing inventory
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div className="space-y-2">
           <Label htmlFor="fullName">Full Name</Label>
           <div className="relative">
@@ -100,7 +99,7 @@ export default function SignupPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your name"
-              className="pl-10"
+              className="pl-8"
               required
               autoComplete="name"
             />
@@ -116,7 +115,7 @@ export default function SignupPage() {
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
               placeholder="e.g. BSP Traders"
-              className="pl-10"
+              className="pl-8"
               required
               autoComplete="organization"
             />
@@ -155,7 +154,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@company.com"
-              className="pl-10"
+              className="pl-8"
               required
               autoComplete="email"
             />
@@ -172,7 +171,7 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={`At least ${MIN_PASSWORD_LENGTH} characters`}
-              className="pl-10 pr-10"
+              className="pl-8 pr-9"
               required
               minLength={MIN_PASSWORD_LENGTH}
               autoComplete="new-password"
@@ -189,25 +188,17 @@ export default function SignupPage() {
         </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
-          >
+          <div className="flex items-center gap-2 rounded border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
             <AlertCircle className="h-4 w-4 shrink-0" />
             {error}
-          </motion.div>
+          </div>
         )}
 
         {notice && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/10 p-3 text-sm text-primary"
-          >
+          <div className="flex items-start gap-2 rounded border border-primary/30 bg-primary/10 p-3 text-sm text-primary">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
             {notice}
-          </motion.div>
+          </div>
         )}
 
         <Button type="submit" variant="neon" className="w-full" size="lg" disabled={loading}>
@@ -225,7 +216,7 @@ export default function SignupPage() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-3 text-center text-sm text-muted-foreground">
         Already have an account?{' '}
         <Link to="/login" className="font-medium text-primary hover:underline">
           Sign in

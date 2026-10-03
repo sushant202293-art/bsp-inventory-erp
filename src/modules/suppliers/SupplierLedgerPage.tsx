@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Download } from 'lucide-react';
 import { containerVariants, itemVariants } from '@/styles/animations';
 
@@ -16,23 +15,23 @@ export default function SupplierLedgerPage() {
   const navigate = useNavigate();
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="rounded-lg p-2 hover:bg-[rgb(var(--color-border))]">
             <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-muted))]" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-[rgb(var(--color-text))]">Supplier Ledger</h1>
+            <h1 className="text-lg font-bold text-[rgb(var(--color-text))]">Supplier Ledger</h1>
             <p className="text-sm text-[rgb(var(--color-muted))]">TechSource India Pvt Ltd</p>
           </div>
         </div>
         <button className="btn-outline inline-flex items-center gap-2">
           <Download className="h-4 w-4" /> Export PDF
         </button>
-      </motion.div>
+      </div>
 
-      <motion.div variants={itemVariants} className="card">
+      <div className="card">
         <div className="table-container">
           <table className="table">
             <thead>
@@ -59,7 +58,7 @@ export default function SupplierLedgerPage() {
             </tbody>
           </table>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

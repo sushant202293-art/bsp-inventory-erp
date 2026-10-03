@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   Package, TrendingUp, AlertTriangle, Search, Upload, FileSpreadsheet,
   Loader2, PlusCircle, Download, CheckCircle2, AlertCircle,
@@ -156,53 +155,50 @@ export default function StockOverviewPage() {
   if (loading) return <div className="flex h-96 items-center justify-center"><LoadingSpinner size="lg" text="Loading stock..." /></div>;
 
   const stats = [
-    { label: 'Total Products', value: summary.total_products, icon: Package, color: 'from-blue-500 to-cyan-400' },
-    { label: 'Total Stock Qty', value: summary.total_qty.toLocaleString(), icon: TrendingUp, color: 'from-green-500 to-emerald-400' },
-    { label: 'Stock Value', value: formatCurrency(summary.total_value), icon: Package, color: 'from-purple-500 to-pink-400' },
-    { label: 'Low Stock Items', value: summary.low_stock, icon: AlertTriangle, color: 'from-amber-500 to-orange-400' },
+    { label: 'Total Products', value: summary.total_products, icon: Package },
+    { label: 'Total Stock Qty', value: summary.total_qty.toLocaleString(), icon: TrendingUp },
+    { label: 'Stock Value', value: formatCurrency(summary.total_value), icon: Package },
+    { label: 'Low Stock Items', value: summary.low_stock, icon: AlertTriangle },
   ];
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-3 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">Stock Statement</h1>
-          <p className="text-sm text-muted-foreground">Current inventory status across all products</p>
+          <h1 className="text-lg font-bold">Stock Statement</h1>
+          <p className="text-xs text-muted-foreground">Current inventory status across all products</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={downloadTemplate}>
-            <Download className="mr-2 h-4 w-4" /> Template
+          <Button variant="outline" size="sm" onClick={downloadTemplate}>
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Template
           </Button>
-          <Button onClick={openImport}>
-            <Upload className="mr-2 h-4 w-4" /> Advanced Import
+          <Button size="sm" onClick={openImport}>
+            <Upload className="mr-1.5 h-3.5 w-3.5" /> Advanced Import
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => (
-          <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-            <Card className="relative overflow-hidden">
-              <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-5`} />
-              <CardContent className="relative p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    <p className="mt-2 text-2xl font-bold">{stat.value}</p>
-                  </div>
-                  <div className={`rounded-lg bg-gradient-to-br ${stat.color} p-3 text-white`}>
-                    <stat.icon className="h-5 w-5" />
-                  </div>
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.label} className="rounded transition-colors hover:border-primary/50">
+            <CardContent className="p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    {stat.label}
+                  </p>
+                  <p className="mt-1 truncate text-xl font-semibold tabular-nums">{stat.value}</p>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                <stat.icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Stock Details</CardTitle>
               {dynamicColumns.length > 0 && (
@@ -230,22 +226,22 @@ export default function StockOverviewPage() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="border-b">
-                  <th className="p-3 text-left font-medium">Code</th>
-                  <th className="p-3 text-left font-medium">Product</th>
-                  <th className="p-3 text-left font-medium">Category</th>
-                  <th className="p-3 text-left font-medium">Brand</th>
-                  <th className="p-3 text-right font-medium">Stock</th>
-                  <th className="p-3 text-right font-medium">Avg Cost</th>
-                  <th className="p-3 text-right font-medium">Value</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Code</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Product</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Category</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-left">Brand</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Stock</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Avg Cost</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-right">Value</th>
                   {dynamicColumns.map((header) => (
                     <th key={header} className="p-3 text-right font-medium text-primary" title="Created from the Excel header">
                       {header}
                     </th>
                   ))}
-                  <th className="p-3 text-center font-medium">Status</th>
+                  <th className="px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground text-center">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -253,19 +249,19 @@ export default function StockOverviewPage() {
                   const imported = rowsByProduct[item.product_id] || {};
                   return (
                     <tr key={item.product_id} className="border-b hover:bg-muted/50">
-                      <td className="p-3 font-mono text-xs">{item.product_code || '-'}</td>
-                      <td className="p-3 font-medium">{item.product_name || '-'}</td>
-                      <td className="p-3 text-muted-foreground">{item.category_name || '-'}</td>
-                      <td className="p-3 text-muted-foreground">{item.brand_name || '-'}</td>
-                      <td className="p-3 text-right font-semibold">{item.total_stock}</td>
-                      <td className="p-3 text-right">{formatCurrency(item.avg_cost || 0)}</td>
-                      <td className="p-3 text-right font-semibold">{formatCurrency(item.stock_value || 0)}</td>
+                      <td className="px-2.5 py-1.5 font-mono text-xs">{item.product_code || '-'}</td>
+                      <td className="px-2.5 py-1.5 font-medium">{item.product_name || '-'}</td>
+                      <td className="px-2.5 py-1.5 text-muted-foreground">{item.category_name || '-'}</td>
+                      <td className="px-2.5 py-1.5 text-muted-foreground">{item.brand_name || '-'}</td>
+                      <td className="px-2.5 py-1.5 text-right font-semibold">{item.total_stock}</td>
+                      <td className="px-2.5 py-1.5 text-right">{formatCurrency(item.avg_cost || 0)}</td>
+                      <td className="px-2.5 py-1.5 text-right font-semibold">{formatCurrency(item.stock_value || 0)}</td>
                       {dynamicColumns.map((header) => (
                         <td key={header} className="p-3 text-right tabular-nums">
                           {formatCell(imported[header])}
                         </td>
                       ))}
-                      <td className="p-3 text-center">
+                      <td className="px-2.5 py-1.5 text-center">
                         <Badge variant={item.total_stock === 0 ? 'destructive' : item.total_stock <= (item.low_stock_level || 0) ? 'warning' : 'success'}>
                           {item.total_stock === 0 ? 'Out' : item.total_stock <= (item.low_stock_level || 0) ? 'Low' : 'In Stock'}
                         </Badge>
@@ -275,7 +271,7 @@ export default function StockOverviewPage() {
                 })}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={8 + dynamicColumns.length} className="p-8 text-center text-muted-foreground">
+                    <td colSpan={8 + dynamicColumns.length} className="p-4 text-center text-muted-foreground">
                       No stock data found
                     </td>
                   </tr>
@@ -297,7 +293,7 @@ export default function StockOverviewPage() {
           </DialogHeader>
 
           {result ? (
-            <div className="space-y-4 py-2">
+            <div className="space-y-3 py-2">
               <div className="flex items-start gap-3 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-4">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
                 <div className="text-sm">
@@ -327,7 +323,7 @@ export default function StockOverviewPage() {
               </DialogFooter>
             </div>
           ) : !preview ? (
-            <div className="space-y-4 py-2">
+            <div className="space-y-3 py-2">
               <label
                 htmlFor="stock-import-file"
                 className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-10 text-center transition ${picking ? 'opacity-60' : 'border-border hover:border-primary/60'}`}
@@ -352,7 +348,7 @@ export default function StockOverviewPage() {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4 py-2">
+            <div className="space-y-3 py-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium">{preview.fileName}</span>
                 <span className="text-muted-foreground">{preview.rows.length} rows</span>

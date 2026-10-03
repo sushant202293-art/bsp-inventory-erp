@@ -21,7 +21,7 @@ export function InvoiceTotals({
     <div className="w-full shrink-0 space-y-1 text-[13px] xl:w-[17.5rem]">
       <Row label="Total quantity" value={String(totals.quantity)} />
       <Row label="Gross subtotal" value={formatCurrency(totals.gross)} />
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-3">
         <span className="text-muted-foreground">Discount</span>
         <span className="flex items-center gap-1 tabular-nums">
           {onHeaderDiscountChange ? (
@@ -61,7 +61,7 @@ export function InvoiceTotals({
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-3">
       <span className="text-muted-foreground">{label}</span>
       <span className="tabular-nums">{value}</span>
     </div>

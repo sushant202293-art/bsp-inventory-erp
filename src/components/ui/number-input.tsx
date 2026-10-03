@@ -18,9 +18,9 @@ interface NumberInputProps extends Omit<React.InputHTMLAttributes<HTMLInputEleme
 }
 
 const sizeClasses = {
-  sm: "h-8 text-xs",
-  default: "h-10 text-sm",
-  lg: "h-12 text-base",
+  sm: "h-7 text-xs",
+  default: "h-8 text-[13px]",
+  lg: "h-9 text-sm",
 };
 
 const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
@@ -116,13 +116,13 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
             onKeyDown={handleKeyDown}
             disabled={disabled}
             className={cn(
-              "flex w-full rounded-md border border-border bg-transparent text-foreground shadow-sm transition-all duration-200 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50",
+              "flex w-full rounded border border-border bg-card text-foreground transition-colors duration-100 placeholder:text-muted-foreground tabular-nums focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:border-primary focus-visible:outline-primary disabled:cursor-not-allowed disabled:bg-sidebar disabled:opacity-60",
               sizeClasses[size],
               showControls ? "rounded-r-none border-r-0" : "",
-              prefix ? "pl-7" : "px-3",
-              suffix ? "pr-7" : "",
-              error && "border-danger focus-visible:ring-danger/30 focus-visible:border-danger",
-              !showControls && "px-3"
+              prefix ? "pl-6" : "px-2.5",
+              suffix ? "pr-6" : "",
+              error && "border-danger focus-visible:border-danger focus-visible:outline-danger",
+              !showControls && "px-2.5"
             )}
             {...props}
           />
@@ -143,22 +143,22 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
                 onClick={increment}
                 disabled={disabled || (max !== undefined && value >= max)}
                 className={cn(
-                  "flex items-center justify-center border border-border border-l-0 rounded-tr-md bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-                  size === "sm" ? "h-4 w-7" : size === "lg" ? "h-6 w-8" : "h-5 w-7"
+                  "flex items-center justify-center border border-border border-l-0 rounded-tr-sm bg-sidebar hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+                  size === "sm" ? "h-3.5 w-6" : size === "lg" ? "h-[18px] w-7" : "h-4 w-6"
                 )}
               >
-                <Plus className={cn(size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                <Plus className={cn(size === "sm" ? "h-2 w-2" : "h-2.5 w-2.5")} />
               </button>
               <button
                 type="button"
                 onClick={decrement}
                 disabled={disabled || (min !== undefined && value <= min)}
                 className={cn(
-                  "flex items-center justify-center border border-border border-l-0 border-t-0 rounded-br-md bg-muted hover:bg-muted/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-                  size === "sm" ? "h-4 w-7" : size === "lg" ? "h-6 w-8" : "h-5 w-7"
+                  "flex items-center justify-center border border-border border-l-0 border-t-0 rounded-br-sm bg-sidebar hover:bg-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+                  size === "sm" ? "h-3.5 w-6" : size === "lg" ? "h-[18px] w-7" : "h-4 w-6"
                 )}
               >
-                <Minus className={cn(size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3")} />
+                <Minus className={cn(size === "sm" ? "h-2 w-2" : "h-2.5 w-2.5")} />
               </button>
             </div>
           )}

@@ -73,9 +73,9 @@ export function InvoiceItemsTable({
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[64rem] border-collapse text-sm">
+        <table className="w-full min-w-[64rem] border-collapse text-[13px]">
           <thead>
-            <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
+            <tr className="border-b bg-muted/40 text-left text-[10px] uppercase tracking-wider text-muted-foreground">
               <th className="w-8 px-2 py-1">#</th>
               <th className="px-2 py-1">Product</th>
               <th className="w-28 px-2 py-1">Code</th>
@@ -93,7 +93,7 @@ export function InvoiceItemsTable({
             {items.map((item, index) => {
               const invalidQty = toNumber(item.quantity) <= 0;
               return (
-                <tr key={item.key} className="border-b align-top">
+                <tr key={item.key} className="border-b align-top hover:bg-muted/30">
                   <td className="px-2 py-1 text-muted-foreground">{index + 1}</td>
                   <td className="px-2 py-1">
                     <ProductAutocomplete

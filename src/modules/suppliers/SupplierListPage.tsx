@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Plus,
   MoreHorizontal,
@@ -48,11 +47,6 @@ import {
 } from '@/services/supplier.service';
 import { INDIAN_STATES } from '@/constants';
 import type { SupplierWithRelations, SupplierFilters } from '@/types/supplier.types';
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 12 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
-};
 
 type SupplierColumnKey =
   | 'code'
@@ -287,7 +281,7 @@ export default function SupplierListPage() {
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn} className="space-y-6">
+    <div className="space-y-3">
       <PageHeader
         title="Suppliers"
         description="Manage your supplier accounts and payment settings"
@@ -314,8 +308,8 @@ export default function SupplierListPage() {
       />
 
       <Card>
-        <CardContent className="pt-6">
-          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+        <CardContent className="pt-3">
+          <div className="mb-2 flex flex-col gap-3 lg:flex-row lg:items-center">
             <SearchInput
               placeholder="Search by name, code, phone, email..."
               value={filters.search || ''}
@@ -399,7 +393,7 @@ export default function SupplierListPage() {
                 rowClassName="transition-colors hover:bg-muted/50"
               />
 
-              <div className="mt-4">
+              <div className="mt-2">
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
@@ -427,6 +421,6 @@ export default function SupplierListPage() {
         onConfirm={handleDelete}
         loading={deleting}
       />
-    </motion.div>
+    </div>
   );
 }

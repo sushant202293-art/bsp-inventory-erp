@@ -37,7 +37,7 @@ export default function AppLayout() {
     setMobileMenuOpen(false);
   }, []);
 
-  const sidebarWidth = isMobile ? 0 : sidebarCollapsed ? 72 : 260;
+  const sidebarWidth = isMobile ? 0 : sidebarCollapsed ? 56 : 232;
 
   return (
     <div
@@ -46,13 +46,13 @@ export default function AppLayout() {
     >
       {isMobile && mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 transition-opacity lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={closeMobileMenu}
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:relative lg:z-auto ${
+        className={`fixed inset-y-0 left-0 z-50 flex flex-col transition-[width] duration-150 lg:relative lg:z-auto ${
           isMobile
             ? mobileMenuOpen
               ? 'translate-x-0'
@@ -60,8 +60,8 @@ export default function AppLayout() {
             : ''
         }`}
         style={{
-          width: isMobile ? 260 : sidebarWidth,
-          minWidth: isMobile ? 260 : sidebarWidth,
+          width: isMobile ? 232 : sidebarWidth,
+          minWidth: isMobile ? 232 : sidebarWidth,
           background: 'rgb(var(--color-sidebar))',
           borderRight: `1px solid rgb(var(--color-border))`,
         }}
@@ -74,9 +74,9 @@ export default function AppLayout() {
         />
       </aside>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header
-          className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b"
+          className="flex h-12 shrink-0 items-center border-b"
           style={{
             background: 'rgb(var(--color-header))',
             borderColor: 'rgb(var(--color-border))',
@@ -89,8 +89,8 @@ export default function AppLayout() {
         </header>
 
         <main
-          className="flex-1 overflow-y-auto p-4 md:p-6"
-          style={{ background: 'rgb(var(--color-sidebar))' }}
+          className="flex-1 overflow-y-auto px-3 py-3 md:px-4 md:py-4"
+          style={{ background: 'rgb(var(--color-background))' }}
         >
           <Outlet />
         </main>

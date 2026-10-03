@@ -125,7 +125,7 @@ export default function SupplierReportPage() {
       onExportExcel={exportToExcel}
       onExportCSV={exportToCSV}
       summary={
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-right">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-right">
           <div><p className="text-xs text-muted-foreground">Suppliers</p><p className="text-lg font-bold">{summary.totalSuppliers}</p></div>
           <div><p className="text-xs text-muted-foreground">Total Outstanding</p><p className="text-lg font-bold text-primary">{formatCurrency(summary.totalOutstanding)}</p></div>
           <div><p className="text-xs text-muted-foreground">Current</p><p className="text-lg font-bold text-green-500">{formatCurrency(summary.current)}</p></div>

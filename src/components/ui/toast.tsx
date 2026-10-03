@@ -26,7 +26,7 @@ function ToastItem({ toast }: { toast: ToastType }) {
   return (
     <div
       className={cn(
-        "pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded-lg border p-4 shadow-elevated transition-all animate-in slide-in-from-right-full",
+        "pointer-events-auto relative flex w-full items-start gap-3 overflow-hidden rounded border p-3 shadow-lg transition-all animate-in slide-in-from-right-full",
         variantStyles[variant]
       )}
     >

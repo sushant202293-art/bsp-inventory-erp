@@ -91,8 +91,8 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 p-6">
-      <div><h1 className="text-2xl font-bold flex items-center gap-2"><Settings className="h-6 w-6" /> Application Settings</h1><p className="text-sm text-muted-foreground">Configure your application preferences</p></div>
+    <div className="space-y-3">
+      <div><h1 className="text-lg font-bold flex items-center gap-2"><Settings className="h-4 w-4" /> Application Settings</h1><p className="text-sm text-muted-foreground">Configure your application preferences</p></div>
 
       <Tabs defaultValue="company">
         <TabsList className="grid w-full grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-7">
@@ -106,8 +106,8 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="company">
-          <Card><CardHeader><CardTitle>Company Information</CardTitle></CardHeader><CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Card><CardHeader><CardTitle>Company Information</CardTitle></CardHeader><CardContent className="space-y-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-2"><Label>Company Name</Label><Input value={companyData.name} onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })} /></div>
               <div className="space-y-2"><Label>Tagline</Label><Input value={companyData.tagline} onChange={(e) => setCompanyData({ ...companyData, tagline: e.target.value })} /></div>
               <div className="space-y-2"><Label>Address</Label><Textarea value={companyData.address} onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })} rows={2} /></div>
@@ -137,20 +137,20 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="tax">
-          <Card><CardHeader><CardTitle>Tax Settings (GST)</CardTitle></CardHeader><CardContent className="space-y-4">
+          <Card><CardHeader><CardTitle>Tax Settings (GST)</CardTitle></CardHeader><CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">GST rates are configured per product. Default rates: 0%, 5%, 12%, 18%, 28%</p>
             <div className="rounded-lg border p-4 space-y-2">
               <p className="font-medium">Intra-State (Same State)</p>
               <p className="text-sm text-muted-foreground">CGST (Half of GST rate) + SGST (Half of GST rate)</p>
-              <p className="font-medium mt-4">Inter-State (Different State)</p>
+              <p className="font-medium mt-2">Inter-State (Different State)</p>
               <p className="text-sm text-muted-foreground">IGST (Full GST rate)</p>
             </div>
           </CardContent></Card>
         </TabsContent>
 
         <TabsContent value="general">
-          <Card><CardHeader><CardTitle>General Settings</CardTitle></CardHeader><CardContent className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Card><CardHeader><CardTitle>General Settings</CardTitle></CardHeader><CardContent className="space-y-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div className="space-y-2"><Label>Date Format</Label><Input value="DD-MM-YYYY" disabled /></div>
               <div className="space-y-2"><Label>Currency</Label><Input value="INR (₹)" disabled /></div>
               <div className="space-y-2"><Label>Number Format</Label><Input value="Indian (1,25,000.00)" disabled /></div>
@@ -161,17 +161,17 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="account">
-          <div className="space-y-6">
+          <div className="space-y-3">
             <Card>
               <CardHeader>
                 <CardTitle>My Account</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3">
                 <p className="text-sm text-muted-foreground">
                   Signed in as <span className="font-medium text-foreground">{user?.email}</span>
                   {profile?.role ? <> &middot; role <span className="font-medium text-foreground">{profile.role.replace('_', ' ')}</span></> : null}
                 </p>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="fullName">Display name</Label>
                     <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -195,8 +195,8 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle>Change password</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New password</Label>
                     <Input
