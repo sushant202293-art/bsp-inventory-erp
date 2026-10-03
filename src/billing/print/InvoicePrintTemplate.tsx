@@ -317,18 +317,7 @@ function Line({
       <td style={{ textAlign: 'right' }}>{formatNumber(item.rate)}</td>
       <td style={{ textAlign: 'right' }}>{item.discount_percent || 0}</td>
       <td style={{ textAlign: 'right' }}>{item.taxable_value.toFixed(2)}</td>
-      <td style={{ textAlign: 'right' }}>
-        {interState ? (
-          <>IGST {item.gst_rate}% = {item.igst_amount.toFixed(2)}</>
-        ) : (
-          <>
-            {item.gst_rate}%
-            <div className="muted">
-              C {item.cgst_amount.toFixed(2)} / S {item.sgst_amount.toFixed(2)}
-            </div>
-          </>
-        )}
-      </td>
+      <td style={{ textAlign: 'right' }}>{item.gst_rate}%</td>
       <td style={{ textAlign: 'right', fontWeight: 600 }}>{item.total_amount.toFixed(2)}</td>
     </tr>
   );

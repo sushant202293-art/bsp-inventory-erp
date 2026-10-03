@@ -37,6 +37,9 @@ export function InvoiceTotals({
         </span>
       </div>
       <Row label="Taxable amount" value={formatCurrency(totals.taxable)} />
+      {/* CGST + SGST for an intra-state supply, IGST for an inter-state one -
+          never both. The split comes from the company state vs the Bill To
+          state, decided by `interStateFor` in `src/billing/calculations.ts`. */}
       {interState ? (
         <Row label="IGST" value={formatCurrency(totals.igst)} />
       ) : (
@@ -45,6 +48,7 @@ export function InvoiceTotals({
           <Row label="SGST" value={formatCurrency(totals.sgst)} />
         </>
       )}
+      <Row label="Total GST" value={formatCurrency(totals.tax)} />
       <Row label="Round off" value={`${totals.round_off >= 0 ? '+' : ''}${formatCurrency(totals.round_off)}`} />
       <Separator className="my-1" />
       <div className="flex items-center justify-between text-sm font-bold">

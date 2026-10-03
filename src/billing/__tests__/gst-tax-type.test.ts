@@ -112,6 +112,29 @@ describe('intra-state vs inter-state amounts', () => {
     expect(intra.sgst_amount).toBe(0);
     expect(intra.total_amount).toBe(1000);
   });
+
+  // The summary panel prints one branch or the other, so the totals object has
+  // to make the unused branch zero - a stale non-zero value there would render
+  // a tax line that does not belong on the bill.
+  it('zeroes the unused tax branch so the summary never shows both', () => {
+    const intra = computeTotals([row], false);
+    expect(intra.igst).toBe(0);
+    expect(intra.cgst).toBeGreaterThan(0);
+    expect(intra.sgst).toBeGreaterThan(0);
+
+    const inter = computeTotals([row], true);
+    expect(inter.cgst).toBe(0);
+    expect(inter.sgst).toBe(0);
+    expect(inter.igst).toBeGreaterThan(0);
+  });
+
+  it('keeps the summary total equal to the tax on the taxable value', () => {
+    const intra = computeTotals([row], false);
+    expect(intra.tax).toBe(180);
+    expect(intra.cgst + intra.sgst).toBeCloseTo(intra.tax, 2);
+    // Grand total = taxable + tax (+ round off), nothing else.
+    expect(intra.grand_total).toBeCloseTo(intra.taxable + intra.tax + intra.round_off, 2);
+  });
 });
 
 // Referenced so the original export is not tree-shaken from the coverage report.

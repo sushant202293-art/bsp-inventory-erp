@@ -173,6 +173,8 @@ export function InvoiceItemsTable({
                       value={String(item.gst_rate)}
                       onChange={(e) => patch(index, { gst_rate: Number(e.target.value) })}
                       disabled={readOnly}
+                      aria-label={`GST rate for line ${index + 1}`}
+                      title="GST rate"
                       className="h-7 w-full rounded border border-input bg-transparent px-1 text-right text-sm"
                     >
                       {GST_RATES.includes(Number(item.gst_rate)) ? null : (
@@ -184,9 +186,6 @@ export function InvoiceItemsTable({
                         </option>
                       ))}
                     </select>
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">
-                      {interState ? `IGST ${item.igst_amount.toFixed(2)}` : `C ${item.cgst_amount.toFixed(2)} / S ${item.sgst_amount.toFixed(2)}`}
-                    </p>
                   </td>
                   <td className="px-2 py-1 text-right font-semibold tabular-nums">
                     {item.total_amount.toFixed(2)}
