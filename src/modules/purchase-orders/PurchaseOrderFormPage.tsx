@@ -611,12 +611,6 @@ export default function PurchaseOrderFormPage() {
                 <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-24">Disc Amt</th>
                 <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-28">Taxable</th>
                 <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-16">GST%</th>
-                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-20">
-                  {intraState ? 'CGST' : 'IGST'}
-                </th>
-                <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-20">
-                  {intraState ? 'SGST' : ''}
-                </th>
                 <th className="px-2 py-1.5 text-right text-xs font-medium text-muted-foreground w-28">Total</th>
                 <th className="px-2 py-1.5 w-10"></th>
               </tr>
@@ -712,12 +706,6 @@ export default function PurchaseOrderFormPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                    </td>
-                    <td className="px-2 py-1.5 text-right text-xs text-muted-foreground">
-                      {formatCurrency(intraState ? totals.cgst : totals.igst)}
-                    </td>
-                    <td className="px-2 py-1.5 text-right text-xs text-muted-foreground">
-                      {intraState ? formatCurrency(totals.sgst) : ''}
                     </td>
                     <td className="px-2 py-1.5 text-right text-xs font-semibold">
                       {formatCurrency(totals.totalAmount)}
