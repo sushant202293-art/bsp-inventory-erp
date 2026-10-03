@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { ProductAutocomplete } from './ProductAutocomplete';
 import { computeItemRow, parseAmount, toNumber } from '../calculations';
 import type { BillingItemRow } from '../billing.types';
-import { Copy, Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 const GST_RATES = [0, 5, 12, 18, 28];
 
@@ -57,10 +57,7 @@ export function InvoiceItemsTable({
     onChange(recalcAll([...items, blankRow(String(Date.now()))]));
   }
 
-  function duplicateItem(index: number) {
-    const copy = { ...items[index], key: `${items[index].key}-copy-${Date.now()}` };
-    onChange(recalcAll([...items.slice(0, index + 1), copy, ...items.slice(index + 1)]));
-  }
+
 
   function removeItem(index: number) {
     if (items.length === 1) {
@@ -196,16 +193,18 @@ export function InvoiceItemsTable({
                   </td>
                   <td className="px-2 py-1">
                     <div className="flex justify-end gap-0.5">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        title="Duplicate row"
-                        className="h-7 w-7"
-                        disabled={readOnly}
-                        onClick={() => duplicateItem(index)}
-                      >
-                        <Copy className="h-3.5 w-3.5" />
-                      </Button>
+                      {index === items.length - 1 ? (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Add Item"
+                          className="h-7 w-7"
+                          disabled={readOnly}
+                          onClick={addItem}
+                        >
+                          <Plus className="h-3.5 w-3.5" />
+                        </Button>
+                      ) : null}
                       <Button
                         size="sm"
                         variant="ghost"
@@ -225,9 +224,7 @@ export function InvoiceItemsTable({
         </table>
       </div>
 
-      <Button variant="outline" size="sm" className="mt-1.5" onClick={addItem} disabled={readOnly}>
-        <Plus className="mr-1 h-3 w-3" /> Add Item
-      </Button>
+
     </div>
   );
 }
