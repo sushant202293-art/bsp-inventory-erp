@@ -13,12 +13,12 @@ import type { BillingPartyState } from '../billing.types';
 import type { CompanyView } from '@/contexts/CompanyContext';
 
 /**
- * Every party card is deliberately shallow (~150-220px on a 1920px screen) so
- * that the items grid below gets the viewport: tight header, 12px body text
+ * Every party card is deliberately shallow (~120-180px on a 1920px screen) so
+ * that the items grid below gets the viewport: tight header, 11px body text
  * with short line boxes, 28px inputs and collapsed address fields.
  */
-const HEADER = 'px-3 pt-2 pb-0.5';
-const BODY = 'px-3 pb-2.5 pt-0 text-[12px] leading-snug';
+const HEADER = 'px-2 pt-1.5 pb-0.5';
+const BODY = 'px-2 pb-2 pt-0 text-[11px] leading-snug';
 
 /* ------------------------------------------------------------------ */
 /* Source Company / From                                               */
@@ -39,19 +39,19 @@ export function SourceCompanyBlock({ company }: { company: CompanyView }) {
   const contactLine = [company.phone ? `Ph ${company.phone}` : '', company.email || ''].filter(Boolean).join('  ·  ');
 
   return (
-    <Card className="rounded-lg">
+    <Card className="rounded-sm">
       <CardHeader className={HEADER}>
         <CardTitle className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           <Building2 className="h-3 w-3" /> Source Company / From
         </CardTitle>
       </CardHeader>
       <CardContent className={`${BODY} space-y-0.5`}>
-        <div className="flex items-start gap-2">
+        <div className="flex items-start gap-1.5">
           {company.logo ? (
             <img
               src={company.logo}
               alt=""
-              className="h-7 w-7 shrink-0 rounded border object-contain bg-white"
+              className="h-6 w-6 shrink-0 rounded-sm border object-contain bg-white"
             />
           ) : null}
           <div className="min-w-0 flex-1">
@@ -59,7 +59,7 @@ export function SourceCompanyBlock({ company }: { company: CompanyView }) {
               {company.name || 'Company not configured'}
             </p>
             {company.tagline ? (
-              <p className="truncate text-[11px] leading-tight text-muted-foreground">{company.tagline}</p>
+              <p className="truncate text-[10px] leading-tight text-muted-foreground">{company.tagline}</p>
             ) : null}
           </div>
         </div>
@@ -85,8 +85,8 @@ export function SourceCompanyBlock({ company }: { company: CompanyView }) {
         </p>
 
         {missing.length > 0 ? (
-          <p className="rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[11px] leading-snug text-amber-600 dark:text-amber-400">
-            Missing {missing.join(', ')} — complete it in Settings &rarr; Company before approving.
+          <p className="rounded-sm border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] leading-snug text-amber-600 dark:text-amber-400">
+            Missing {missing.join(', ')} — complete in Settings
           </p>
         ) : null}
       </CardContent>

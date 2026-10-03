@@ -70,9 +70,9 @@ function NavItem({
       <button
         onClick={handleClick}
         className={cn(
-          'relative flex h-8 w-full items-center gap-2.5 text-[13px] transition-colors duration-100',
+          'relative flex h-7 w-full items-center gap-2 text-xs transition-colors duration-100',
           collapsed && !isChild && 'justify-center px-0',
-          isChild ? 'pl-8 pr-2' : 'pl-2.5 pr-2',
+          isChild ? 'pl-7 pr-2' : 'pl-2 pr-2',
           isActive
             ? 'bg-[var(--color-sidebarActive)] font-semibold text-[var(--color-sidebarTextActive)]'
             : 'font-medium text-[var(--color-sidebarText)] hover:bg-[var(--color-sidebarHover)] hover:text-[var(--color-sidebarTextActive)]'
@@ -82,15 +82,15 @@ function NavItem({
       >
         {isActive && (
           <span
-            className="absolute left-0 top-0 h-full w-[3px]"
+            className="absolute left-0 top-0 h-full w-[2px]"
             style={{ background: 'rgb(var(--color-primary))' }}
           />
         )}
-        <Icon size={16} className="shrink-0" />
+        <Icon size={14} className="shrink-0" />
         {!collapsed && <span className="truncate text-left">{item.label}</span>}
         {!collapsed && hasChildren && (
           <ChevronRight
-            size={13}
+            size={12}
             className={cn('ml-auto shrink-0 transition-transform duration-150', isExpanded && 'rotate-90')}
           />
         )}
@@ -213,24 +213,24 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
     <div className="flex h-full flex-col">
       <div
         className={cn(
-          'flex h-12 shrink-0 items-center gap-2 border-b px-3',
+          'flex h-10 shrink-0 items-center gap-2 border-b px-2',
           collapsed && 'justify-center px-0'
         )}
         style={{ borderColor: 'rgb(var(--color-border))' }}
       >
         {(!collapsed || isMobile) && (
           <div className="flex min-w-0 items-center gap-2">
-            <CompanyLogo className="h-7 w-7" />
+            <CompanyLogo className="h-6 w-6" />
             <div className="min-w-0">
               <h1
-                className="truncate text-[13px] font-bold leading-tight"
+                className="truncate text-xs font-bold leading-tight"
                 style={{ color: 'rgb(var(--color-text))' }}
               >
                 {company.name || 'BSP Inventory'}
               </h1>
               {company.tagline && (
                 <p
-                  className="truncate text-[10px] leading-tight"
+                  className="truncate text-[9px] leading-tight"
                   style={{ color: 'rgb(var(--color-muted))' }}
                 >
                   {company.tagline}
@@ -239,28 +239,28 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
             </div>
           </div>
         )}
-        {collapsed && !isMobile && <CompanyLogo className="h-7 w-7" />}
+        {collapsed && !isMobile && <CompanyLogo className="h-6 w-6" />}
 
         {isMobile && (
           <button
             onClick={onClose}
-            className="ml-auto rounded p-1 transition-colors hover:bg-[var(--color-sidebarHover)]"
+            className="ml-auto rounded-sm p-1 transition-colors hover:bg-[var(--color-sidebarHover)]"
             style={{ color: 'var(--color-sidebarText)' }}
             aria-label="Close menu"
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-2">
+      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-1.5">
         {visibleSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className={cn(sectionIndex > 0 && 'mt-3 border-t pt-3')}
+          <div key={sectionIndex} className={cn(sectionIndex > 0 && 'mt-2 border-t pt-2')}
             style={sectionIndex > 0 ? { borderColor: 'rgb(var(--color-border))' } : undefined}
           >
             {section.title && !collapsed && (
               <h3
-                className="mb-1 px-2.5 text-[10px] font-semibold uppercase tracking-wider"
+                className="mb-1 px-2 text-[9px] font-semibold uppercase tracking-wider"
                 style={{ color: 'rgb(var(--color-muted))' }}
               >
                 {section.title}
@@ -268,7 +268,7 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
             )}
             {section.title && collapsed && (
               <div
-                className="mx-auto mb-2 h-px w-5"
+                className="mx-auto mb-1.5 h-px w-4"
                 style={{ background: 'rgb(var(--color-border))' }}
               />
             )}
@@ -287,32 +287,32 @@ export default function Sidebar({ collapsed, onToggle, onClose, isMobile }: Side
       </nav>
 
       <div
-        className={cn('shrink-0 border-t p-1.5', collapsed && 'px-1')}
+        className={cn('shrink-0 border-t p-1', collapsed && 'px-0.5')}
         style={{ borderColor: 'rgb(var(--color-border))' }}
       >
         <button
           onClick={onToggle}
           className={cn(
-            'hidden h-7 w-full items-center gap-2 rounded px-2 text-[11px] font-medium transition-colors hover:bg-[var(--color-sidebarHover)] lg:flex',
+            'hidden h-6 w-full items-center gap-1.5 rounded-sm px-1.5 text-[10px] font-medium transition-colors hover:bg-[var(--color-sidebarHover)] lg:flex',
             collapsed && 'justify-center px-0'
           )}
           style={{ color: 'var(--color-sidebarText)' }}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
           {!collapsed && <span>Collapse</span>}
         </button>
 
         <button
           onClick={handleLogout}
           className={cn(
-            'flex h-8 w-full items-center gap-2.5 rounded px-2.5 text-[13px] font-medium transition-colors hover:bg-red-500/10 hover:text-red-500',
+            'flex h-7 w-full items-center gap-2 rounded-sm px-2 text-xs font-medium transition-colors hover:bg-red-500/10 hover:text-red-500',
             collapsed && 'justify-center px-0'
           )}
           style={{ color: 'var(--color-sidebarText)' }}
           title={collapsed ? 'Log Out' : undefined}
         >
-          <LogOut size={16} className="shrink-0" />
+          <LogOut size={14} className="shrink-0" />
           {!collapsed && <span>Log Out</span>}
         </button>
       </div>

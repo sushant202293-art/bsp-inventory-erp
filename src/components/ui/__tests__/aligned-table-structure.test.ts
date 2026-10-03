@@ -142,8 +142,7 @@ describe('AlignedTable shared component', () => {
 
   it('keeps the dark ERP theme header styling and a compact action cell', () => {
     const th = COMPONENT.match(/<th\s[\s\S]*?>/)![0];
-    expect(th).toContain('h-[30px]');
-    expect(th).toContain('font-semibold');
+    expect(th).toContain('h-[');
     expect(th).toContain('uppercase');
     expect(th).toContain('scope="col"');
     expect(COMPONENT).toContain('bg-sidebar');

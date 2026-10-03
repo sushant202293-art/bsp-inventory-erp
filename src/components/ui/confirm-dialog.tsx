@@ -89,7 +89,7 @@ function ConfirmDialog({
             {cancelLabel}
           </Button>
           <Button
-            variant={config.confirmVariant}
+            variant={config.confirmVariant === 'neon' || config.confirmVariant === 'gradient' ? 'default' : config.confirmVariant}
             onClick={handleConfirm}
             disabled={loading}
           >

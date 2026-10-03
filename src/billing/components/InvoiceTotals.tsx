@@ -18,10 +18,10 @@ export function InvoiceTotals({
   onHeaderDiscountChange,
 }: Props) {
   return (
-    <div className="w-full shrink-0 space-y-1 text-[13px] xl:w-[17.5rem]">
+    <div className="w-full shrink-0 space-y-0.5 text-xs xl:w-[17.5rem]">
       <Row label="Total quantity" value={String(totals.quantity)} />
       <Row label="Gross subtotal" value={formatCurrency(totals.gross)} />
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-2">
         <span className="text-muted-foreground">Discount</span>
         <span className="flex items-center gap-1 tabular-nums">
           {onHeaderDiscountChange ? (
@@ -46,13 +46,13 @@ export function InvoiceTotals({
         </>
       )}
       <Row label="Round off" value={`${totals.round_off >= 0 ? '+' : ''}${formatCurrency(totals.round_off)}`} />
-      <Separator className="my-1.5" />
-      <div className="flex items-center justify-between text-base font-bold">
+      <Separator className="my-1" />
+      <div className="flex items-center justify-between text-sm font-bold">
         <span>Grand Total</span>
         <span className="tabular-nums">{formatCurrency(totals.grand_total)}</span>
       </div>
-      <p className="pt-1 text-xs leading-snug italic text-muted-foreground">
-        <span className="font-semibold not-italic text-foreground">Amount in words:</span>{' '}
+      <p className="pt-1 text-[11px] leading-snug italic text-muted-foreground">
+        <span className="font-semibold not-italic text-foreground">In words:</span>{' '}
         {totals.amount_in_words}
       </p>
     </div>
@@ -61,7 +61,7 @@ export function InvoiceTotals({
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3">
+    <div className="flex items-center justify-between gap-2">
       <span className="text-muted-foreground">{label}</span>
       <span className="tabular-nums">{value}</span>
     </div>

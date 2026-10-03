@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
             </div>
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <Button type="submit" variant="neon" className="w-full" size="lg" disabled={loading}>
+          <Button type="submit" className="w-full" size="lg" disabled={loading}>
             {loading ? 'Sending...' : <><Send className="mr-2 h-4 w-4" /> Send Reset Link</>}
           </Button>
           <Button asChild variant="ghost" className="w-full">

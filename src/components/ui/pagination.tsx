@@ -60,21 +60,21 @@ function Pagination({
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
   return (
-    <div className={cn("flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between", className)}>
-      <div className="flex items-center gap-3">
+    <div className={cn("flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between", className)}>
+      <div className="flex items-center gap-2">
         {showTotalItems && (
-          <p className="text-sm text-muted-foreground">
-            Showing {startItem} to {endItem} of {totalItems} entries
+          <p className="text-[11px] text-muted-foreground">
+            Showing {startItem} to {endItem} of {totalItems}
           </p>
         )}
         {showPageSizeSelector && onPageSizeChange && (
-          <div className="flex items-center gap-2">
-            <p className="text-sm text-muted-foreground">Rows per page</p>
+          <div className="flex items-center gap-1.5">
+            <p className="text-[11px] text-muted-foreground">Rows</p>
             <Select
               value={String(pageSize)}
               onValueChange={(v) => onPageSizeChange(Number(v))}
             >
-              <SelectTrigger className="h-8 w-[70px]">
+              <SelectTrigger className="h-6 w-[60px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -89,39 +89,39 @@ function Pagination({
         )}
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         {showFirstLast && (
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-6 w-6"
             onClick={() => onPageChange(1)}
             disabled={currentPage === 1}
           >
-            <ChevronsLeft className="h-4 w-4" />
+            <ChevronsLeft className="h-3.5 w-3.5" />
           </Button>
         )}
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="h-6 w-6"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-3.5 w-3.5" />
         </Button>
 
         {pageNumbers.map((page, index) => (
           <React.Fragment key={index}>
             {page === "..." ? (
-              <span className="flex h-8 w-8 items-center justify-center text-sm text-muted-foreground">
+              <span className="flex h-6 w-6 items-center justify-center text-[11px] text-muted-foreground">
                 ...
               </span>
             ) : (
               <Button
                 variant={currentPage === page ? "default" : "outline"}
                 size="icon"
-                className="h-8 w-8"
+                className="h-6 w-6 text-[11px]"
                 onClick={() => onPageChange(page)}
               >
                 {page}
@@ -133,21 +133,21 @@ function Pagination({
         <Button
           variant="outline"
           size="icon"
-          className="h-8 w-8"
+          className="h-6 w-6"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-3.5 w-3.5" />
         </Button>
         {showFirstLast && (
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-6 w-6"
             onClick={() => onPageChange(totalPages)}
             disabled={currentPage === totalPages}
           >
-            <ChevronsRight className="h-4 w-4" />
+            <ChevronsRight className="h-3.5 w-3.5" />
           </Button>
         )}
       </div>

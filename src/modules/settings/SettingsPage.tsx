@@ -220,7 +220,7 @@ export default function SettingsPage() {
                     />
                   </div>
                 </div>
-                <Button variant="neon" onClick={savePassword} disabled={savingPw}>
+                <Button onClick={savePassword} disabled={savingPw}>
                   {savingPw ? 'Updating...' : 'Update password'}
                 </Button>
                 <p className="text-xs text-muted-foreground">

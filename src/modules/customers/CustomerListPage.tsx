@@ -188,7 +188,7 @@ export default function CustomerListPage() {
   ) => {
     switch (columnKey) {
       case 'code':
-        return <span className="font-mono text-sm">{customer.code || '-'}</span>;
+        return <span className="font-mono">{customer.code || '-'}</span>;
 
       case 'name':
         return (
@@ -217,8 +217,8 @@ export default function CustomerListPage() {
         return (
           <span
             className={cn(
-              'whitespace-nowrap font-medium tabular-nums',
-              balance > 0 ? 'text-red-500' : balance < 0 ? 'text-green-500' : 'text-muted-foreground'
+              'whitespace-nowrap font-semibold tabular-nums',
+              balance > 0 ? 'text-red-600' : balance < 0 ? 'text-green-600' : 'text-muted-foreground'
             )}
           >
             {formatCurrency(balance)}
@@ -235,7 +235,7 @@ export default function CustomerListPage() {
 
       case 'is_active':
         return (
-          <Badge variant={customer.is_active ? 'success' : 'secondary'}>
+          <Badge variant={customer.is_active ? 'success' : 'secondary'} className="text-[10px] px-1.5 py-0">
             {customer.is_active ? 'Active' : 'Inactive'}
           </Badge>
         );
@@ -244,23 +244,23 @@ export default function CustomerListPage() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-6 w-6">
+                <MoreHorizontal className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => navigate(`/customers/${customer.id}`)}>
-                <Eye className="mr-2 h-4 w-4" />
+                <Eye className="mr-2 h-3.5 w-3.5" />
                 View
               </DropdownMenuItem>
               {canEdit('customers') && (
                 <DropdownMenuItem onClick={() => navigate(`/customers/${customer.id}/edit`)}>
-                  <Pencil className="mr-2 h-4 w-4" />
+                  <Pencil className="mr-2 h-3.5 w-3.5" />
                   Edit
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={() => navigate(`/ledgers/customers?customer_id=${customer.id}`)}>
-                <BookOpen className="mr-2 h-4 w-4" />
+                <BookOpen className="mr-2 h-3.5 w-3.5" />
                 Ledger
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -269,7 +269,7 @@ export default function CustomerListPage() {
                   className="text-red-500 focus:text-red-500"
                   onClick={() => setDeleteId(customer.id)}
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash2 className="mr-2 h-3.5 w-3.5" />
                   Delete
                 </DropdownMenuItem>
               )}
@@ -280,25 +280,25 @@ export default function CustomerListPage() {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <PageHeader
         title="Customers"
-        description="Manage your customer accounts and credit settings"
+        description="Manage customer accounts and credit settings"
         breadcrumbs={[
           { label: 'Dashboard', onClick: () => navigate('/dashboard') },
           { label: 'Customers' },
         ]}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {canExport('customers') && (
-              <Button variant="outline" onClick={handleExport}>
-                <Download className="mr-2 h-4 w-4" />
+              <Button variant="outline" size="sm" onClick={handleExport}>
+                <Download className="mr-1 h-3.5 w-3.5" />
                 Export
               </Button>
             )}
             {canCreate('customers') && (
-              <Button onClick={() => navigate('/customers/new')}>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button size="sm" onClick={() => navigate('/customers/new')}>
+                <Plus className="mr-1 h-3.5 w-3.5" />
                 Add Customer
               </Button>
             )}
@@ -307,8 +307,8 @@ export default function CustomerListPage() {
       />
 
       <Card>
-        <CardContent className="pt-3">
-          <div className="mb-2 flex flex-col gap-3 lg:flex-row lg:items-center">
+        <CardContent className="p-2">
+          <div className="mb-2 flex flex-col gap-2 lg:flex-row lg:items-center">
             <SearchInput
               placeholder="Search by name, code, phone, email..."
               value={filters.search || ''}
@@ -318,7 +318,7 @@ export default function CustomerListPage() {
               }}
               className="w-full lg:max-w-md lg:flex-1"
             />
-            <div className="flex flex-wrap items-center gap-2 lg:ml-auto lg:flex-nowrap">
+            <div className="flex flex-wrap items-center gap-1.5 lg:ml-auto lg:flex-nowrap">
               <Select
                 value={filters.is_active === undefined ? 'all' : String(filters.is_active)}
                 onValueChange={(value) => {
@@ -329,7 +329,7 @@ export default function CustomerListPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[132px]">
+                <SelectTrigger className="w-[110px]">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -346,7 +346,7 @@ export default function CustomerListPage() {
                   setPage(1);
                 }}
               >
-                <SelectTrigger className="w-[164px]">
+                <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="All States" />
                 </SelectTrigger>
                 <SelectContent>
@@ -362,7 +362,7 @@ export default function CustomerListPage() {
           </div>
 
           {loading ? (
-            <AlignedTableSkeleton columns={CUSTOMER_COLUMNS} rows={8} />
+            <AlignedTableSkeleton columns={CUSTOMER_COLUMNS} rows={10} />
           ) : customers.length === 0 ? (
             <EmptyState
               icon={<Users className="h-8 w-8 text-muted-foreground/60" />}
@@ -388,7 +388,6 @@ export default function CustomerListPage() {
                 rows={customers}
                 rowKey={(customer) => customer.id}
                 renderCell={renderCustomerCell}
-                rowClassName="transition-colors hover:bg-muted/50"
               />
 
               <div className="mt-2">

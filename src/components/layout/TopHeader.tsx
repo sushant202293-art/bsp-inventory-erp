@@ -28,26 +28,26 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
   }, []);
 
   return (
-    <div className="flex h-full w-full items-center justify-between gap-3 px-3">
-      <div className="flex min-w-0 items-center gap-2.5">
+    <div className="flex h-full w-full items-center justify-between gap-2 px-2">
+      <div className="flex min-w-0 items-center gap-2">
         <button
           onClick={onToggleSidebar}
-          className="rounded p-1.5 transition-colors hover:bg-sidebar"
+          className="rounded-sm p-1 transition-colors hover:bg-sidebar"
           style={{ color: 'rgb(var(--color-text-secondary))' }}
           aria-label="Toggle sidebar"
         >
-          <Menu size={18} />
+          <Menu size={16} />
         </button>
 
         <span
-          className="hidden truncate text-[13px] font-semibold md:inline"
+          className="hidden truncate text-xs font-semibold md:inline"
           style={{ color: 'rgb(var(--color-text))' }}
         >
           {getPageTitle(location.pathname)}
         </span>
       </div>
 
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
         <div className="relative">
           {searchOpen ? (
             <div className="flex items-center">
@@ -57,7 +57,7 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search... (Ctrl+K)"
                 autoFocus
-                className="h-8 w-44 rounded border border-border bg-card px-2.5 text-[13px] outline-none transition-colors focus:border-primary sm:w-64"
+                className="h-7 w-44 rounded-sm border border-border bg-card px-2 text-xs outline-none transition-colors focus:border-primary sm:w-64"
                 style={{ color: 'rgb(var(--color-text))' }}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') toggleSearch();
@@ -65,23 +65,23 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
               />
               <button
                 onClick={toggleSearch}
-                className="ml-1 rounded p-1 hover:bg-sidebar"
+                className="ml-1 rounded-sm p-1 hover:bg-sidebar"
                 style={{ color: 'rgb(var(--color-muted))' }}
                 aria-label="Close search"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             </div>
           ) : (
             <button
               onClick={toggleSearch}
-              className="flex h-8 items-center gap-1.5 rounded border border-border px-2 text-[13px] transition-colors hover:bg-sidebar"
+              className="flex h-7 items-center gap-1 rounded-sm border border-border px-2 text-xs transition-colors hover:bg-sidebar"
               style={{
                 color: 'rgb(var(--color-muted))',
               }}
               title="Search (Ctrl+K)"
             >
-              <Search size={14} />
+              <Search size={13} />
               <span className="hidden lg:inline">Search</span>
             </button>
           )}
@@ -89,12 +89,12 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
 
         <button
           onClick={() => setTheme(isDark ? 'light-professional' : 'neon-blue')}
-          className="rounded p-1.5 transition-colors hover:bg-sidebar"
+          className="rounded-sm p-1 transition-colors hover:bg-sidebar"
           style={{ color: 'rgb(var(--color-text-secondary))' }}
           title={isDark ? 'Light Mode' : 'Dark Mode'}
           aria-label="Toggle theme"
         >
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          {isDark ? <Sun size={15} /> : <Moon size={15} />}
         </button>
 
         <div className="relative">
@@ -103,13 +103,13 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
               setNotificationOpen((prev) => !prev);
               setProfileOpen(false);
             }}
-            className="relative rounded p-1.5 transition-colors hover:bg-sidebar"
+            className="relative rounded-sm p-1 transition-colors hover:bg-sidebar"
             style={{ color: 'rgb(var(--color-text-secondary))' }}
             aria-label="Notifications"
           >
-            <Bell size={16} />
+            <Bell size={15} />
             <span
-              className="absolute right-0.5 top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold text-white"
+              className="absolute right-0 top-0 flex h-3 w-3 items-center justify-center rounded-full text-[8px] font-bold text-white"
               style={{ background: 'rgb(var(--color-error))' }}
             >
               3
@@ -127,16 +127,16 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
               setProfileOpen((prev) => !prev);
               setNotificationOpen(false);
             }}
-            className="flex h-8 items-center gap-1.5 rounded px-1.5 transition-colors hover:bg-sidebar"
+            className="flex h-7 items-center gap-1.5 rounded-sm px-1.5 transition-colors hover:bg-sidebar"
           >
             <div
-              className="flex h-6 w-6 items-center justify-center rounded-sm text-[11px] font-bold text-white"
+              className="flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-bold text-white"
               style={{ background: 'rgb(var(--color-primary))' }}
             >
               {(profile?.full_name ?? user?.email ?? 'User')?.charAt(0) || 'A'}
             </div>
             <span
-              className="hidden max-w-[140px] truncate text-[13px] font-medium md:inline"
+              className="hidden max-w-[120px] truncate text-xs font-medium md:inline"
               style={{ color: 'rgb(var(--color-text))' }}
             >
               {(profile?.full_name ?? user?.email ?? 'User') || 'Admin'}

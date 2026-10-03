@@ -26,9 +26,9 @@ function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-1.5", className)}>
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav className="flex flex-wrap items-center gap-1 text-[11px] text-muted-foreground">
+        <nav className="flex flex-wrap items-center gap-1 text-[10px] text-muted-foreground">
           <Home className="h-3 w-3" />
           {breadcrumbs.map((crumb, index) => (
             <React.Fragment key={index}>
@@ -50,16 +50,16 @@ function PageHeader({
         </nav>
       )}
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0 space-y-0.5">
-          <h1 className="truncate text-lg font-bold leading-tight tracking-tight text-foreground">
+          <h1 className="truncate text-sm font-bold leading-tight tracking-tight text-foreground">
             {title}
           </h1>
           {description && (
-            <p className="truncate text-xs text-muted-foreground">{description}</p>
+            <p className="truncate text-[11px] text-muted-foreground">{description}</p>
           )}
         </div>
-        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        {actions && <div className="flex flex-wrap items-center gap-1.5">{actions}</div>}
       </div>
       {children}
     </div>

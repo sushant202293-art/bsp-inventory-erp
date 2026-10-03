@@ -37,7 +37,7 @@ export default function AppLayout() {
     setMobileMenuOpen(false);
   }, []);
 
-  const sidebarWidth = isMobile ? 0 : sidebarCollapsed ? 56 : 232;
+  const sidebarWidth = isMobile ? 0 : sidebarCollapsed ? 50 : 220;
 
   return (
     <div
@@ -60,8 +60,8 @@ export default function AppLayout() {
             : ''
         }`}
         style={{
-          width: isMobile ? 232 : sidebarWidth,
-          minWidth: isMobile ? 232 : sidebarWidth,
+          width: isMobile ? 220 : sidebarWidth,
+          minWidth: isMobile ? 220 : sidebarWidth,
           background: 'rgb(var(--color-sidebar))',
           borderRight: `1px solid rgb(var(--color-border))`,
         }}
@@ -76,7 +76,7 @@ export default function AppLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header
-          className="flex h-12 shrink-0 items-center border-b"
+          className="flex h-10 shrink-0 items-center border-b"
           style={{
             background: 'rgb(var(--color-header))',
             borderColor: 'rgb(var(--color-border))',
@@ -89,7 +89,7 @@ export default function AppLayout() {
         </header>
 
         <main
-          className="flex-1 overflow-y-auto px-3 py-3 md:px-4 md:py-4"
+          className="flex-1 overflow-y-auto px-3 py-2"
           style={{ background: 'rgb(var(--color-background))' }}
         >
           <Outlet />

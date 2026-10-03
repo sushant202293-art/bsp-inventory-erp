@@ -3,32 +3,101 @@
 @tailwind utilities;
 
 @layer base {
+  /* ======================== */
+  /* Professional Light Theme */
+  /* ======================== */
   :root {
-    --color-background: 244 246 249;
+    --color-background: 248 250 252;
     --color-card: 255 255 255;
-    --color-sidebar: 248 250 252;
+    --color-header: 255 255 255;
+    --color-sidebar: 255 255 255;
+    --color-sidebarActive: 241 245 249;
+    --color-sidebarHover: 248 250 252;
+    --color-sidebarText: 51 65 85;
+    --color-sidebarTextActive: 15 23 42;
     --color-border: 226 232 240;
+    --color-input: 255 255 255;
     --color-muted: 100 116 139;
-    --color-success: 16 185 129;
-    --color-warning: 245 158 11;
-    --color-danger: 239 68 68;
-    --color-info: 59 130 246;
+    --color-muted-foreground: 100 116 139;
     --color-text: 15 23 42;
     --color-text-secondary: 71 85 105;
+    --color-success: 22 163 74;
+    --color-warning: 234 179 8;
+    --color-danger: 220 38 38;
+    --color-error: 220 38 38;
+    --color-info: 37 99 235;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary-foreground: 255 255 255;
+    --color-accent-foreground: 255 255 255;
+    --color-destructive-foreground: 255 255 255;
   }
 
   .dark {
-    --color-background: 10 10 15;
-    --color-card: 17 17 24;
-    --color-sidebar: 13 13 20;
-    --color-border: 30 30 46;
-    --color-muted: 107 114 128;
-    --color-success: 16 185 129;
-    --color-warning: 245 158 11;
+    --color-background: 15 23 42;
+    --color-card: 30 41 59;
+    --color-header: 30 41 59;
+    --color-sidebar: 30 41 59;
+    --color-sidebarActive: 51 65 85;
+    --color-sidebarHover: 51 65 85;
+    --color-sidebarText: 203 213 225;
+    --color-sidebarTextActive: 248 250 252;
+    --color-border: 51 65 85;
+    --color-input: 30 41 59;
+    --color-muted: 148 163 184;
+    --color-muted-foreground: 148 163 184;
+    --color-text: 248 250 252;
+    --color-text-secondary: 203 213 225;
+    --color-success: 34 197 94;
+    --color-warning: 250 204 21;
     --color-danger: 239 68 68;
+    --color-error: 239 68 68;
     --color-info: 59 130 246;
-    --color-text: 241 245 249;
-    --color-text-secondary: 148 163 184;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary-foreground: 255 255 255;
+    --color-accent-foreground: 255 255 255;
+    --color-destructive-foreground: 255 255 255;
+  }
+
+  /* ======================== */
+  /* THEME: Light Professional */
+  /* ======================== */
+  [data-theme="light-professional"] {
+    --color-primary: 37 99 235;
+    --color-primary-50: 239 246 255;
+    --color-primary-100: 219 234 254;
+    --color-primary-200: 191 219 254;
+    --color-primary-300: 147 197 253;
+    --color-primary-400: 96 165 250;
+    --color-primary-500: 37 99 235;
+    --color-primary-600: 29 78 216;
+    --color-primary-700: 30 64 175;
+    --color-primary-800: 30 58 138;
+    --color-primary-900: 23 37 84;
+    --color-primary-950: 15 23 42;
+    --color-secondary: 100 116 139;
+    --color-secondary-50: 248 250 252;
+    --color-secondary-100: 241 245 249;
+    --color-secondary-200: 226 232 240;
+    --color-secondary-300: 203 213 225;
+    --color-secondary-400: 148 163 184;
+    --color-secondary-500: 100 116 139;
+    --color-secondary-600: 71 85 105;
+    --color-secondary-700: 51 65 85;
+    --color-secondary-800: 30 41 59;
+    --color-secondary-900: 15 23 42;
+    --color-secondary-950: 2 6 23;
+    --color-accent: 22 163 74;
+    --color-accent-50: 240 253 244;
+    --color-accent-100: 220 252 231;
+    --color-accent-200: 187 247 208;
+    --color-accent-300: 134 239 172;
+    --color-accent-400: 74 222 128;
+    --color-accent-500: 22 163 74;
+    --color-accent-600: 21 128 61;
+    --color-accent-700: 22 101 52;
+    --color-accent-800: 22 78 99;
+    --color-accent-900: 20 83 45;
+    --color-accent-950: 5 46 22;
   }
 
   /* ======================== */
@@ -83,1492 +152,72 @@
   }
 
   /* ======================== */
-  /* THEME: Cyber Purple       */
+  /* Base Styles              */
   /* ======================== */
-  [data-theme="cyber-purple"] {
-    --color-primary: 191 90 242;
-    --color-primary-50: 253 244 255;
-    --color-primary-100: 250 232 255;
-    --color-primary-200: 245 208 254;
-    --color-primary-300: 240 171 252;
-    --color-primary-400: 232 121 249;
-    --color-primary-500: 191 90 242;
-    --color-primary-600: 162 28 175;
-    --color-primary-700: 134 25 143;
-    --color-primary-800: 112 26 117;
-    --color-primary-900: 88 28 135;
-    --color-primary-950: 59 7 100;
-    --color-secondary: 255 107 157;
-    --color-secondary-50: 255 241 242;
-    --color-secondary-100: 255 228 230;
-    --color-secondary-200: 254 205 211;
-    --color-secondary-300: 253 164 175;
-    --color-secondary-400: 251 113 133;
-    --color-secondary-500: 255 107 157;
-    --color-secondary-600: 225 29 72;
-    --color-secondary-700: 190 18 60;
-    --color-secondary-800: 159 18 57;
-    --color-secondary-900: 136 19 55;
-    --color-secondary-950: 76 5 25;
-    --color-accent: 0 229 255;
-    --color-accent-50: 236 254 255;
-    --color-accent-100: 207 250 254;
-    --color-accent-200: 165 243 252;
-    --color-accent-300: 103 232 249;
-    --color-accent-400: 34 211 238;
-    --color-accent-500: 0 229 255;
-    --color-accent-600: 8 145 178;
-    --color-accent-700: 14 116 144;
-    --color-accent-800: 21 94 117;
-    --color-accent-900: 22 78 99;
-    --color-accent-950: 8 51 68;
-  }
-
-  .dark[data-theme="cyber-purple"],
-  [data-theme="cyber-purple"].dark {
-    --color-background: 10 5 16;
-    --color-card: 17 10 26;
-    --color-sidebar: 13 7 20;
-    --color-border: 30 16 48;
-    --color-muted: 124 90 158;
-  }
-
-  /* ======================== */
-  /* THEME: Emerald            */
-  /* ======================== */
-  [data-theme="emerald"] {
-    --color-primary: 16 185 129;
-    --color-primary-50: 236 253 245;
-    --color-primary-100: 209 250 229;
-    --color-primary-200: 167 243 208;
-    --color-primary-300: 110 231 183;
-    --color-primary-400: 52 211 153;
-    --color-primary-500: 16 185 129;
-    --color-primary-600: 5 150 105;
-    --color-primary-700: 4 120 87;
-    --color-primary-800: 6 95 70;
-    --color-primary-900: 6 78 59;
-    --color-primary-950: 2 44 34;
-    --color-secondary: 245 158 11;
-    --color-secondary-50: 255 251 235;
-    --color-secondary-100: 254 243 199;
-    --color-secondary-200: 253 230 138;
-    --color-secondary-300: 252 211 77;
-    --color-secondary-400: 251 191 36;
-    --color-secondary-500: 245 158 11;
-    --color-secondary-600: 217 119 6;
-    --color-secondary-700: 180 83 9;
-    --color-secondary-800: 146 64 14;
-    --color-secondary-900: 120 53 15;
-    --color-secondary-950: 69 26 3;
-    --color-accent: 6 182 212;
-    --color-accent-50: 236 254 255;
-    --color-accent-100: 207 250 254;
-    --color-accent-200: 165 243 252;
-    --color-accent-300: 103 232 249;
-    --color-accent-400: 34 211 238;
-    --color-accent-500: 6 182 212;
-    --color-accent-600: 8 145 178;
-    --color-accent-700: 14 116 144;
-    --color-accent-800: 21 94 117;
-    --color-accent-900: 22 78 99;
-    --color-accent-950: 8 51 68;
-  }
-
-  .dark[data-theme="emerald"],
-  [data-theme="emerald"].dark {
-    --color-background: 5 15 10;
-    --color-card: 10 26 18;
-    --color-sidebar: 7 20 13;
-    --color-border: 15 46 30;
-    --color-muted: 58 138 106;
-  }
-
-  /* ======================== */
-  /* THEME: Ocean              */
-  /* ======================== */
-  [data-theme="ocean"] {
-    --color-primary: 14 165 233;
-    --color-primary-50: 240 249 255;
-    --color-primary-100: 224 242 254;
-    --color-primary-200: 186 230 253;
-    --color-primary-300: 125 211 252;
-    --color-primary-400: 56 189 248;
-    --color-primary-500: 14 165 233;
-    --color-primary-600: 2 132 199;
-    --color-primary-700: 3 105 161;
-    --color-primary-800: 7 89 133;
-    --color-primary-900: 12 74 110;
-    --color-primary-950: 8 47 73;
-    --color-secondary: 99 102 241;
-    --color-secondary-50: 238 242 255;
-    --color-secondary-100: 224 231 255;
-    --color-secondary-200: 199 210 254;
-    --color-secondary-300: 165 180 252;
-    --color-secondary-400: 129 140 248;
-    --color-secondary-500: 99 102 241;
-    --color-secondary-600: 79 70 229;
-    --color-secondary-700: 67 56 202;
-    --color-secondary-800: 55 48 163;
-    --color-secondary-900: 49 46 129;
-    --color-secondary-950: 30 27 75;
-    --color-accent: 20 184 166;
-    --color-accent-50: 240 253 250;
-    --color-accent-100: 204 251 241;
-    --color-accent-200: 153 246 228;
-    --color-accent-300: 94 234 212;
-    --color-accent-400: 45 212 191;
-    --color-accent-500: 20 184 166;
-    --color-accent-600: 13 148 136;
-    --color-accent-700: 15 118 110;
-    --color-accent-800: 17 94 89;
-    --color-accent-900: 19 78 74;
-    --color-accent-950: 4 47 46;
-  }
-
-  .dark[data-theme="ocean"],
-  [data-theme="ocean"].dark {
-    --color-background: 5 10 16;
-    --color-card: 10 18 32;
-    --color-sidebar: 7 13 24;
-    --color-border: 15 26 46;
-    --color-muted: 58 122 176;
-  }
-
-  /* ======================== */
-  /* THEME: Sunset             */
-  /* ======================== */
-  [data-theme="sunset"] {
-    --color-primary: 249 115 22;
-    --color-primary-50: 255 247 237;
-    --color-primary-100: 255 237 213;
-    --color-primary-200: 254 215 170;
-    --color-primary-300: 253 186 116;
-    --color-primary-400: 251 146 60;
-    --color-primary-500: 249 115 22;
-    --color-primary-600: 234 88 12;
-    --color-primary-700: 194 65 12;
-    --color-primary-800: 154 52 18;
-    --color-primary-900: 124 45 18;
-    --color-primary-950: 67 20 7;
-    --color-secondary: 236 72 153;
-    --color-secondary-50: 253 242 248;
-    --color-secondary-100: 252 231 243;
-    --color-secondary-200: 251 207 232;
-    --color-secondary-300: 249 168 212;
-    --color-secondary-400: 244 114 182;
-    --color-secondary-500: 236 72 153;
-    --color-secondary-600: 219 39 119;
-    --color-secondary-700: 190 24 93;
-    --color-secondary-800: 157 23 77;
-    --color-secondary-900: 131 24 67;
-    --color-secondary-950: 80 7 36;
-    --color-accent: 234 179 8;
-    --color-accent-50: 254 252 232;
-    --color-accent-100: 254 249 195;
-    --color-accent-200: 254 240 138;
-    --color-accent-300: 253 224 71;
-    --color-accent-400: 250 204 21;
-    --color-accent-500: 234 179 8;
-    --color-accent-600: 202 138 4;
-    --color-accent-700: 161 98 7;
-    --color-accent-800: 133 77 14;
-    --color-accent-900: 113 63 18;
-    --color-accent-950: 66 32 6;
-  }
-
-  .dark[data-theme="sunset"],
-  [data-theme="sunset"].dark {
-    --color-background: 16 8 5;
-    --color-card: 26 13 10;
-    --color-sidebar: 20 10 7;
-    --color-border: 46 21 15;
-    --color-muted: 160 96 64;
-  }
-
-  /* ======================== */
-  /* THEME: Royal              */
-  /* ======================== */
-  [data-theme="royal"] {
-    --color-primary: 109 40 217;
-    --color-primary-50: 245 243 255;
-    --color-primary-100: 237 233 254;
-    --color-primary-200: 221 214 254;
-    --color-primary-300: 196 181 253;
-    --color-primary-400: 167 139 250;
-    --color-primary-500: 109 40 217;
-    --color-primary-600: 91 33 182;
-    --color-primary-700: 76 29 149;
-    --color-primary-800: 59 7 100;
-    --color-primary-900: 46 16 101;
-    --color-primary-950: 30 10 58;
-    --color-secondary: 217 119 6;
-    --color-secondary-50: 255 251 235;
-    --color-secondary-100: 254 243 199;
-    --color-secondary-200: 253 230 138;
-    --color-secondary-300: 252 211 77;
-    --color-secondary-400: 251 191 36;
-    --color-secondary-500: 217 119 6;
-    --color-secondary-600: 180 83 9;
-    --color-secondary-700: 146 64 14;
-    --color-secondary-800: 120 53 15;
-    --color-secondary-900: 69 26 3;
-    --color-secondary-950: 39 21 7;
-    --color-accent: 245 158 11;
-    --color-accent-50: 255 251 235;
-    --color-accent-100: 254 243 199;
-    --color-accent-200: 253 230 138;
-    --color-accent-300: 252 211 77;
-    --color-accent-400: 251 191 36;
-    --color-accent-500: 245 158 11;
-    --color-accent-600: 217 119 6;
-    --color-accent-700: 180 83 9;
-    --color-accent-800: 146 64 14;
-    --color-accent-900: 120 53 15;
-    --color-accent-950: 69 26 3;
-  }
-
-  .dark[data-theme="royal"],
-  [data-theme="royal"].dark {
-    --color-background: 8 5 16;
-    --color-card: 14 10 26;
-    --color-sidebar: 10 7 20;
-    --color-border: 26 15 46;
-    --color-muted: 106 74 158;
-  }
-
-  /* ======================== */
-  /* THEME: Crimson            */
-  /* ======================== */
-  [data-theme="crimson"] {
-    --color-primary: 220 38 38;
-    --color-primary-50: 254 242 242;
-    --color-primary-100: 254 226 226;
-    --color-primary-200: 254 202 202;
-    --color-primary-300: 252 165 165;
-    --color-primary-400: 248 113 113;
-    --color-primary-500: 220 38 38;
-    --color-primary-600: 185 28 28;
-    --color-primary-700: 153 27 27;
-    --color-primary-800: 127 29 29;
-    --color-primary-900: 100 21 21;
-    --color-primary-950: 69 10 10;
-    --color-secondary: 29 78 216;
-    --color-secondary-50: 239 246 255;
-    --color-secondary-100: 219 234 254;
-    --color-secondary-200: 191 219 254;
-    --color-secondary-300: 147 197 253;
-    --color-secondary-400: 96 165 250;
-    --color-secondary-500: 29 78 216;
-    --color-secondary-600: 30 64 175;
-    --color-secondary-700: 30 58 138;
-    --color-secondary-800: 23 37 84;
-    --color-secondary-900: 15 29 62;
-    --color-secondary-950: 10 18 40;
-    --color-accent: 245 158 11;
-    --color-accent-50: 255 251 235;
-    --color-accent-100: 254 243 199;
-    --color-accent-200: 253 230 138;
-    --color-accent-300: 252 211 77;
-    --color-accent-400: 251 191 36;
-    --color-accent-500: 245 158 11;
-    --color-accent-600: 217 119 6;
-    --color-accent-700: 180 83 9;
-    --color-accent-800: 146 64 14;
-    --color-accent-900: 120 53 15;
-    --color-accent-950: 69 26 3;
-  }
-
-  .dark[data-theme="crimson"],
-  [data-theme="crimson"].dark {
-    --color-background: 16 5 5;
-    --color-card: 26 10 10;
-    --color-sidebar: 20 7 7;
-    --color-border: 46 15 15;
-    --color-muted: 160 64 64;
-  }
-
-  /* ======================== */
-  /* THEME: Aurora              */
-  /* ======================== */
-  [data-theme="aurora"] {
-    --color-primary: 34 211 238;
-    --color-primary-50: 236 254 255;
-    --color-primary-100: 207 250 254;
-    --color-primary-200: 165 243 252;
-    --color-primary-300: 103 232 249;
-    --color-primary-400: 34 211 238;
-    --color-primary-500: 6 182 212;
-    --color-primary-600: 8 145 178;
-    --color-primary-700: 14 116 144;
-    --color-primary-800: 21 94 117;
-    --color-primary-900: 22 78 99;
-    --color-primary-950: 8 51 68;
-    --color-secondary: 168 85 247;
-    --color-secondary-50: 250 245 255;
-    --color-secondary-100: 243 232 255;
-    --color-secondary-200: 233 213 255;
-    --color-secondary-300: 216 180 254;
-    --color-secondary-400: 192 132 252;
-    --color-secondary-500: 168 85 247;
-    --color-secondary-600: 147 51 234;
-    --color-secondary-700: 126 34 206;
-    --color-secondary-800: 107 33 168;
-    --color-secondary-900: 88 28 135;
-    --color-secondary-950: 59 7 100;
-    --color-accent: 52 211 153;
-    --color-accent-50: 236 253 245;
-    --color-accent-100: 209 250 229;
-    --color-accent-200: 167 243 208;
-    --color-accent-300: 110 231 183;
-    --color-accent-400: 52 211 153;
-    --color-accent-500: 16 185 129;
-    --color-accent-600: 5 150 105;
-    --color-accent-700: 4 120 87;
-    --color-accent-800: 6 95 70;
-    --color-accent-900: 6 78 59;
-    --color-accent-950: 2 44 34;
-  }
-
-  .dark[data-theme="aurora"],
-  [data-theme="aurora"].dark {
-    --color-background: 5 10 16;
-    --color-card: 10 18 24;
-    --color-sidebar: 7 13 20;
-    --color-border: 15 30 40;
-    --color-muted: 58 138 176;
-  }
-
-  /* ======================== */
-  /* THEME: Midnight           */
-  /* ======================== */
-  [data-theme="midnight"] {
-    --color-primary: 129 140 248;
-    --color-primary-50: 238 242 255;
-    --color-primary-100: 224 231 255;
-    --color-primary-200: 199 210 254;
-    --color-primary-300: 165 180 252;
-    --color-primary-400: 129 140 248;
-    --color-primary-500: 99 102 241;
-    --color-primary-600: 79 70 229;
-    --color-primary-700: 67 56 202;
-    --color-primary-800: 55 48 163;
-    --color-primary-900: 49 46 129;
-    --color-primary-950: 30 27 75;
-    --color-secondary: 244 114 182;
-    --color-secondary-50: 253 242 248;
-    --color-secondary-100: 252 231 243;
-    --color-secondary-200: 251 207 232;
-    --color-secondary-300: 249 168 212;
-    --color-secondary-400: 244 114 182;
-    --color-secondary-500: 236 72 153;
-    --color-secondary-600: 219 39 119;
-    --color-secondary-700: 190 24 93;
-    --color-secondary-800: 157 23 77;
-    --color-secondary-900: 131 24 67;
-    --color-secondary-950: 80 7 36;
-    --color-accent: 34 211 238;
-    --color-accent-50: 236 254 255;
-    --color-accent-100: 207 250 254;
-    --color-accent-200: 165 243 252;
-    --color-accent-300: 103 232 249;
-    --color-accent-400: 34 211 238;
-    --color-accent-500: 6 182 212;
-    --color-accent-600: 8 145 178;
-    --color-accent-700: 14 116 144;
-    --color-accent-800: 21 94 117;
-    --color-accent-900: 22 78 99;
-    --color-accent-950: 8 51 68;
-  }
-
-  .dark[data-theme="midnight"],
-  [data-theme="midnight"].dark {
-    --color-background: 5 5 10;
-    --color-card: 10 10 18;
-    --color-sidebar: 7 7 13;
-    --color-border: 16 16 30;
-    --color-muted: 90 90 138;
-  }
-
-  /* ======================== */
-  /* THEME: Light Professional */
-  /* ======================== */
-  [data-theme="light-professional"] {
-    --color-primary: 37 99 235;
-    --color-primary-50: 239 246 255;
-    --color-primary-100: 219 234 254;
-    --color-primary-200: 191 219 254;
-    --color-primary-300: 147 197 253;
-    --color-primary-400: 96 165 250;
-    --color-primary-500: 37 99 235;
-    --color-primary-600: 29 78 216;
-    --color-primary-700: 30 64 175;
-    --color-primary-800: 30 58 138;
-    --color-primary-900: 23 37 84;
-    --color-primary-950: 15 23 42;
-    --color-secondary: 8 145 178;
-    --color-secondary-50: 236 254 255;
-    --color-secondary-100: 207 250 254;
-    --color-secondary-200: 165 243 252;
-    --color-secondary-300: 103 232 249;
-    --color-secondary-400: 34 211 238;
-    --color-secondary-500: 8 145 178;
-    --color-secondary-600: 14 116 144;
-    --color-secondary-700: 21 94 117;
-    --color-secondary-800: 22 78 99;
-    --color-secondary-900: 8 51 68;
-    --color-secondary-950: 4 30 42;
-    --color-accent: 5 150 105;
-    --color-accent-50: 236 253 245;
-    --color-accent-100: 209 250 229;
-    --color-accent-200: 167 243 208;
-    --color-accent-300: 110 231 183;
-    --color-accent-400: 52 211 153;
-    --color-accent-500: 5 150 105;
-    --color-accent-600: 4 120 87;
-    --color-accent-700: 6 95 70;
-    --color-accent-800: 6 78 59;
-    --color-accent-900: 2 44 34;
-    --color-accent-950: 1 22 17;
-    --color-background: 248 250 252;
-    --color-card: 255 255 255;
-    --color-sidebar: 241 245 249;
-    --color-border: 226 232 240;
-    --color-muted: 100 116 139;
-  }
-
-  .dark[data-theme="light-professional"],
-  [data-theme="light-professional"].dark {
-    --color-background: 15 23 42;
-    --color-card: 30 41 59;
-    --color-sidebar: 15 23 41;
-    --color-border: 51 65 85;
-    --color-muted: 148 163 184;
-  }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
 
   body {
-    @apply bg-background text-text antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  html {
-    scroll-behavior: auto;
-  }
-
-  ::selection {
-    @apply bg-primary/20 text-primary;
-  }
-
-  ::-moz-selection {
-    @apply bg-primary/20 text-primary;
-  }
-}
-
-@layer components {
-  /* ===================== *
-   *  DESIGN TOKENS        *
-   *  Single source of     *
-   *  truth for the size   *
-   *  of every repeated    *
-   *  control in the app.  *
-   * ===================== */
-  :root {
-    --ui-input-h: 32px;   /* inputs, selects, small form fields */
-    --ui-field-h: 30px;   /* dense voucher-entry cells          */
-    --ui-row-h: 32px;     /* table body rows                    */
-    --ui-head-h: 30px;    /* table header row                   */
-    --ui-btn-h: 32px;     /* default button height              */
-    --ui-header-h: 48px;  /* slim top navigation bar            */
-    --ui-sidebar-w: 232px;
-    --ui-sidebar-collapsed-w: 56px;
-    --ui-radius: 3px;     /* 0-4px everywhere                   */
-    --ui-gap: 8px;        /* standard inline gap                */
-  }
-
-  /* Legacy utility names kept so older markup still resolves, but the
-     decorative glass / neon / 3D treatments are gone: the interface is
-     now flat, sharp and print-friendly. */
-  .glass,
-  .glass-card,
-  .glass-sidebar,
-  .glass-input,
-  .card-3d,
-  .card-3d-tilt,
-  .neon-glow,
-  .neon-glow-sm,
-  .neon-glow-lg,
-  .neon-text,
-  .neon-border,
-  .neon-border-animated {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    transform: none;
-    box-shadow: none;
-  }
-
-  .glass,
-  .glass-card {
-    background: var(--color-card);
-    border: 1px solid rgb(var(--color-border));
-  }
-
-  .glass-sidebar {
-    background: rgb(var(--color-sidebar));
-    border-right: 1px solid rgb(var(--color-border));
-  }
-
-  .glass-input {
-    background: rgb(var(--color-card));
-    border: 1px solid rgb(var(--color-border));
-  }
-
-  .glass-input:focus {
-    background: rgb(var(--color-card));
-    border-color: rgb(var(--color-primary));
-    box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.15);
-  }
-
-  .gradient-primary {
-    background: rgb(var(--color-primary));
-  }
-
-  .gradient-text {
-    background: none;
-    -webkit-text-fill-color: currentColor;
-    color: rgb(var(--color-primary));
-  }
-
-  .gradient-border {
-    position: relative;
-    background: var(--color-card);
-    border: 1px solid rgb(var(--color-border));
-    border-radius: var(--ui-radius);
-  }
-
-  .gradient-border::before {
-    content: none;
-  }
-
-  /* ===================== *
-   *  BUTTONS              *
-   * ===================== */
-  .btn-primary {
-    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
-    background: rgb(var(--color-primary));
-    color: rgb(var(--color-primary-foreground));
-  }
-
-  .btn-primary:hover {
-    filter: brightness(0.94);
-  }
-
-  .btn-primary:active {
-    filter: brightness(0.88);
-  }
-
-  .btn-secondary {
-    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
-    background: rgb(var(--color-secondary));
-    color: rgb(var(--color-secondary-foreground));
-  }
-
-  .btn-secondary:hover {
-    filter: brightness(0.94);
-  }
-
-  .btn-outline {
-    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded border px-3 text-[13px] font-medium transition-colors;
-    background: rgb(var(--color-card));
-    border-color: rgb(var(--color-border));
-    color: rgb(var(--color-text));
-  }
-
-  .btn-outline:hover {
-    background: rgb(var(--color-sidebar));
-    border-color: rgb(var(--color-muted) / 0.5);
-  }
-
-  .btn-ghost {
-    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
-    background: transparent;
-    color: rgb(var(--color-text-secondary));
-  }
-
-  .btn-ghost:hover {
-    background: rgb(var(--color-sidebar));
-    color: rgb(var(--color-text));
-  }
-
-  .btn-danger {
-    @apply inline-flex h-[var(--ui-btn-h)] items-center justify-center gap-1.5 whitespace-nowrap rounded px-3 text-[13px] font-medium transition-colors;
-    background: rgb(var(--color-danger));
-    color: #fff;
-  }
-
-  .btn-danger:hover {
-    filter: brightness(0.94);
-  }
-
-  /* ===================== *
-   *  PANELS / CARDS       *
-   * ===================== */
-  .card {
-    @apply rounded border;
-    background: rgb(var(--color-card));
-    border-color: rgb(var(--color-border));
-    box-shadow: none;
-  }
-
-  .card-hover {
-    @apply card;
-  }
-
-  .card-hover:hover {
-    border-color: rgb(var(--color-border));
-    box-shadow: none;
-  }
-
-  /* Compact section shell used across list/report pages. */
-  .panel {
-    @apply rounded border;
-    background: rgb(var(--color-card));
-    border-color: rgb(var(--color-border));
-  }
-
-  .panel-header {
-    @apply flex items-center justify-between gap-2 border-b px-3 py-2;
-    border-color: rgb(var(--color-border));
-    background: rgb(var(--color-sidebar));
-  }
-
-  .panel-title {
-    @apply text-[11px] font-semibold uppercase tracking-wide;
-    color: rgb(var(--color-muted));
-  }
-
-  /* ===================== *
-   *  FORM CONTROLS        *
-   * ===================== */
-  .input {
-    @apply w-full rounded border bg-card px-2.5 text-[13px] transition-colors outline-none;
-    height: var(--ui-input-h);
-    border-color: rgb(var(--color-border));
-    color: rgb(var(--color-text));
-  }
-
-  .input:focus {
-    border-color: rgb(var(--color-primary));
-    box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.15);
-  }
-
-  .input::placeholder {
-    color: rgb(var(--color-muted));
-  }
-
-  .input:disabled {
-    background: rgb(var(--color-sidebar));
-    color: rgb(var(--color-muted));
-    cursor: not-allowed;
-  }
-
-  /* Read-only values must not look editable. */
-  .input-readonly,
-  .field-readonly {
-    background: rgb(var(--color-sidebar));
-    color: rgb(var(--color-text-secondary));
-    border-style: dashed;
-  }
-
-  .field-label {
-    @apply mb-1 block text-[11px] font-semibold uppercase tracking-wide;
-    color: rgb(var(--color-muted));
-  }
-
-  /* ===================== *
-   *  TABLES (spreadsheet) *
-   * ===================== */
-  .table-container {
-    @apply w-full overflow-auto rounded border;
-    border-color: rgb(var(--color-border));
-    background: rgb(var(--color-card));
-  }
-
-  .table {
-    @apply w-full caption-bottom text-[13px];
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-
-  .table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    height: var(--ui-head-h);
-    padding: 0 10px;
-    text-align: left;
-    vertical-align: middle;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    background: rgb(var(--color-sidebar));
-    color: rgb(var(--color-muted));
-    border-bottom: 1px solid rgb(var(--color-border));
-  }
-
-  .table tbody td {
-    height: var(--ui-row-h);
-    padding: 4px 10px;
-    vertical-align: middle;
-    border-bottom: 1px solid rgb(var(--color-border-light));
-    color: rgb(var(--color-text));
-  }
-
-  .table tbody tr:last-child td {
-    border-bottom: 0;
-  }
-
-  .table tbody tr:hover td {
-    background: rgb(var(--color-primary) / 0.05);
-  }
-
-  .table tbody tr:nth-child(even) td {
-    background: rgb(var(--color-sidebar) / 0.45);
-  }
-
-  .table tbody tr:nth-child(even):hover td {
-    background: rgb(var(--color-primary) / 0.05);
-  }
-
-  /* Numeric / money columns always line up on the right. */
-  .num,
-  .text-right,
-  th.text-right,
-  td.text-right {
-    font-variant-numeric: tabular-nums;
-  }
-
-  .table tfoot td {
-    height: var(--ui-row-h);
-    padding: 4px 10px;
-    font-weight: 600;
-    background: rgb(var(--color-sidebar));
-    border-top: 1px solid rgb(var(--color-border));
-  }
-
-  /* ===================== *
-   *  BADGES / STATUS      *
-   * ===================== */
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-sm px-1.5 py-px text-[11px] font-semibold leading-4;
-    border: 1px solid transparent;
-    white-space: nowrap;
-  }
-
-  .badge-primary {
-    @apply badge;
-    background: rgb(var(--color-primary) / 0.12);
-    color: rgb(var(--color-primary-700));
-  }
-
-  .dark .badge-primary {
-    color: rgb(var(--color-primary-300));
-  }
-
-  .badge-success {
-    @apply badge;
-    background: rgb(var(--color-success) / 0.14);
-    color: rgb(var(--color-success));
-  }
-
-  .badge-warning {
-    @apply badge;
-    background: rgb(var(--color-warning) / 0.16);
-    color: rgb(var(--color-warning));
-  }
-
-  .badge-danger {
-    @apply badge;
-    background: rgb(var(--color-danger) / 0.14);
-    color: rgb(var(--color-danger));
-  }
-
-  .badge-info {
-    @apply badge;
-    background: rgb(var(--color-info) / 0.14);
-    color: rgb(var(--color-info));
-  }
-
-  .status-dot {
-    @apply inline-block h-2 w-2 rounded-full;
-  }
-
-  .status-active {
-    @apply status-dot;
-    background: rgb(var(--color-success));
-  }
-
-  .status-inactive {
-    @apply status-dot;
-    background: rgb(var(--color-danger));
-  }
-
-  .status-pending {
-    @apply status-dot;
-    background: rgb(var(--color-warning));
-  }
-
-  /* ===================== *
-   *  FEEDBACK             *
-   * ===================== */
-  .skeleton {
-    @apply relative overflow-hidden rounded-sm;
-    background: rgb(var(--color-border));
-    animation: none;
-  }
-
-  .tooltip {
-    @apply invisible absolute z-50 rounded px-2 py-1 text-[11px] font-medium;
-    background: rgb(var(--color-text));
-    color: rgb(var(--color-background));
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .tooltip-trigger:hover + .tooltip {
-    @apply visible;
-  }
-
-  .dialog-overlay {
-    @apply fixed inset-0 z-50 bg-black/40;
-    animation: fadeIn 0.15s ease-out;
-  }
-
-  .dialog-content {
-    @apply fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded border p-4 shadow-lg;
-    background: var(--color-card);
-    border-color: var(--color-border);
-    animation: scaleIn 0.15s ease-out;
-  }
-
-  /* ===================== *
-   *  SCROLLBARS           *
-   * ===================== */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgb(var(--color-muted) / 0.4);
-    border-radius: 0;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--color-muted) / 0.7);
-    background-clip: padding-box;
-  }
-
-  .thin-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .animate-delay-75 {
-    animation-delay: 75ms;
-  }
-
-  .animate-delay-100 {
-    animation-delay: 100ms;
-  }
-
-  .animate-delay-150 {
-    animation-delay: 150ms;
-  }
-
-  .animate-delay-200 {
-    animation-delay: 200ms;
-  }
-
-  .animate-delay-300 {
-    animation-delay: 300ms;
-  }
-
-  .animate-delay-500 {
-    animation-delay: 500ms;
-  }
-
-  .animate-delay-700 {
-    animation-delay: 700ms;
-  }
-
-  .animate-delay-1000 {
-    animation-delay: 1000ms;
-  }
-
-  .mask-fade-bottom {
-    mask-image: linear-gradient(to bottom, black 60%, transparent);
-    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent);
-  }
-
-  .mask-fade-edges {
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  }
-}
-
-/* Print Styles */
-@media print {
-  *,
-  *::before,
-  *::after {
-    background: transparent !important;
-    color: #000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-  }
-
-  body,
-  html {
-    font-size: 12pt;
-    line-height: 1.5;
-  }
-
-  .no-print,
-  nav,
-  .sidebar,
-  .navbar,
-  .footer,
-  button,
-  .btn-primary,
-  .btn-secondary,
-  .btn-outline,
-  .btn-ghost,
-  .btn-danger {
-    display: none !important;
-  }
-
-  .print-only {
-    display: block !important;
-  }
-
-  a[href]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.8em;
-    color: #555 !important;
-  }
-
-  a[href^="#"]::after,
-  a[href^="javascript:"]::after {
-    content: "";
-  }
-
-  table {
-    border-collapse: collapse !important;
-    /* A table must be allowed to flow onto the next page. Forcing
-       `page-break-inside: avoid` on the table itself makes the print engine
-       either drop the overflowing rows or squeeze the whole table onto one
-       page, which is what produced the "report ends early" symptom. Rows and
-       repeating headers are handled below instead. */
-    page-break-inside: auto;
-    break-inside: auto;
-  }
-
-  thead {
-    display: table-header-group;
-  }
-
-  tfoot {
-    display: table-footer-group;
-  }
-
-  tr {
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-
-  table, td, th, img {
-    page-break-inside: avoid;
-  }
-
-  img {
-    max-width: 100% !important;
-    page-break-inside: avoid;
-  }
-
-  h2, h3 {
-    page-break-after: avoid;
-  }
-
-  p {
-    orphans: 3;
-    widows: 3;
-  }
-
-  @page {
-    margin: 1.5cm;
-    size: A4;
-  }
-
-  .print-break-before {
-    page-break-before: always;
-  }
-
-  .print-break-after {
-    page-break-after: always;
-  }
-}
-
-/* ==========================================================================
-   Product Management print report
-   --------------------------------------------------------------------------
-   A dedicated, data-only document rendered into a portal on <body>, so it is
-   not a descendant of the app shell's `h-screen overflow-hidden` / `flex-1
-   overflow-y-auto` scroll containers that used to trap the print output
-   inside a viewport-sized box with its own scrollbar.
-
-   Mounting is signalled with `body.is-printing-report`; the app tree is hidden
-   only while that class is present, so the invoice/quotation print path
-   (which prints the live app) keeps working unchanged.
-   ========================================================================== */
-
-/* Named page keeps this report landscape without changing the portrait
-   default used by the document/invoice print path. */
-@page product-report {
-  size: A4 landscape;
-  margin: 10mm;
-}
-
-.print-report-root {
-  display: none;
-}
-
-@media print {
-  /* Print only the report, and only while it is mounted. */
-  body.is-printing-report > *:not(.print-report-root) {
-    display: none !important;
-  }
-
-  body.is-printing-report {
-    background: #fff !important;
-  }
-
-  html,
-  body {
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-    background: #fff !important;
-  }
-
-  .print-report-root {
-    display: block !important;
-    position: static !important;
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    page: product-report;
-  }
-
-  .print-report {
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-    color: #000 !important;
-    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 10px;
-    line-height: 1.35;
-  }
-
-  /* The global print reset forces every colour to black, which is right for
-     the app chrome but wrong for the status pills. These are more specific
-     than `*`, so they win. */
-  .print-report * {
-    box-sizing: border-box;
-  }
-
-  .print-report a[href]::after {
-    content: none !important;
-  }
-
-  .print-report__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 12px;
-    padding-bottom: 6px;
-    margin-bottom: 8px;
-    border-bottom: 1.5px solid #000;
-  }
-
-  .print-report__title {
-    margin: 0;
-    font-size: 19px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .print-report__subtitle {
-    margin: 2px 0 0;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
   }
 
-  .print-report__meta {
-    text-align: right;
-    font-size: 9.5px;
-    white-space: nowrap;
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
   }
 
-  .print-report__meta p {
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--color-background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--color-border));
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--color-muted));
+  }
+
+  /* Table-like grid lines for professional appearance */
+  .table-grid {
+    border-collapse: collapse;
+  }
+
+  .table-grid th,
+  .table-grid td {
+    border: 1px solid rgb(var(--color-border));
+    padding: 0.375rem 0.5rem;
+  }
+
+  /* Compact form layouts */
+  .form-compact .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Excel-like input focus */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 1px solid rgb(var(--color-primary));
+    outline-offset: 0;
+  }
+
+  /* Remove number input spinners for cleaner look */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
     margin: 0;
   }
 
-  .print-summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 8px;
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
-
-  .print-summary__item {
-    flex: 1 1 0;
-    min-width: 88px;
-    border: 1px solid #999;
-    border-radius: 3px;
-    padding: 4px 7px;
-  }
-
-  .print-summary__label {
-    display: block;
-    font-size: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #444 !important;
-  }
-
-  .print-summary__value {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .print-filters {
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-    margin-bottom: 8px;
-    padding: 4px 7px;
-    border: 1px solid #bbb;
-    border-radius: 3px;
-    background: #f2f2f2 !important;
-  }
-
-  .print-filters__label {
-    font-size: 8px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #444 !important;
-    white-space: nowrap;
-  }
-
-  .print-filters__list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px 14px;
-  }
-
-  .print-filters__item {
-    font-size: 9px;
-    white-space: nowrap;
-  }
-
-  .print-warning {
-    margin: 0 0 8px;
-    padding: 4px 7px;
-    border: 1px solid #000;
-    font-size: 9px;
-    font-weight: 600;
-  }
-
-  /* The wrapper must not re-introduce a scroll container. */
-  .print-table-wrapper {
-    height: auto !important;
-    max-height: none !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    width: 100%;
-  }
-
-  .print-table {
-    width: 100% !important;
-    table-layout: fixed;
-    border-collapse: collapse !important;
-  }
-
-  .print-table th,
-  .print-table td {
-    border: 0.5px solid #808080;
-    padding: 2.5px 4px;
-    font-size: 9.5px;
-    vertical-align: top;
-    overflow-wrap: break-word;
-    word-break: normal;
-    hyphens: manual;
-  }
-
-  .print-table thead th {
-    background: #e6e6e6 !important;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    text-align: left;
-    vertical-align: bottom;
-  }
-
-  /* Column widths. `col` + `table-layout: fixed` gives predictable widths
-     instead of the browser equalising every column and squeezing names. */
-  .print-col-index   { width: 3%; }
-  .print-col-code    { width: 9%; }
-  .print-col-name    { width: 24%; }
-  .print-col-medium  { width: 11%; }
-  .print-col-unit    { width: 5%; }
-  .print-col-money   { width: 10%; }
-  .print-col-stock   { width: 7%; }
-  .print-col-status  { width: 10%; }
-
-  .print-num {
-    text-align: right;
-    white-space: nowrap;
-  }
-
-  .print-code {
-    font-family: "Consolas", "SF Mono", "Courier New", monospace;
-    font-size: 9px;
-  }
-
-  .print-name {
-    font-weight: 600;
-  }
-
-  .print-badge {
-    display: inline-block;
-    padding: 0 4px;
-    border: 0.5px solid #000;
-    border-radius: 2px;
-    font-size: 8.5px;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .print-badge--success { color: #14532d !important; }
-  .print-badge--warning { color: #713f12 !important; }
-  .print-badge--danger  { color: #7f1d1d !important; }
-
-  /* `table-footer-group` makes the browser repeat this on every printed page,
-     which is the only reliable page-footer technique: `@page` margin boxes with
-     counter(page) are not supported by Chromium, and computing the page count
-     in JS would require a second layout pass. */
-  .print-table tfoot {
-    display: table-footer-group;
-  }
-
-  .print-tfoot {
-    border: 0 !important;
-    padding-top: 3px !important;
-    font-size: 8.5px;
-    color: #333 !important;
-  }
-}
-
-/* Responsive Utilities */
-@media (max-width: 640px) {
-  .mobile-hide {
-    display: none !important;
-  }
-
-  .mobile-full {
-    width: 100% !important;
-  }
-
-  .mobile-stack {
-    flex-direction: column !important;
-  }
-
-  .mobile-text-center {
-    text-align: center !important;
-  }
-
-  .mobile-p-2 {
-    padding: 0.5rem !important;
-  }
-
-  .mobile-text-xs {
-    font-size: 0.75rem !important;
-  }
-}
-
-@media (min-width: 641px) and (max-width: 1024px) {
-  .tablet-hide {
-    display: none !important;
-  }
-
-  .tablet-full {
-    width: 100% !important;
-  }
-}
-
-@media (min-width: 1025px) {
-  .desktop-hide {
-    display: none !important;
-  }
-}
-
-/* Focus Visible */
-*:focus-visible {
-  outline: 1px solid rgb(var(--color-primary));
-  outline-offset: 1px;
-}
-
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Custom Properties for JavaScript */
-:root {
-  --color-primary-rgb: 0, 212, 255;
-  --color-secondary-rgb: 168, 85, 247;
-  --color-accent-rgb: 0, 255, 136;
-  --sidebar-width: 232px;
-  --sidebar-collapsed-width: 56px;
-  --header-height: 48px;
-}
-
-/* ============================================================ *
- *  DERIVED / SHADCN-COMPAT TOKENS
- *
- *  The app calls for `text-muted-foreground`, `destructive` and
- *  `*-foreground`, none of which existed in the scale above, so
- *  Tailwind never emitted them and the affected text inherited
- *  its parent's colour. These definitions activate that markup.
- *
- *  Placed last so they win over the earlier same-specificity
- *  blocks, which keeps each theme's existing scale untouched.
- * ============================================================ */
-:root {
-  /* secondary text: readable on the light surfaces above */
-  --color-muted-foreground: 100 116 139;
-  --color-primary-foreground: 255 255 255;
-  --color-secondary-foreground: 255 255 255;
-  --color-accent-foreground: 2 6 23;
-  --color-destructive-foreground: 255 255 255;
-  --color-input: 203 213 225;
-  --color-shadow: 15 23 42;
-}
-
-.dark {
-  --color-muted-foreground: 148 163 184;
-  --color-primary-foreground: 255 255 255;
-  --color-secondary-foreground: 255 255 255;
-  --color-accent-foreground: 2 6 23;
-  --color-destructive-foreground: 255 255 255;
-  --color-input: 51 65 85;
-  --color-shadow: 0 0 0;
-}
-
-/* `*-foreground` is the colour of text drawn ON the saturated
-   brand colour, so it flips to near-black on the bright neon
-   palettes and stays white on the deep ones. */
-[data-theme="neon-blue"]     { --color-primary-foreground: 2 8 23;    --color-muted-foreground: 71 85 105; }
-[data-theme="cyber-purple"]  { --color-primary-foreground: 250 245 255; --color-muted-foreground: 71 85 105; }
-[data-theme="emerald"]       { --color-primary-foreground: 2 46 34;   --color-muted-foreground: 71 85 105; }
-[data-theme="ocean"]         { --color-primary-foreground: 3 30 46;   --color-muted-foreground: 71 85 105; }
-[data-theme="sunset"]        { --color-primary-foreground: 41 15 4;   --color-muted-foreground: 71 85 105; }
-[data-theme="royal"]         { --color-primary-foreground: 245 243 255; --color-muted-foreground: 71 85 105; }
-[data-theme="crimson"]       { --color-primary-foreground: 254 242 242; --color-muted-foreground: 71 85 105; }
-[data-theme="aurora"]        { --color-primary-foreground: 3 24 32;   --color-muted-foreground: 71 85 105; }
-[data-theme="midnight"]      { --color-primary-foreground: 10 10 20;  --color-muted-foreground: 71 85 105; }
-[data-theme="light-professional"] { --color-primary-foreground: 255 255 255; --color-muted-foreground: 100 116 139; }
-
-/* Dark mode: tint the secondary text with the theme so it reads as
-   neon rather than grey, and keep it bright enough on the dark card. */
-.dark[data-theme="neon-blue"]    { --color-muted-foreground: 125 211 252; }
-.dark[data-theme="cyber-purple"] { --color-muted-foreground: 216 180 254; }
-.dark[data-theme="emerald"]      { --color-muted-foreground: 110 231 183; }
-.dark[data-theme="ocean"]        { --color-muted-foreground: 125 211 252; }
-.dark[data-theme="sunset"]       { --color-muted-foreground: 253 224 71; }
-.dark[data-theme="royal"]        { --color-muted-foreground: 199 210 254; }
-.dark[data-theme="crimson"]      { --color-muted-foreground: 252 165 165; }
-.dark[data-theme="aurora"]       { --color-muted-foreground: 165 243 252; }
-.dark[data-theme="midnight"]     { --color-muted-foreground: 165 180 252; }
-.dark[data-theme="light-professional"] { --color-muted-foreground: 203 213 225; }
-
-/* Surfaces and states referenced by AppLayout / Sidebar / TopHeader.
-   These came from theme.config's camelCase names, which globals.css
-   never carried, so the header strip and sidebar states fell back to
-   unstyled defaults. */
-:root {
-  --color-header: 255 255 255;
-  --color-border-light: 241 245 249;
-  --color-error: 239 68 68;
-  --color-sidebar-hover: 241 245 249;
-  --color-sidebar-active: 219 234 254;
-  --color-sidebar-text: 71 85 105;
-  --color-sidebar-text-active: 30 64 175;
-}
-
-.dark {
-  --color-header: 15 23 42;
-  --color-border-light: 39 39 58;
-  --color-error: 248 113 113;
-  --color-sidebar-hover: 26 26 43;
-  --color-sidebar-active: 12 74 110;
-  --color-sidebar-text: 148 163 184;
-  --color-sidebar-text-active: 125 211 252;
 }

@@ -69,34 +69,34 @@ export function InvoiceItemsTable({
 
   return (
     <div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[64rem] border-collapse text-[13px]">
+      <div className="overflow-x-auto rounded-sm border border-border">
+        <table className="w-full min-w-[64rem] border-collapse text-xs">
           <thead>
-            <tr className="border-b bg-muted/40 text-left text-[10px] uppercase tracking-wider text-muted-foreground">
-              <th className="w-8 px-2 py-1">#</th>
-              <th className="px-2 py-1">Product</th>
-              <th className="w-28 px-2 py-1">Code</th>
-              <th className="w-20 px-2 py-1 text-right">Qty</th>
-              <th className="w-20 px-2 py-1">Unit</th>
-              <th className="w-28 px-2 py-1 text-right">Rate</th>
-              <th className="w-20 px-2 py-1 text-right">Disc %</th>
-              <th className="w-28 px-2 py-1 text-right">Taxable</th>
-              <th className="w-24 px-2 py-1 text-right">GST</th>
-              <th className="w-32 px-2 py-1 text-right">Total</th>
-              <th className="w-20 px-2 py-1 text-right">Actions</th>
+            <tr className="border-b bg-sidebar text-left text-[10px] font-bold uppercase tracking-wider text-foreground">
+              <th className="w-8 px-2 py-1 h-[26px]">#</th>
+              <th className="px-2 py-1 h-[26px]">Product</th>
+              <th className="w-28 px-2 py-1 h-[26px]">Code</th>
+              <th className="w-20 px-2 py-1 h-[26px] text-right">Qty</th>
+              <th className="w-20 px-2 py-1 h-[26px]">Unit</th>
+              <th className="w-28 px-2 py-1 h-[26px] text-right">Rate</th>
+              <th className="w-20 px-2 py-1 h-[26px] text-right">Disc %</th>
+              <th className="w-28 px-2 py-1 h-[26px] text-right">Taxable</th>
+              <th className="w-24 px-2 py-1 h-[26px] text-right">GST</th>
+              <th className="w-32 px-2 py-1 h-[26px] text-right">Total</th>
+              <th className="w-20 px-2 py-1 h-[26px] text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, index) => {
               const invalidQty = toNumber(item.quantity) <= 0;
               return (
-                <tr key={item.key} className="border-b align-top hover:bg-muted/30">
+                <tr key={item.key} className="border-b align-top hover:bg-primary/5 h-7">
                   <td className="px-2 py-1 text-muted-foreground">{index + 1}</td>
                   <td className="px-2 py-1">
                     <ProductAutocomplete
                       value={item.product_name}
                       priceField={priceField}
-                      className="min-w-[16rem]"
+                      className="min-w-[16rem] h-7"
                       onChange={(text) => patch(index, { product_name: text, product_id: null })}
                       onSelect={(product) => {
                         const price = Number(product[priceField] || 0);
@@ -119,8 +119,8 @@ export function InvoiceItemsTable({
                       }}
                     />
                     {!item.product_id && item.product_name.trim().length > 0 ? (
-                      <p className="mt-0.5 text-[11px] text-amber-500">
-                        Select this product from the dropdown to bill it.
+                      <p className="mt-0.5 text-[10px] text-amber-500">
+                        Select from dropdown
                       </p>
                     ) : null}
                   </td>
@@ -137,7 +137,7 @@ export function InvoiceItemsTable({
                       disabled={readOnly}
                     />
                     {invalidQty ? (
-                      <p className="mt-0.5 text-[11px] text-red-500">Qty must be &gt; 0</p>
+                      <p className="mt-0.5 text-[10px] text-red-500">Qty &gt; 0</p>
                     ) : null}
                   </td>
                   <td className="px-2 py-1 text-muted-foreground">{item.unit || '—'}</td>

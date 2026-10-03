@@ -67,7 +67,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
 
     return (
       <div className="relative w-full">
-        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
         <input
           ref={ref}
           type="text"
@@ -75,8 +75,8 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           onChange={handleChange}
           placeholder={placeholder}
           className={cn(
-            "flex h-8 w-full rounded border border-border bg-card pl-8 pr-8 text-[13px] text-foreground transition-colors duration-100 placeholder:text-muted-foreground focus-visible:outline-1 focus-visible:outline-offset-0 focus-visible:border-primary focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60",
-            error && "border-danger focus-visible:border-danger focus-visible:outline-danger",
+            "flex h-7 w-full rounded-sm border border-border bg-card pl-7 pr-7 text-xs text-foreground transition-colors duration-100 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-60",
+            error && "border-danger focus-visible:border-danger focus-visible:ring-danger",
             className
           )}
           {...props}
@@ -84,7 +84,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
         {internalValue && (
           <button
             onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             type="button"
             aria-label="Clear search"
           >
@@ -92,7 +92,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           </button>
         )}
         {errorMessage && (
-          <p className="mt-1 text-[11px] text-danger">{errorMessage}</p>
+          <p className="mt-0.5 text-[11px] text-danger">{errorMessage}</p>
         )}
       </div>
     );

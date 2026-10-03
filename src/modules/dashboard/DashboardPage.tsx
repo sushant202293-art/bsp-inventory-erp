@@ -73,10 +73,10 @@ export default function DashboardPage() {
 
   const dateButtons = [
     { key: 'today' as const, label: 'Today' },
-    { key: 'week' as const, label: 'This Week' },
-    { key: 'month' as const, label: 'This Month' },
-    { key: 'quarter' as const, label: 'This Quarter' },
-    { key: 'year' as const, label: 'This Year' },
+    { key: 'week' as const, label: 'Week' },
+    { key: 'month' as const, label: 'Month' },
+    { key: 'quarter' as const, label: 'Quarter' },
+    { key: 'year' as const, label: 'Year' },
   ];
 
   if (loading) {
@@ -87,8 +87,6 @@ export default function DashboardPage() {
     );
   }
 
-  // getCustomerOutstandingDashboard returns a list, so the KPI totals are
-  // derived here rather than read off a single object.
   const totalReceivables = customerOutstanding.reduce(
     (sum, c) => sum + (c.outstanding_balance || 0),
     0
@@ -127,18 +125,18 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-3 pb-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-2 pb-2">
+      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-lg font-bold leading-tight">Dashboard</h1>
-          <p className="text-xs text-muted-foreground">Welcome back. Here is your business overview.</p>
+          <h1 className="text-sm font-bold leading-tight">Dashboard</h1>
+          <p className="text-[11px] text-muted-foreground">Business overview and key metrics</p>
         </div>
-        <div className="flex gap-0.5 rounded border bg-muted/50 p-0.5">
+        <div className="flex gap-0.5 rounded-sm border bg-muted/30 p-0.5">
           {dateButtons.map((btn) => (
             <button
               key={btn.key}
               onClick={() => setDateRange(btn.key)}
-              className={`rounded px-2 py-1 text-[11px] font-medium transition-colors ${
+              className={`rounded-sm px-2 py-0.5 text-[11px] font-medium transition-colors ${
                 dateRange === btn.key
                   ? 'bg-card text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -153,17 +151,17 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         {kpiCards.map((card) => (
           <Link key={card.title} to={card.link}>
-            <Card className="group rounded transition-colors hover:border-primary/50">
-              <CardContent className="p-3">
+            <Card className="group rounded-sm transition-colors hover:border-primary/50">
+              <CardContent className="p-2.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="truncate text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       {card.title}
                     </p>
-                    <p className="mt-1 truncate text-xl font-semibold tabular-nums">{card.value}</p>
-                    <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{card.sub}</p>
+                    <p className="mt-1 truncate text-lg font-bold tabular-nums">{card.value}</p>
+                    <p className="mt-0.5 truncate text-[10px] text-muted-foreground">{card.sub}</p>
                   </div>
-                  <card.icon className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary" />
+                  <card.icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground group-hover:text-primary" />
                 </div>
               </CardContent>
             </Card>
@@ -172,38 +170,38 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-        <Card className="rounded">
-          <CardHeader className="flex flex-row items-center gap-2 border-b px-3 py-2">
-            <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-            <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <Card className="rounded-sm">
+          <CardHeader className="flex flex-row items-center gap-2 border-b px-2 py-1.5">
+            <AlertTriangle className="h-3 w-3 text-amber-500" />
+            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               Low Stock Alert
             </CardTitle>
             {lowStockItems.length > 0 && (
-              <Badge variant="destructive" className="ml-auto">{lowStockItems.length}</Badge>
+              <Badge variant="destructive" className="ml-auto text-[10px] px-1.5 py-0">{lowStockItems.length}</Badge>
             )}
           </CardHeader>
           <CardContent className="p-0">
             {lowStockItems.length === 0 ? (
-              <p className="px-3 py-3 text-xs text-muted-foreground">All products are well stocked.</p>
+              <p className="px-2 py-2 text-[11px] text-muted-foreground">All products are well stocked.</p>
             ) : (
-              <div className="max-h-64 overflow-y-auto">
+              <div className="max-h-56 overflow-y-auto">
                 {lowStockItems.map((item) => (
                   <div
                     key={item.product_id}
-                    className="flex items-center justify-between gap-2 border-b px-3 py-1.5 text-[13px] last:border-0 hover:bg-muted/40"
+                    className="flex items-center justify-between gap-2 border-b px-2 py-1.5 text-xs last:border-0 hover:bg-muted/20"
                   >
                     <div className="min-w-0">
                       <p className="truncate font-medium">{item.product_name}</p>
-                      <p className="truncate text-[11px] text-muted-foreground">
+                      <p className="truncate text-[10px] text-muted-foreground">
                         {item.product_code}
                         {item.category_name ? ` · ${item.category_name}` : ''}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <Badge variant={item.current_stock === 0 ? 'destructive' : 'warning'}>
+                      <Badge variant={item.current_stock === 0 ? 'destructive' : 'warning'} className="text-[10px] px-1.5 py-0">
                         {item.current_stock} left
                       </Badge>
-                      <p className="mt-0.5 text-[11px] text-muted-foreground">Reorder: {item.low_stock_level}</p>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground">Min: {item.low_stock_level}</p>
                     </div>
                   </div>
                 ))}
@@ -212,33 +210,33 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded">
-          <CardHeader className="flex flex-row items-center gap-2 border-b px-3 py-2">
-            <TrendingUp className="h-3.5 w-3.5 text-green-500" />
-            <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <Card className="rounded-sm">
+          <CardHeader className="flex flex-row items-center gap-2 border-b px-2 py-1.5">
+            <TrendingUp className="h-3 w-3 text-green-500" />
+            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               Fast Moving Items
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {fastMoving.length === 0 ? (
-              <p className="px-3 py-3 text-xs text-muted-foreground">No sales data available for this period.</p>
+              <p className="px-2 py-2 text-[11px] text-muted-foreground">No sales data available for this period.</p>
             ) : (
-              <div className="max-h-64 overflow-y-auto">
+              <div className="max-h-56 overflow-y-auto">
                 {fastMoving.map((item, idx) => (
                   <div
                     key={item.product_id}
-                    className="flex items-center gap-2 border-b px-3 py-1.5 text-[13px] last:border-0 hover:bg-muted/40"
+                    className="flex items-center gap-2 border-b px-2 py-1.5 text-xs last:border-0 hover:bg-muted/20"
                   >
-                    <span className="w-5 shrink-0 text-center text-[11px] font-semibold text-muted-foreground tabular-nums">
+                    <span className="w-4 shrink-0 text-center text-[10px] font-semibold text-muted-foreground tabular-nums">
                       {idx + 1}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{item.product_name}</p>
-                      <p className="truncate text-[11px] text-muted-foreground">{item.product_code}</p>
+                      <p className="truncate text-[10px] text-muted-foreground">{item.product_code}</p>
                     </div>
                     <div className="shrink-0 text-right">
-                      <p className="font-medium tabular-nums">{item.total_quantity} sold</p>
-                      <p className="text-[11px] text-muted-foreground tabular-nums">
+                      <p className="font-semibold tabular-nums">{item.total_quantity} sold</p>
+                      <p className="text-[10px] text-muted-foreground tabular-nums">
                         {formatCurrency(item.total_revenue)}
                       </p>
                     </div>
@@ -251,21 +249,21 @@ export default function DashboardPage() {
       </div>
 
       {recentActivity.length > 0 && (
-        <Card className="rounded">
-          <CardHeader className="flex flex-row items-center gap-2 border-b px-3 py-2">
-            <BarChart3 className="h-3.5 w-3.5 text-blue-500" />
-            <CardTitle className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <Card className="rounded-sm">
+          <CardHeader className="flex flex-row items-center gap-2 border-b px-2 py-1.5">
+            <BarChart3 className="h-3 w-3 text-blue-500" />
+            <CardTitle className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               Recent Activity
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="max-h-72 overflow-y-auto">
+            <div className="max-h-64 overflow-y-auto">
               {recentActivity.map((act) => (
                 <div
                   key={act.id}
-                  className="flex items-center gap-2 border-b px-3 py-1.5 text-[13px] last:border-0 hover:bg-muted/40"
+                  className="flex items-center gap-2 border-b px-2 py-1.5 text-xs last:border-0 hover:bg-muted/20"
                 >
-                  <Badge variant={act.type === 'sale' ? 'success' : act.type === 'purchase' ? 'info' : 'secondary'}>
+                  <Badge variant={act.type === 'sale' ? 'success' : act.type === 'purchase' ? 'info' : 'secondary'} className="text-[10px] px-1.5 py-0">
                     {act.type}
                   </Badge>
                   <div className="min-w-0 flex-1">
@@ -273,12 +271,12 @@ export default function DashboardPage() {
                       {act.document_number}
                       {act.party_name ? ` · ${act.party_name}` : ''}
                     </p>
-                    <p className="truncate text-[11px] text-muted-foreground">
+                    <p className="truncate text-[10px] text-muted-foreground">
                       {formatDate(act.document_date)}
                       {act.status ? ` · ${act.status}` : ''}
                     </p>
                   </div>
-                  <p className="shrink-0 font-medium tabular-nums">{formatCurrency(act.grand_total)}</p>
+                  <p className="shrink-0 font-semibold tabular-nums">{formatCurrency(act.grand_total)}</p>
                 </div>
               ))}
             </div>
@@ -286,17 +284,17 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3 lg:grid-cols-6">
         {[
-          { label: '+ New Sale', to: '/transactions/sales/new' },
-          { label: '+ New PO', to: '/purchase-orders/new' },
-          { label: '+ New Quotation', to: '/quotations/new' },
-          { label: '+ New PI', to: '/proforma-invoices/new' },
-          { label: '+ New Customer', to: '/customers/new' },
-          { label: '+ New Supplier', to: '/suppliers/new' },
+          { label: '+ Sale', to: '/transactions/sales/new' },
+          { label: '+ Purchase', to: '/transactions/purchases/new' },
+          { label: '+ Quotation', to: '/quotations/new' },
+          { label: '+ PO', to: '/purchase-orders/new' },
+          { label: '+ Customer', to: '/customers/new' },
+          { label: '+ Supplier', to: '/suppliers/new' },
         ].map((action) => (
           <Link key={action.to} to={action.to}>
-            <Button variant="outline" className="h-9 w-full text-[13px] font-medium">
+            <Button variant="outline" className="h-7 w-full text-xs font-medium">
               {action.label}
             </Button>
           </Link>

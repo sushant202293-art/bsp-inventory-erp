@@ -70,12 +70,12 @@ function TableFrame({ minWidth = "1100px", className, children }: TableFrameProp
   return (
     <div
       className={cn(
-        "w-full overflow-x-auto rounded border border-border bg-card",
+        "w-full overflow-x-auto rounded-sm border border-border bg-card",
         className
       )}
     >
       <table
-        className="w-full table-fixed border-collapse caption-bottom text-[13px] tabular-nums"
+        className="w-full table-fixed border-collapse caption-bottom text-xs tabular-nums"
         style={{ minWidth }}
       >
         {children}
@@ -93,7 +93,7 @@ function HeaderCells<K extends string>({ columns }: { columns: AlignedTableColum
             key={column.key}
             scope="col"
             className={cn(
-              "sticky top-0 z-10 h-[30px] whitespace-nowrap border-b border-border bg-sidebar px-2.5 align-middle text-[11px] font-semibold uppercase tracking-wide text-muted-foreground",
+              "sticky top-0 z-10 h-[26px] whitespace-nowrap border-b border-border bg-sidebar px-2 align-middle text-[10px] font-bold uppercase tracking-wide text-foreground",
               ALIGN_CLASS[column.align ?? DEFAULT_ALIGN],
               column.headerClassName
             )}
@@ -152,7 +152,7 @@ function AlignedTable<K extends string, T>({
           <tr
             key={rowKey(row)}
             className={cn(
-              "border-b border-border/70 transition-colors hover:bg-primary/5 [&:nth-child(even)]:bg-sidebar/50 [&:nth-child(even)]:hover:bg-primary/5",
+              "border-b border-border transition-colors hover:bg-primary/5",
               rowClassName
             )}
           >
@@ -160,7 +160,7 @@ function AlignedTable<K extends string, T>({
               <td
                 key={column.key}
                 className={cn(
-                  "h-8 px-2.5 py-1 align-middle",
+                  "h-7 px-2 py-1 align-middle",
                   ALIGN_CLASS[column.align ?? DEFAULT_ALIGN],
                   column.cellClassName
                 )}
@@ -198,19 +198,19 @@ function AlignedTableSkeleton<K extends string, T>({
       <HeaderCells columns={columns} />
       <tbody>
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <tr key={rowIndex} className="border-b border-border/70">
+          <tr key={rowIndex} className="border-b border-border">
             {columns.map((column) => (
               <td
                 key={column.key}
                 className={cn(
-                  "h-8 px-2.5 py-1 align-middle",
+                  "h-7 px-2 py-1 align-middle",
                   ALIGN_CLASS[column.align ?? DEFAULT_ALIGN],
                   column.cellClassName
                 )}
               >
                 <Skeleton
                   className={cn(
-                    "h-4",
+                    "h-3.5",
                     column.align === "center" ? "mx-auto w-10" : "w-full"
                   )}
                 />
