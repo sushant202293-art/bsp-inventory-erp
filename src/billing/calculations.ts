@@ -125,9 +125,32 @@ export function parseAmount(value: string): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+/**
+ * GST treatment for a voucher.
+ *
+ * IGST only applies when both places of supply are actually known and they
+ * differ. `isSameState` answers "are these the same?", which is false when a
+ * state is simply missing, so calling `!isSameState` used to charge IGST on
+ * every voucher whose company or party state had not been filled in yet. An
+ * unknown place of supply is now treated as intra-state (CGST + SGST) and
+ * flagged with `needsPlaceOfSupply` so the form can ask for it instead of
+ * quietly taxing the bill the wrong way.
+ */
 export function interStateFor(
   companyState: string | null | undefined,
   partyState: string | null | undefined
 ): boolean {
+  if (!companyState || !companyState.trim()) return false;
+  if (!partyState || !partyState.trim()) return false;
   return !isSameState(companyState, partyState);
+}
+
+/** True when the tax type could not be decided because a state is missing. */
+export function needsPlaceOfSupply(
+  companyState: string | null | undefined,
+  partyState: string | null | undefined
+): boolean {
+  const company = (companyState || '').trim();
+  const party = (partyState || '').trim();
+  return !company || !party;
 }

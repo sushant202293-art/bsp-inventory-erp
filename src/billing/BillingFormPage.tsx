@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
-import { Save, Eye, CheckCircle2, Loader2 } from 'lucide-react';
+import { Save, Eye, CheckCircle2, Loader2, AlertTriangle } from 'lucide-react';
 
 import { useCompanyView } from '@/contexts/CompanyContext';
 import { transactionService } from '@/services/transaction.service';
@@ -20,7 +20,8 @@ import {
   type BillingPrintModel,
   type BillingPrintParty,
 } from './billing.types';
-import { computeItemRow, computeTotals, interStateFor } from './calculations';
+import { computeItemRow, computeTotals, interStateFor, needsPlaceOfSupply } from './calculations';
+import { clearBillingDraft, draftHasContent, loadBillingDraft, saveBillingDraft } from './draft-persistence';
 import { previewDocumentNumber } from './document-number.service';
 import {
   loadBillingConfig,
@@ -108,6 +109,9 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
 
   const supplyState = party.state || party.billing.state;
   const interState = interStateFor(companyView.state, supplyState);
+  // An unknown place of supply cannot be taxed as IGST: until it is filled in
+  // the bill is treated as intra-state and the user is told why.
+  const supplyStateMissing = needsPlaceOfSupply(companyView.state, supplyState);
 
   const validItems = useMemo(
     () => items.filter((row) => row.product_name.trim().length > 0),
@@ -120,6 +124,68 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
   );
 
   /* ---------------- data loading ---------------- */
+
+  // Rehydrate an unsaved voucher before anything else reads the state. Only
+  // new documents qualify: editing a saved one always reloads it from the
+  // database, and a stale draft must never overwrite the stored row.
+  const [draftRestored, setDraftRestored] = useState(false);
+  useEffect(() => {
+    if (id || draftRestored) return;
+    const draft = loadBillingDraft(docType);
+    if (!draft || !draftHasContent(draft)) {
+      setDraftRestored(true);
+      return;
+    }
+    setDocNumber(draft.docNumber);
+    setDocDate(draft.docDate);
+    setExtraDate(draft.extraDate);
+    setReferenceNumber(draft.referenceNumber);
+    setParty(draft.party);
+    setItems(draft.items.length > 0 ? draft.items : [blankRow('row-1')]);
+    setHeaderDiscount(draft.headerDiscount);
+    setTerms(draft.terms);
+    setNotes(draft.notes);
+    setPayments(draft.payments);
+    setDraftRestored(true);
+    toast({
+      title: 'Unsaved voucher restored',
+      description: 'Your items were kept from the last session.',
+    });
+  }, [id, docType, draftRestored]);
+
+  // Mirror the voucher on every change so a tab switch or refresh cannot lose
+  // it. The config effect above owns `terms` until it arrives; overwriting it
+  // here is safe because the stored draft value is whatever the user last had.
+  useEffect(() => {
+    if (id || !draftRestored) return;
+    saveBillingDraft({
+      docType,
+      docNumber,
+      docDate,
+      extraDate,
+      referenceNumber,
+      party,
+      items,
+      headerDiscount,
+      terms,
+      notes,
+      payments,
+    });
+  }, [
+    id,
+    draftRestored,
+    docType,
+    docNumber,
+    docDate,
+    extraDate,
+    referenceNumber,
+    party,
+    items,
+    headerDiscount,
+    terms,
+    notes,
+    payments,
+  ]);
 
   useEffect(() => {
     loadBillingConfig()
@@ -330,6 +396,8 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
         title: approving ? 'Approved' : 'Draft saved',
         description: `${docConfig.formTitle} ${docNumber || ''} saved.`,
       });
+      // The document now lives in the database, so the safety net is done.
+      clearBillingDraft(docType);
       navigate(docConfig.listPath);
     } catch (error) {
       toast({
@@ -511,6 +579,18 @@ export default function BillingFormPage({ docType }: BillingFormPageProps) {
           />
           <ShipToBlock state={party} onChange={setParty} savedShipping={null} />
         </div>
+
+        {supplyStateMissing ? (
+          <div className="flex items-start gap-1.5 rounded border border-amber-500/40 bg-amber-500/10 px-2.5 py-1.5 text-[11px] text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0" />
+            <span>
+              Place of supply is incomplete. CGST + SGST are applied for now; set the state on the
+              {' '}
+              {docConfig.party === 'supplier' ? 'supplier' : 'customer'}
+              {' '}and on the company profile to bill IGST when the states differ.
+            </span>
+          </div>
+        ) : null}
 
         <Card className="rounded-lg">
           <CardHeader className="px-3 pt-2 pb-0.5">
