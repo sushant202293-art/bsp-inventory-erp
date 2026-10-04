@@ -30,6 +30,16 @@
     --color-secondary-foreground: 255 255 255;
     --color-accent-foreground: 255 255 255;
     --color-destructive-foreground: 255 255 255;
+
+    /* Palette fallbacks (light-mode safe). Every theme block below also
+       defines these, but the fallback guarantees bg-primary / bg-secondary /
+       bg-accent always resolve. Previously 8 of the 10 themes had no entry
+       at all, so in light mode those buttons rendered as transparent
+       backgrounds with white text - invisible on the white card - while the
+       same markup looked fine on the dark surface. */
+    --color-primary: 37 99 235;
+    --color-secondary: 100 116 139;
+    --color-accent: 22 163 74;
   }
 
   .dark {
@@ -59,87 +69,39 @@
   }
 
   /* ======================== */
+  /* COLOR THEMES             */
+  /* ======================== */
+  /* One block per selectable theme (see src/config/theme.config.ts). Only the
+     DEFAULT palette tokens are consumed by the app (bg-primary, text-primary,
+     bg-secondary, bg-accent, ...); the numeric 50-950 ramps were removed
+     because nothing references them and they had drifted out of sync with the
+     configured palette.
+
+     Each [data-theme] block holds the LIGHT-mode palette: primaries are
+     deliberately darker shades so the button still stands out on the white
+     card and white label text stays readable (>= 4.5:1 against white).
+     The .dark[data-theme] overrides re-apply the vivid palette for dark mode
+     and switch the label colour to dark text when the bright shade needs it
+     (e.g. neon cyan, where white text would sit at ~1.8:1). */
+
+  /* ======================== */
   /* THEME: Light Professional */
   /* ======================== */
   [data-theme="light-professional"] {
     --color-primary: 37 99 235;
-    --color-primary-50: 239 246 255;
-    --color-primary-100: 219 234 254;
-    --color-primary-200: 191 219 254;
-    --color-primary-300: 147 197 253;
-    --color-primary-400: 96 165 250;
-    --color-primary-500: 37 99 235;
-    --color-primary-600: 29 78 216;
-    --color-primary-700: 30 64 175;
-    --color-primary-800: 30 58 138;
-    --color-primary-900: 23 37 84;
-    --color-primary-950: 15 23 42;
+    --color-primary-foreground: 255 255 255;
     --color-secondary: 100 116 139;
-    --color-secondary-50: 248 250 252;
-    --color-secondary-100: 241 245 249;
-    --color-secondary-200: 226 232 240;
-    --color-secondary-300: 203 213 225;
-    --color-secondary-400: 148 163 184;
-    --color-secondary-500: 100 116 139;
-    --color-secondary-600: 71 85 105;
-    --color-secondary-700: 51 65 85;
-    --color-secondary-800: 30 41 59;
-    --color-secondary-900: 15 23 42;
-    --color-secondary-950: 2 6 23;
     --color-accent: 22 163 74;
-    --color-accent-50: 240 253 244;
-    --color-accent-100: 220 252 231;
-    --color-accent-200: 187 247 208;
-    --color-accent-300: 134 239 172;
-    --color-accent-400: 74 222 128;
-    --color-accent-500: 22 163 74;
-    --color-accent-600: 21 128 61;
-    --color-accent-700: 22 101 52;
-    --color-accent-800: 22 78 99;
-    --color-accent-900: 20 83 45;
-    --color-accent-950: 5 46 22;
   }
 
   /* ======================== */
-  /* THEME: Neon Blue          */
+  /* THEME: Neon Blue         */
   /* ======================== */
   [data-theme="neon-blue"] {
-    --color-primary: 0 212 255;
-    --color-primary-50: 236 254 255;
-    --color-primary-100: 207 250 254;
-    --color-primary-200: 165 243 252;
-    --color-primary-300: 103 232 249;
-    --color-primary-400: 34 211 238;
-    --color-primary-500: 0 212 255;
-    --color-primary-600: 8 145 178;
-    --color-primary-700: 14 116 144;
-    --color-primary-800: 21 94 117;
-    --color-primary-900: 22 78 99;
-    --color-primary-950: 8 51 68;
-    --color-secondary: 168 85 247;
-    --color-secondary-50: 250 245 255;
-    --color-secondary-100: 243 232 255;
-    --color-secondary-200: 233 213 255;
-    --color-secondary-300: 216 180 254;
-    --color-secondary-400: 192 132 252;
-    --color-secondary-500: 168 85 247;
-    --color-secondary-600: 147 51 234;
-    --color-secondary-700: 126 34 206;
-    --color-secondary-800: 107 33 168;
-    --color-secondary-900: 88 28 135;
-    --color-secondary-950: 59 7 100;
-    --color-accent: 0 255 136;
-    --color-accent-50: 236 253 245;
-    --color-accent-100: 209 250 229;
-    --color-accent-200: 167 243 208;
-    --color-accent-300: 110 231 183;
-    --color-accent-400: 52 211 153;
-    --color-accent-500: 0 255 136;
-    --color-accent-600: 5 150 105;
-    --color-accent-700: 4 120 87;
-    --color-accent-800: 6 95 70;
-    --color-accent-900: 6 78 59;
-    --color-accent-950: 2 44 34;
+    --color-primary: 37 99 235;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 99 102 241;
+    --color-accent: 6 182 212;
   }
 
   .dark[data-theme="neon-blue"],
@@ -149,6 +111,125 @@
     --color-sidebar: 7 13 24;
     --color-border: 15 26 46;
     --color-muted: 74 111 165;
+    --color-primary: 0 212 255;
+    --color-primary-foreground: 15 23 42;
+  }
+
+  /* ======================== */
+  /* THEME: Cyber Purple      */
+  /* ======================== */
+  [data-theme="cyber-purple"] {
+    --color-primary: 147 51 238;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 236 72 153;
+    --color-accent: 6 182 212;
+  }
+
+  .dark[data-theme="cyber-purple"] {
+    --color-primary: 168 85 247;
+  }
+
+  /* ======================== */
+  /* THEME: Emerald           */
+  /* ======================== */
+  [data-theme="emerald"] {
+    --color-primary: 4 120 87;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 20 184 166;
+    --color-secondary-foreground: 15 23 42;
+    --color-accent: 6 182 212;
+  }
+
+  .dark[data-theme="emerald"] {
+    --color-primary: 16 185 129;
+    --color-primary-foreground: 15 23 42;
+  }
+
+  /* ======================== */
+  /* THEME: Ocean             */
+  /* ======================== */
+  [data-theme="ocean"] {
+    --color-primary: 3 105 161;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 6 182 212;
+    --color-secondary-foreground: 15 23 42;
+    --color-accent: 139 92 246;
+  }
+
+  .dark[data-theme="ocean"] {
+    --color-primary: 14 165 233;
+    --color-primary-foreground: 15 23 42;
+  }
+
+  /* ======================== */
+  /* THEME: Sunset            */
+  /* ======================== */
+  [data-theme="sunset"] {
+    --color-primary: 194 65 12;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 239 68 68;
+    --color-accent: 234 179 8;
+  }
+
+  .dark[data-theme="sunset"] {
+    --color-primary: 249 115 22;
+    --color-primary-foreground: 15 23 42;
+  }
+
+  /* ======================== */
+  /* THEME: Royal             */
+  /* ======================== */
+  [data-theme="royal"] {
+    --color-primary: 79 70 229;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 139 92 246;
+    --color-accent: 217 70 239;
+  }
+
+  .dark[data-theme="royal"] {
+    --color-primary: 99 102 241;
+  }
+
+  /* ======================== */
+  /* THEME: Crimson           */
+  /* ======================== */
+  [data-theme="crimson"] {
+    --color-primary: 220 38 38;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 225 29 72;
+    --color-accent: 249 115 22;
+  }
+
+  /* ======================== */
+  /* THEME: Aurora            */
+  /* ======================== */
+  [data-theme="aurora"] {
+    --color-primary: 14 116 144;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 167 139 250;
+    --color-secondary-foreground: 15 23 42;
+    --color-accent: 52 211 153;
+  }
+
+  .dark[data-theme="aurora"] {
+    --color-primary: 34 211 238;
+    --color-primary-foreground: 15 23 42;
+  }
+
+  /* ======================== */
+  /* THEME: Midnight          */
+  /* ======================== */
+  [data-theme="midnight"] {
+    --color-primary: 79 70 229;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 244 114 182;
+    --color-secondary-foreground: 15 23 42;
+    --color-accent: 251 191 36;
+  }
+
+  .dark[data-theme="midnight"] {
+    --color-primary: 129 140 248;
+    --color-primary-foreground: 15 23 42;
   }
 
   /* ======================== */

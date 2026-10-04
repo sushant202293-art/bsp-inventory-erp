@@ -23,7 +23,7 @@ const buttonVariants = cva(
         success:
           "bg-success text-white hover:bg-success/90",
         warning:
-          "bg-warning text-white hover:bg-warning/90",
+          "bg-warning text-black hover:bg-warning/90",
       },
       size: {
         sm: "h-6 rounded-sm px-2 text-[11px] gap-0.5",

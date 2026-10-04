@@ -217,9 +217,11 @@ After running `supabase/seed/admin_user.sql`:
 
 **⚠️ Change this immediately in production!**
 
-You can also skip all of the above and just sign up at `/signup` — migration
-007 (`supabase/migrations/007_signup_onboarding.sql`) creates the company and
-admin profile for you automatically.
+There is **no self-service sign-up**. Registration is rejected at the
+database level (`supabase/migrations/011_block_public_signup.sql`): every
+account must be created by an administrator from **Users → Add User** (or
+seeded with `supabase/seed/admin_user.sql`). Accounts the admin deactivates
+from the Users page can no longer sign in.
 
 ## 👥 User Roles & Permissions
 

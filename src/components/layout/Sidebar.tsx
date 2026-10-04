@@ -137,7 +137,7 @@ function CompanyLogo({ className }: { className?: string }) {
   }, [logoUrl]);
 
   const base =
-    'flex shrink-0 items-center justify-center overflow-hidden rounded-sm text-xs font-bold text-white';
+    'flex shrink-0 items-center justify-center overflow-hidden rounded-sm text-xs font-bold text-primary-foreground';
 
   if (loading) {
     return <div className={cn(base, 'bg-muted', className)} aria-hidden="true" />;

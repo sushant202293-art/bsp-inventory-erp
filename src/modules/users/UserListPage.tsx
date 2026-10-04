@@ -7,12 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { usePermissions } from '@/contexts/PermissionContext';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { Users, Plus, Search, Shield, Edit, UserX, UserCheck, Key } from 'lucide-react';
 
 export default function UserListPage() {
+  const { profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<any[]>([]);
   const [search, setSearch] = useState('');
@@ -38,12 +40,33 @@ export default function UserListPage() {
         await supabase.from('profiles').update({ full_name: formData.full_name, contact: formData.contact, role: formData.role, department: formData.department }).eq('id', editUser.id);
         toast({ title: 'Updated', description: 'User updated successfully' });
       } else {
-        const { data: authData, error } = await supabase.auth.signUp({ email: formData.email, password: 'TempPassword123!' });
-        if (error) throw error;
-        if (authData.user) {
-          await supabase.from('profiles').insert({ id: authData.user.id, full_name: formData.full_name, email: formData.email, contact: formData.contact, role: formData.role, department: formData.department, is_active: true });
+        if (!profile?.company_id) {
+          throw new Error('Your account is not linked to a company, so users cannot be created.');
         }
-        toast({ title: 'Created', description: 'User created. Temporary password sent to email.' });
+        // Public sign-up is disabled in the database (migration 011): the
+        // on_auth_user_created trigger only accepts users carrying
+        // invited_by_admin and builds their profile (company, role,
+        // department, contact) from this metadata.
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: 'TempPassword123!',
+          options: {
+            data: {
+              invited_by_admin: true,
+              full_name: formData.full_name,
+              company_id: profile.company_id,
+              role: formData.role,
+              department: formData.department,
+              contact: formData.contact,
+            },
+          },
+        });
+        if (error) throw error;
+        toast({
+          title: 'Created',
+          description:
+            'User created. Share the temporary password (TempPassword123!) with them - no email is sent. They should change it after signing in.',
+        });
       }
       setShowForm(false); setEditUser(null);
       loadUsers();

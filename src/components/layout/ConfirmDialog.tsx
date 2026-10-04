@@ -15,18 +15,23 @@ const variantConfig = {
     iconBg: 'rgba(239, 68, 68, 0.1)',
     iconColor: 'rgb(var(--color-error))',
     buttonBg: 'rgb(var(--color-error))',
+    buttonFg: 'rgb(255 255 255)',
   },
   warning: {
     icon: AlertCircle,
     iconBg: 'rgba(245, 158, 11, 0.1)',
     iconColor: 'rgb(var(--color-warning))',
     buttonBg: 'rgb(var(--color-warning))',
+    // Amber is far too light for white text (~1.7:1) - the label used to
+    // disappear; a fixed dark ink stays readable on both light and dark.
+    buttonFg: 'rgb(15 23 42)',
   },
   info: {
     icon: Info,
     iconBg: 'rgba(59, 130, 246, 0.1)',
     iconColor: 'rgb(var(--color-info))',
     buttonBg: 'rgb(var(--color-info))',
+    buttonFg: 'rgb(255 255 255)',
   },
 };
 
@@ -95,8 +100,8 @@ export default function ConfirmDialog({ isOpen, options }: ConfirmDialogProps) {
               </button>
               <button
                 onClick={onConfirm}
-                className="h-8 rounded px-3 text-[13px] font-medium text-white transition-opacity hover:opacity-90"
-                style={{ background: config.buttonBg }}
+                className="h-8 rounded px-3 text-[13px] font-medium transition-opacity hover:opacity-90"
+                style={{ background: config.buttonBg, color: config.buttonFg }}
               >
                 {confirmText}
               </button>

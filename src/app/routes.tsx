@@ -8,7 +8,6 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 import UnitsListPage from '@/modules/units/UnitsListPage';
 
 const LoginPage = React.lazy(() => import('@/pages/LoginPage'));
-const SignupPage = React.lazy(() => import('@/pages/SignupPage'));
 const ForgotPasswordPage = React.lazy(() => import('@/pages/ForgotPasswordPage'));
 const DashboardPage = React.lazy(() => import('@/modules/dashboard/DashboardPage'));
 const ProductWorkspacePage = React.lazy(() => import('@/modules/products/ProductWorkspacePage'));
@@ -90,7 +89,6 @@ export default function AppRoutes() {
     <Suspense fallback={<Loader />}>
       <Routes>
         <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
-        <Route path="/signup" element={<AuthLayout><SignupPage /></AuthLayout>} />
         <Route path="/forgot-password" element={<AuthLayout><ForgotPasswordPage /></AuthLayout>} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
@@ -101,9 +99,25 @@ export default function AppRoutes() {
           {/* Product Management workspace: the single catalog entry point.
               `?tab=products|categories|brands|units` selects the active tab. */}
           <Route path="products" element={<ProductWorkspacePage />} />
-          <Route path="products/new" element={<ProductFormPage />} />
+          <Route
+            path="products/new"
+            element={
+              <>
+                <ProductWorkspacePage />
+                <ProductFormPage />
+              </>
+            }
+          />
           <Route path="products/:id" element={<ProductDetailPage />} />
-          <Route path="products/:id/edit" element={<ProductFormPage />} />
+          <Route
+            path="products/:id/edit"
+            element={
+              <>
+                <ProductDetailPage />
+                <ProductFormPage />
+              </>
+            }
+          />
           {/* Standalone master-data pages, kept so existing deep links keep
               working. They render the same panels embedded in the workspace. */}
           <Route path="products/list" element={<ProductListPage />} />
@@ -112,15 +126,47 @@ export default function AppRoutes() {
           <Route path="units" element={<UnitsListPage />} />
 
           <Route path="customers" element={<CustomerListPage />} />
-          <Route path="customers/new" element={<CustomerFormPage />} />
+          <Route
+            path="customers/new"
+            element={
+              <>
+                <CustomerListPage />
+                <CustomerFormPage />
+              </>
+            }
+          />
           <Route path="customers/:id" element={<CustomerDetailPage />} />
-          <Route path="customers/:id/edit" element={<CustomerFormPage />} />
+          <Route
+            path="customers/:id/edit"
+            element={
+              <>
+                <CustomerDetailPage />
+                <CustomerFormPage />
+              </>
+            }
+          />
           <Route path="customers/:id/ledger" element={<CustomerLedgerPage />} />
 
           <Route path="suppliers" element={<SupplierListPage />} />
-          <Route path="suppliers/new" element={<SupplierFormPage />} />
+          <Route
+            path="suppliers/new"
+            element={
+              <>
+                <SupplierListPage />
+                <SupplierFormPage />
+              </>
+            }
+          />
           <Route path="suppliers/:id" element={<SupplierDetailPage />} />
-          <Route path="suppliers/:id/edit" element={<SupplierFormPage />} />
+          <Route
+            path="suppliers/:id/edit"
+            element={
+              <>
+                <SupplierDetailPage />
+                <SupplierFormPage />
+              </>
+            }
+          />
           <Route path="suppliers/:id/ledger" element={<SupplierLedgerPage />} />
 
           <Route path="transactions/sales" element={<SalesListPage />} />

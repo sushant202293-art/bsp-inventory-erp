@@ -20,7 +20,7 @@ interface ProfileDropdownProps {
 
 export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProps) {
   const { profile, user, signOut } = useAuth();
-  const { theme, setTheme, isDark } = useTheme();
+  const { theme, setTheme, setMode, isDark } = useTheme();
   const navigate = useNavigate();
 
   const menuItems = useMemo(
@@ -64,11 +64,11 @@ export default function ProfileDropdown({ isOpen, onClose }: ProfileDropdownProp
         label: isDark ? 'Light Mode' : 'Dark Mode',
         icon: isDark ? Sun : Moon,
         action: () => {
-          setTheme(isDark ? 'light-professional' : 'neon-blue');
+          setMode(isDark ? 'light' : 'dark');
         },
       },
     ],
-    [navigate, onClose, theme, setTheme, isDark]
+    [navigate, onClose, theme, setTheme, setMode, isDark]
   );
 
   const handleLogout = () => {

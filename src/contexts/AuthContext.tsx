@@ -143,6 +143,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (data.user) {
+        // Only active staff accounts may enter. Credentials alone are not
+        // enough: an admin can deactivate a user (Users page) and that must
+        // take effect immediately, not just block data through RLS.
+        const { data: prof } = await supabase
+          .from('profiles')
+          .select('is_active')
+          .eq('id', data.user.id)
+          .single();
+
+        if (prof && !prof.is_active) {
+          await supabase.auth.signOut();
+          return { error: 'This account has been deactivated. Contact your administrator.' };
+        }
+
         setUser(data.user);
         await loadProfile(data.user.id);
       }

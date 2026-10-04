@@ -133,7 +133,7 @@
 
 #### Auth Pages
 - ✅ LoginPage
-- ✅ SignupPage (creates company + admin via migration 007)
+- ❌ SignupPage — removed; accounts are created by an admin (Users → Add User), public sign-up is blocked by migration 011
 - ✅ ForgotPasswordPage
 - ✅ NotFoundPage
 - ✅ UnauthorizedPage

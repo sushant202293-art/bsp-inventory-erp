@@ -116,11 +116,8 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <p className="mt-3 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{' '}
-        <Link to="/signup" className="font-semibold text-primary hover:underline">
-          Create one
-        </Link>
+      <p className="mt-3 text-center text-xs text-muted-foreground">
+        Accounts are created by an administrator. Contact your admin if you need access.
       </p>
 
       <p className="mt-2 text-center text-xs text-muted-foreground">

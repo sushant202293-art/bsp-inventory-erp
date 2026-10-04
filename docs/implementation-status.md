@@ -17,7 +17,7 @@ The project has a **solid foundation** with approximately **70% implementation c
 5. **Advanced Reports** - Basic reports exist, need aging, fast/slow movers, etc.
 6. **Document Printing/PDF** - Needs professional print layouts
 7. **Unit Module Route** - Page exists but not in routes.tsx
-8. **Signup Onboarding** - Partially implemented, needs enhancement
+8. **User Invitation Flow** - Users are created by an admin; still needs an email invite / forced password reset on first login
 9. **3D Premium UI Styling** - Current UI is functional but basic
 
 ---
@@ -98,7 +98,7 @@ The project has a **solid foundation** with approximately **70% implementation c
 
 - ✅ Supabase Auth integration
 - ✅ Login page (LoginPage.tsx)
-- ✅ Signup page (SignupPage.tsx)
+- ✅ Admin-provisioned accounts (Users → Add User; public sign-up blocked by migration 011, SignupPage removed)
 - ✅ Forgot password page (ForgotPasswordPage.tsx)
 - ✅ Auth context (AuthContext.tsx)
 - ✅ Permission context (PermissionContext.tsx)
@@ -108,7 +108,7 @@ The project has a **solid foundation** with approximately **70% implementation c
 
 ### ⚠️ PARTIALLY IMPLEMENTED
 
-- ⚠️ **Signup onboarding flow** - Basic signup exists, needs guided onboarding wizard
+- ⚠️ **User invitation flow** - Admin-created users get a shared temporary password; no email invite / forced reset on first login yet
 
 ### ❌ MISSING
 

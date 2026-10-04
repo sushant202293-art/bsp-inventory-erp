@@ -13,7 +13,7 @@ interface TopHeaderProps {
 
 export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
   const { user, profile } = useAuth();
-  const { setTheme, isDark } = useTheme();
+  const { setMode, isDark } = useTheme();
   const location = useLocation();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -88,7 +88,7 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
         </div>
 
         <button
-          onClick={() => setTheme(isDark ? 'light-professional' : 'neon-blue')}
+          onClick={() => setMode(isDark ? 'light' : 'dark')}
           className="rounded-sm p-1 transition-colors hover:bg-sidebar"
           style={{ color: 'rgb(var(--color-text-secondary))' }}
           title={isDark ? 'Light Mode' : 'Dark Mode'}
@@ -130,7 +130,7 @@ export default function TopHeader({ onToggleSidebar }: TopHeaderProps) {
             className="flex h-7 items-center gap-1.5 rounded-sm px-1.5 transition-colors hover:bg-sidebar"
           >
             <div
-              className="flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-bold text-white"
+              className="flex h-5 w-5 items-center justify-center rounded-sm text-[10px] font-bold text-primary-foreground"
               style={{ background: 'rgb(var(--color-primary))' }}
             >
               {(profile?.full_name ?? user?.email ?? 'User')?.charAt(0) || 'A'}

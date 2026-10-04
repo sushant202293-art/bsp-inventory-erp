@@ -56,7 +56,7 @@ BEGIN
 
     IF v_company_id IS NULL THEN
         RAISE EXCEPTION
-            'No company found. Run demo_data.sql, or sign up once at /signup, then re-run this script.';
+            'No company found. Run demo_data.sql first, then re-run this script.';
     END IF;
 
     -- Resolve crypt() through whichever schema actually holds it. The call
@@ -98,7 +98,12 @@ BEGIN
             v_hash,
             now(),
             '{"provider":"email","providers":["email"]}'::jsonb,
-            jsonb_build_object('full_name', v_full_name),
+            jsonb_build_object(
+                'full_name', v_full_name,
+                'invited_by_admin', true,
+                'company_id', v_company_id,
+                'role', 'admin'
+            ),
             now(), now(), '', '', '', ''
         );
     END IF;
@@ -176,9 +181,10 @@ BEGIN
         END IF;
     END IF;
 
-    -- The on_auth_user_created trigger (migration 007) already inserted a
-    -- profile for this user, but with company_id NULL and role 'viewer',
-    -- because no company metadata was present. Attach and promote it.
+    -- Migration 011's on_auth_user_created trigger accepts this row because
+    -- invited_by_admin is set and provisions the profile with the company and
+    -- admin role from the metadata. The upsert below simply re-asserts the
+    -- same values (and fills in the username, which the trigger does not set).
     INSERT INTO public.profiles (
         id, company_id, full_name, username, email, role, is_active
     ) VALUES (
