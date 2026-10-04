@@ -3,10 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Save, X, Loader2 } from 'lucide-react';
-import { PageHeader } from '@/components/ui/page-header';
+import { Save, X, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -27,13 +25,11 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/components/ui/use-toast';
 import { usePermissions } from '@/contexts/PermissionContext';
-import { cn } from '@/lib/utils';
 import {
   getSupplier,
   createSupplier,
   updateSupplier,
 } from '@/services/supplier.service';
-import { INDIAN_STATES } from '@/constants';
 import type { SupplierFormData } from '@/types/supplier.types';
 
 const supplierFormSchema = z.object({
@@ -96,6 +92,13 @@ const supplierFormSchema = z.object({
 
 type FormValues = z.input<typeof supplierFormSchema>;
 
+const LABEL_CLS =
+  'block mb-1 text-[11px] font-medium text-slate-400 uppercase tracking-wider';
+const INPUT_CLS =
+  'h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus-visible:border-cyan-500 focus-visible:ring-cyan-500';
+const SECTION_CLS = 'space-y-2.5 rounded-xl border border-slate-800 bg-slate-950/40 p-3.5';
+const SECTION_TITLE_CLS = 'text-[11px] font-medium text-slate-400 uppercase tracking-wider';
+
 export default function SupplierFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -105,6 +108,7 @@ export default function SupplierFormPage() {
 
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEditing);
+  const [showAdditional, setShowAdditional] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(supplierFormSchema),
@@ -193,6 +197,13 @@ export default function SupplierFormPage() {
             notes: supplier.notes || '',
             is_active: supplier.is_active,
           });
+
+          if (
+            bank?.bank_name || bank?.account_number || supplier.notes ||
+            supplier.payment_terms || supplier.credit_limit || supplier.opening_balance
+          ) {
+            setShowAdditional(true);
+          }
         })
         .catch((error) => {
           toast({
@@ -233,591 +244,654 @@ export default function SupplierFormPage() {
 
   const sameAsBilling = form.watch('same_as_billing');
 
-  if (fetching) {
-    return (
-      <div className="space-y-3">
-        <div className="h-10 w-[300px] animate-pulse rounded-md bg-muted" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-4 space-y-3">
-              <div className="h-6 w-[200px] animate-pulse rounded bg-muted" />
-              {Array.from({ length: 4 }).map((_, j) => (
-                <div key={j} className="h-10 w-full animate-pulse rounded bg-muted" />
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const handleClose = () => {
+    navigate('/suppliers');
+  };
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  });
 
   return (
-    <div className="space-y-3">
-      <PageHeader
-        title={isEditing ? 'Edit Supplier' : 'New Supplier'}
-        description={isEditing ? 'Update supplier information' : 'Add a new supplier to your records'}
-        breadcrumbs={[
-          { label: 'Dashboard', onClick: () => navigate('/dashboard') },
-          { label: 'Suppliers', onClick: () => navigate('/suppliers') },
-          { label: isEditing ? 'Edit' : 'New' },
-        ]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate('/suppliers')}>
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button onClick={form.handleSubmit(onSubmit)} disabled={loading}>
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-              {isEditing ? 'Update' : 'Create'}
-            </Button>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-150"
+      onClick={handleBackdropClick}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="supplier-modal-title"
+        className="flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl animate-in zoom-in-95 duration-150 text-slate-100"
+      >
+        {/* Header (Pinned) */}
+        <div className="flex items-start justify-between border-b border-slate-800 bg-slate-900 px-6 py-4">
+          <div className="space-y-0.5">
+            <h2 id="supplier-modal-title" className="text-base font-semibold text-slate-100">
+              {isEditing ? 'Edit Supplier' : 'Add New Supplier'}
+            </h2>
+            <p className="text-xs text-slate-400">
+              {isEditing
+                ? 'Update supplier details in your vendor directory.'
+                : 'Quickly register a supplier to your vendor directory.'}
+            </p>
           </div>
-        }
-      />
+          <button
+            type="button"
+            onClick={handleClose}
+            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-100"
+            aria-label="Close dialog"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Supplier Name *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter supplier name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Supplier Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., SUPP-001" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="gstin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>GSTIN</FormLabel>
-                        <FormControl>
-                          <Input placeholder="22AAAAA0000A1Z5" maxLength={15} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="pan"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PAN</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ABCDE1234F" maxLength={10} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              {fetching ? (
+                <div className="flex min-h-[300px] items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
                 </div>
-                <FormField
-                  control={form.control}
-                  name="is_active"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Active Status</FormLabel>
-                        <p className="text-sm text-muted-foreground">
-                          Inactive suppliers cannot be used in transactions
-                        </p>
-                      </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <FormField
-                  control={form.control}
-                  name="contact_person"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contact Person</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter contact person name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input placeholder="10-digit phone number" maxLength={15} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="alt_phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Alternate Phone</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Alternate phone" maxLength={15} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="supplier@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing Address</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <FormField
-                  control={form.control}
-                  name="billing_address.line1"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address Line 1</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Street address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="billing_address.line2"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address Line 2</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Apartment, suite, etc." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="billing_address.city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input placeholder="City" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="billing_address.state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input placeholder="State" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="billing_address.pin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>PIN Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="6-digit PIN" maxLength={6} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="billing_address.country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Country</FormLabel>
-                        <FormControl>
-                          <Input placeholder="India" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Shipping Address</CardTitle>
-                <FormField
-                  control={form.control}
-                  name="same_as_billing"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2 space-y-0">
-                      <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                      <FormLabel className="text-sm font-normal">Same as billing</FormLabel>
-                    </FormItem>
-                  )}
-                />
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {!sameAsBilling && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="shipping_address.line1"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address Line 1</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Street address" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="shipping_address.line2"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address Line 2</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Apartment, suite, etc." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="grid grid-cols-2 gap-3">
-                      <FormField
-                        control={form.control}
-                        name="shipping_address.city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>City</FormLabel>
-                            <FormControl>
-                              <Input placeholder="City" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="shipping_address.state"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>State</FormLabel>
-                            <FormControl>
-                              <Input placeholder="State" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <FormField
-                        control={form.control}
-                        name="shipping_address.pin"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>PIN Code</FormLabel>
-                            <FormControl>
-                              <Input placeholder="6-digit PIN" maxLength={6} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="shipping_address.country"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Country</FormLabel>
-                            <FormControl>
-                              <Input placeholder="India" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </>
-                )}
-                {sameAsBilling && (
-                  <p className="text-sm text-muted-foreground py-4">
-                    Shipping address will be the same as billing address.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Credit & Payment Settings</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="credit_limit"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Credit Limit (₹)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={field.value}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="credit_period"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Credit Period (days)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            value={field.value}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="opening_balance"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Opening Balance (₹)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            value={field.value}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="opening_balance_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Balance Type</FormLabel>
-                        <FormControl>
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="debit">Debit (We owe them)</SelectItem>
-                              <SelectItem value="credit">Credit (They owe us)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="payment_terms"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Payment Terms</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Net 30, 2% 10 Net 30" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Bank Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <FormField
-                  control={form.control}
-                  name="bank_details.bank_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bank Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Bank name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="bank_details.account_number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Account Number</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Account number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <FormField
-                    control={form.control}
-                    name="bank_details.ifsc_code"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>IFSC Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="IFSC code" maxLength={11} {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="bank_details.branch"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Branch</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Branch name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes</FormLabel>
-                      <FormControl>
-                        <textarea
-                          className="flex min-h-[80px] w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                          placeholder="Additional notes..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="flex items-center justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => navigate('/suppliers')}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <Save className="mr-2 h-4 w-4" />
+                <>
+                  {/* Section 1: Identification & Tax */}
+                  <div className={SECTION_CLS}>
+                    <h3 className={SECTION_TITLE_CLS}>Identification &amp; Tax</h3>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <div className="sm:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className={LABEL_CLS}>
+                                Supplier Name <span className="text-rose-400">*</span>
+                              </FormLabel>
+                              <FormControl>
+                                <Input className={INPUT_CLS} placeholder="e.g., Global Supplies Co" {...field} />
+                              </FormControl>
+                              <FormMessage className="text-[11px] text-rose-400" />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <div className="sm:col-span-1">
+                        <FormField
+                          control={form.control}
+                          name="code"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className={LABEL_CLS}>Supplier Code</FormLabel>
+                              <FormControl>
+                                <Input className={INPUT_CLS} placeholder="e.g., SUPP-001" {...field} />
+                              </FormControl>
+                              <FormMessage className="text-[11px] text-rose-400" />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="gstin"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_CLS}>GSTIN</FormLabel>
+                            <FormControl>
+                              <Input className={INPUT_CLS} placeholder="22AAAAA0000A1Z5" maxLength={15} {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-rose-400" />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="pan"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_CLS}>PAN</FormLabel>
+                            <FormControl>
+                              <Input className={INPUT_CLS} placeholder="ABCDE1234F" maxLength={10} {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-rose-400" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="is_active"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel className="block text-xs font-medium text-slate-300">
+                              Active Status
+                            </FormLabel>
+                            <p className="text-[11px] text-slate-500">
+                              Inactive suppliers cannot be used in transactions
+                            </p>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Section 2: Contact */}
+                  <div className={SECTION_CLS}>
+                    <h3 className={SECTION_TITLE_CLS}>Contact</h3>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="contact_person"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_CLS}>Contact Person</FormLabel>
+                            <FormControl>
+                              <Input className={INPUT_CLS} placeholder="e.g., Suresh Mehta" {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-rose-400" />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_CLS}>Phone</FormLabel>
+                            <FormControl>
+                              <Input className={INPUT_CLS} placeholder="10-digit phone number" maxLength={15} {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-rose-400" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_CLS}>Email</FormLabel>
+                            <FormControl>
+                              <Input type="email" className={INPUT_CLS} placeholder="supplier@example.com" {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-rose-400" />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="alt_phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className={LABEL_CLS}>Alternate Phone</FormLabel>
+                            <FormControl>
+                              <Input className={INPUT_CLS} placeholder="Alternate phone" maxLength={15} {...field} />
+                            </FormControl>
+                            <FormMessage className="text-[11px] text-rose-400" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section 3: Addresses */}
+                  <div className={SECTION_CLS}>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className={SECTION_TITLE_CLS}>Addresses</h3>
+                      <FormField
+                        control={form.control}
+                        name="same_as_billing"
+                        render={({ field }) => (
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <FormLabel className="text-xs font-medium text-slate-300">
+                              Shipping same as billing
+                            </FormLabel>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      {/* Billing */}
+                      <div className="space-y-2.5">
+                        <p className="text-[11px] font-medium text-cyan-400 uppercase tracking-wider">
+                          Billing Address
+                        </p>
+                        <FormField
+                          control={form.control}
+                          name="billing_address.line1"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className={LABEL_CLS}>Address Line 1</FormLabel>
+                              <FormControl>
+                                <Input className={INPUT_CLS} placeholder="Street address" {...field} />
+                              </FormControl>
+                              <FormMessage className="text-[11px] text-rose-400" />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="billing_address.line2"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className={LABEL_CLS}>Address Line 2</FormLabel>
+                              <FormControl>
+                                <Input className={INPUT_CLS} placeholder="Apartment, suite, etc." {...field} />
+                              </FormControl>
+                              <FormMessage className="text-[11px] text-rose-400" />
+                            </FormItem>
+                          )}
+                        />
+                        <div className="grid grid-cols-2 gap-3">
+                          <FormField
+                            control={form.control}
+                            name="billing_address.city"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>City</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="City" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="billing_address.state"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>State</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="State" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="billing_address.pin"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>PIN Code</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="6-digit PIN" maxLength={6} {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="billing_address.country"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Country</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="India" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Shipping */}
+                      <div className="space-y-2.5">
+                        <p className="text-[11px] font-medium text-cyan-400 uppercase tracking-wider">
+                          Shipping Address
+                        </p>
+                        {!sameAsBilling && (
+                          <>
+                            <FormField
+                              control={form.control}
+                              name="shipping_address.line1"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className={LABEL_CLS}>Address Line 1</FormLabel>
+                                  <FormControl>
+                                    <Input className={INPUT_CLS} placeholder="Street address" {...field} />
+                                  </FormControl>
+                                  <FormMessage className="text-[11px] text-rose-400" />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="shipping_address.line2"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className={LABEL_CLS}>Address Line 2</FormLabel>
+                                  <FormControl>
+                                    <Input className={INPUT_CLS} placeholder="Apartment, suite, etc." {...field} />
+                                  </FormControl>
+                                  <FormMessage className="text-[11px] text-rose-400" />
+                                </FormItem>
+                              )}
+                            />
+                            <div className="grid grid-cols-2 gap-3">
+                              <FormField
+                                control={form.control}
+                                name="shipping_address.city"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className={LABEL_CLS}>City</FormLabel>
+                                    <FormControl>
+                                      <Input className={INPUT_CLS} placeholder="City" {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-[11px] text-rose-400" />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name="shipping_address.state"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className={LABEL_CLS}>State</FormLabel>
+                                    <FormControl>
+                                      <Input className={INPUT_CLS} placeholder="State" {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-[11px] text-rose-400" />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name="shipping_address.pin"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className={LABEL_CLS}>PIN Code</FormLabel>
+                                    <FormControl>
+                                      <Input className={INPUT_CLS} placeholder="6-digit PIN" maxLength={6} {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-[11px] text-rose-400" />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={form.control}
+                                name="shipping_address.country"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className={LABEL_CLS}>Country</FormLabel>
+                                    <FormControl>
+                                      <Input className={INPUT_CLS} placeholder="India" {...field} />
+                                    </FormControl>
+                                    <FormMessage className="text-[11px] text-rose-400" />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </>
+                        )}
+                        {sameAsBilling && (
+                          <p className="rounded-lg border border-slate-800 bg-slate-950/60 p-3 text-xs text-slate-400">
+                            Shipping address will be the same as billing address.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progressive Disclosure: Credit, Bank & Notes */}
+                  <div className="rounded-xl border border-slate-800 bg-slate-950/30 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setShowAdditional((prev) => !prev)}
+                      className="flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs font-medium text-slate-300 transition-colors hover:bg-slate-800/50 hover:text-slate-100"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-cyan-400 font-semibold">{showAdditional ? '−' : '+'}</span>
+                        <span>
+                          {showAdditional ? 'Hide Credit, Payment & Bank' : 'Add Credit, Payment & Bank'}
+                        </span>
+                      </span>
+                      {showAdditional ? (
+                        <ChevronUp className="h-4 w-4 text-slate-400" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-slate-400" />
+                      )}
+                    </button>
+
+                    {showAdditional && (
+                      <div className="border-t border-slate-800/80 p-3.5 space-y-3 animate-in fade-in duration-150">
+                        <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                          Credit &amp; Payment Settings
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="credit_limit"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Credit Limit (₹)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    className={INPUT_CLS}
+                                    value={field.value}
+                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                  />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="credit_period"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Credit Period (days)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    className={INPUT_CLS}
+                                    value={field.value}
+                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                  />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="opening_balance"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Opening Balance (₹)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    className={INPUT_CLS}
+                                    value={field.value}
+                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                  />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="opening_balance_type"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Balance Type</FormLabel>
+                                <FormControl>
+                                  <Select value={field.value} onValueChange={field.onChange}>
+                                    <SelectTrigger className={INPUT_CLS}>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="border-slate-700 bg-slate-900 text-slate-100">
+                                      <SelectItem value="debit">Debit (We owe them)</SelectItem>
+                                      <SelectItem value="credit">Credit (They owe us)</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="payment_terms"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Payment Terms</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="e.g., Net 30, 2% 10 Net 30" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <p className="pt-1 text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                          Bank Details
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <FormField
+                            control={form.control}
+                            name="bank_details.bank_name"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Bank Name</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="Bank name" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="bank_details.account_number"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Account Number</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="Account number" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="bank_details.ifsc_code"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>IFSC Code</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="IFSC code" maxLength={11} {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="bank_details.branch"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className={LABEL_CLS}>Branch</FormLabel>
+                                <FormControl>
+                                  <Input className={INPUT_CLS} placeholder="Branch name" {...field} />
+                                </FormControl>
+                                <FormMessage className="text-[11px] text-rose-400" />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <FormField
+                          control={form.control}
+                          name="notes"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className={LABEL_CLS}>Notes</FormLabel>
+                              <FormControl>
+                                <textarea
+                                  className="min-h-[70px] w-full rounded-md border border-slate-700 bg-slate-950/60 p-2.5 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus-visible:border-cyan-500 focus-visible:ring-cyan-500"
+                                  placeholder="Additional notes..."
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormMessage className="text-[11px] text-rose-400" />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
-              {isEditing ? 'Update Supplier' : 'Create Supplier'}
-            </Button>
-          </div>
-        </form>
-      </Form>
+            </div>
+
+            {/* Footer (Pinned) */}
+            <div className="flex items-center justify-end gap-3 border-t border-slate-800 bg-slate-900/80 px-6 py-3.5">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={loading}
+                className="h-9 border-slate-700 bg-transparent px-4 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading || fetching}
+                className="h-9 bg-cyan-600 px-4 text-xs font-medium text-white shadow-sm transition-all hover:bg-cyan-500 focus-visible:ring-1 focus-visible:ring-cyan-400 active:scale-[0.98] disabled:opacity-50"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-1.5">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Saving...</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <Save className="h-3.5 w-3.5" />
+                    <span>{isEditing ? 'Update Supplier' : 'Save Supplier'}</span>
+                  </span>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

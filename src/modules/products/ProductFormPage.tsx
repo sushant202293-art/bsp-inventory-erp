@@ -4,15 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  Save, X, Loader2, Upload, Tag, DollarSign, Package, Settings, Sparkles,
-  Plus, Image as ImageIcon, Percent, FileCode, Boxes,
+  Save, X, Loader2, Sparkles, Plus, ChevronDown, ChevronUp,
 } from 'lucide-react';
-import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -53,33 +48,6 @@ interface Unit { id: string; name: string; short_name: string; }
 
 type QuickCreateKind = 'category' | 'brand' | 'unit' | null;
 
-/**
- * A `+` button rendered inside a Select trigger row. Radix Select owns its
- * trigger, so a nested button has to be rendered as a sibling and positioned
- * over the control instead of being nested inside it.
- */
-function SelectQuickAdd({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="icon"
-      className="absolute right-1 top-1 h-[calc(100%-0.5rem)] w-9 shrink-0"
-      onClick={onClick}
-      aria-label={label}
-      title={label}
-    >
-      <Plus className="h-4 w-4" />
-    </Button>
-  );
-}
-
 export default function ProductFormPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -88,6 +56,8 @@ export default function ProductFormPage() {
 
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditing);
+  const [showAdditional, setShowAdditional] = useState(false);
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
@@ -159,6 +129,9 @@ export default function ProductFormPage() {
           barcode: product.barcode || '',
           is_active: product.is_active,
         });
+        if (product.description || product.color || product.size || product.image_url) {
+          setShowAdditional(true);
+        }
       } catch {
         toast({ title: 'Error', description: 'Failed to load product.', variant: 'destructive' });
         navigate('/products');
@@ -171,7 +144,11 @@ export default function ProductFormPage() {
 
   const generateCode = () => {
     const code = `PRD-${generateId().substring(0, 6).toUpperCase()}`;
-    setValue('code', code);
+    setValue('code', code, { shouldValidate: true });
+  };
+
+  const handleClose = () => {
+    navigate('/products');
   };
 
   const openQuickCreate = (kind: Exclude<QuickCreateKind, null>) => {
@@ -180,11 +157,6 @@ export default function ProductFormPage() {
     setQuickShortName('');
   };
 
-  /**
-   * Creates a master record inline and immediately selects it in the product
-   * form. Reuses the same tables and RLS policies as the master-data tabs, so
-   * no new schema or service is involved.
-   */
   const handleQuickCreate = async () => {
     if (!quickCreate) return;
     const name = quickName.trim();
@@ -302,465 +274,544 @@ export default function ProductFormPage() {
     }
   };
 
-  /**
-   * Saves without leaving the form. Only offered when creating, since
-   * re-creating an existing product id is meaningless.
-   */
-  const onSubmitAndAddAnother = async (data: FormData) => {
-    setLoading(true);
-    try {
-      await createProduct(buildPayload(data));
-      toast({
-        title: 'Product created',
-        description: 'Product saved. Fill in the next one.',
-        variant: 'success',
-      });
-      reset({
-        name: '', code: '', category_id: data.category_id, brand_id: data.brand_id,
-        color: '', size: '', unit_id: data.unit_id, gst_rate: data.gst_rate ?? 18,
-        hsn_sac: '', description: '', purchase_price: 0, selling_price: 0,
-        low_stock_level: data.low_stock_level ?? 10, reorder_level: data.reorder_level ?? 5,
-        image_url: '', barcode: '', is_active: true,
-      });
-    } catch {
-      toast({ title: 'Error', description: 'Failed to save product.', variant: 'destructive' });
-    } finally {
-      setLoading(false);
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
     }
   };
 
-  if (initialLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && quickCreate === null) {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [quickCreate]);
 
   return (
-    <div className="space-y-3">
-      <PageHeader
-        title={isEditing ? 'Edit Product' : 'Add New Product'}
-        description={isEditing ? 'Update product information' : 'Add a new product to your inventory'}
-        breadcrumbs={[
-          { label: 'Dashboard', onClick: () => navigate('/dashboard') },
-          { label: 'Products', onClick: () => navigate('/products') },
-          { label: isEditing ? 'Edit' : 'New Product' },
-        ]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate('/products')} className="gap-2">
-              <X className="h-4 w-4" />
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit(onSubmit)} disabled={isSubmitting || loading} className="gap-2">
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              {isEditing ? 'Update Product' : 'Save Product'}
-            </Button>
-          </div>
-        }
-      />
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-        {/* ---------------------------------------------- 1. Basic */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Tag className="h-4 w-4 text-primary" />
-                Basic Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Product Name *</label>
-                  <Input
-                    {...register('name')}
-                    error={!!errors.name}
-                    errorMessage={errors.name?.message}
-                    placeholder="Enter product name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Product Code *</label>
-                  <div className="flex gap-2">
-                    <Input
-                      {...register('code')}
-                      error={!!errors.code}
-                      errorMessage={errors.code?.message}
-                      placeholder="e.g., PRD-001"
-                      className="flex-1"
-                    />
-                    <Button type="button" variant="outline" onClick={generateCode} className="shrink-0 gap-1">
-                      <Sparkles className="h-3 w-3" />
-                      Auto
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Category</label>
-                  <div className="relative">
-                    <Select
-                      value={watch('category_id') || 'none'}
-                      onValueChange={(v) => setValue('category_id', v === 'none' ? null : v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No Category</SelectItem>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <SelectQuickAdd label="Create category" onClick={() => openQuickCreate('category')} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Brand</label>
-                  <div className="relative">
-                    <Select
-                      value={watch('brand_id') || 'none'}
-                      onValueChange={(v) => setValue('brand_id', v === 'none' ? null : v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select brand" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No Brand</SelectItem>
-                        {brands.map((br) => (
-                          <SelectItem key={br.id} value={br.id}>{br.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <SelectQuickAdd label="Create brand" onClick={() => openQuickCreate('brand')} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Unit of Measure</label>
-                  <div className="relative">
-                    <Select
-                      value={watch('unit_id') || 'none'}
-                      onValueChange={(v) => setValue('unit_id', v === 'none' ? null : v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select unit" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">No Unit</SelectItem>
-                        {units.map((u) => (
-                          <SelectItem key={u.id} value={u.id}>{u.name} ({u.short_name})</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <SelectQuickAdd label="Create unit" onClick={() => openQuickCreate('unit')} />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Color</label>
-                  <Input {...register('color')} placeholder="e.g., Red, Blue" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Size</label>
-                  <Input {...register('size')} placeholder="e.g., XL, 500ml" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* --------------------------------------------- 2. Pricing */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <DollarSign className="h-4 w-4 text-green-500" />
-                Pricing
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Purchase Price *</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...register('purchase_price', { valueAsNumber: true })}
-                    error={!!errors.purchase_price}
-                    errorMessage={errors.purchase_price?.message}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Selling Price *</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...register('selling_price', { valueAsNumber: true })}
-                    error={!!errors.selling_price}
-                    errorMessage={errors.selling_price?.message}
-                    placeholder="0.00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                    <Percent className="h-3.5 w-3.5 text-muted-foreground" />
-                    GST Rate (%)
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    {...register('gst_rate', { valueAsNumber: true })}
-                    placeholder="18"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
-                  Margin:{' '}
-                  <span className={`font-medium ${marginPercent < 0 ? 'text-red-600' : 'text-foreground'}`}>
-                    {marginPercent.toFixed(1)}%
-                  </span>
-                </div>
-                <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
-                  GST Amount:{' '}
-                  <span className="font-medium text-foreground">{formatCurrency(gstAmount)}</span>
-                </div>
-                <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
-                  Price incl. GST:{' '}
-                  <span className="font-medium text-foreground">{formatCurrency(priceWithTax)}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* -------------------------------------------- 3. Inventory */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Package className="h-4 w-4 text-blue-500" />
-                Inventory &amp; Thresholds
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Low Stock Level</label>
-                  <Input
-                    type="number"
-                    {...register('low_stock_level', { valueAsNumber: true })}
-                    placeholder="10"
-                  />
-                  <p className="text-xs text-muted-foreground">Alerts when stock falls to this level.</p>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Reorder Level</label>
-                  <Input
-                    type="number"
-                    {...register('reorder_level', { valueAsNumber: true })}
-                    placeholder="5"
-                  />
-                  <p className="text-xs text-muted-foreground">Suggested quantity when reordering.</p>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Barcode</label>
-                  <Input {...register('barcode')} placeholder="Enter barcode" />
-                  <p className="text-xs text-muted-foreground">Used by the barcode scanner search.</p>
-                </div>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-1.5 text-sm font-medium text-foreground">
-                    <FileCode className="h-3.5 w-3.5 text-muted-foreground" />
-                    HSN/SAC Code
-                  </label>
-                  <Input {...register('hsn_sac')} placeholder="e.g., 8471" />
-                  <p className="text-xs text-muted-foreground">Required for GST invoicing.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-                <Boxes className="mt-0.5 h-4 w-4 shrink-0" />
-                <p>
-                  Opening stock, warehouse and rack are managed from the Stock module
-                  (stock movements and adjustments). Setting them here would bypass
-                  stock ledgers and break inventory valuation.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* ---------------------------------------------- 4. Details */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <FileCode className="h-4 w-4 text-amber-500" />
-                Additional Details
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Description</label>
-                <Textarea
-                  {...register('description')}
-                  placeholder="Product description (optional)"
-                  rows={4}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* ---------------------------------------------- 5. Images */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <ImageIcon className="h-4 w-4 text-cyan-500" />
-                Images
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                <div className="h-32 w-32 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
-                  {imageUrl ? (
-                    <img src={imageUrl} alt="Product preview" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center gap-1">
-                      <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
-                      <span className="text-[10px] text-muted-foreground">No image</span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 space-y-2">
-                  <label className="text-sm font-medium text-foreground">Image URL</label>
-                  <div className="flex gap-2">
-                    <Input {...register('image_url')} placeholder="https://..." className="flex-1" />
-                    <Button type="button" variant="outline" size="icon" title="Upload image">
-                      <Upload className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Paste a publicly reachable image URL. The catalog stores a single
-                    image per product.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* ------------------------------------------ Status toggle */}
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Settings className="h-4 w-4 text-purple-500" />
-                Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                <div>
-                  <p className="text-sm font-medium text-foreground">Active Status</p>
-                  <p className="text-xs text-muted-foreground">
-                    {watch('is_active') ? 'This product is active and visible' : 'This product is archived'}
-                  </p>
-                </div>
-                <Switch
-                  checked={watch('is_active')}
-                  onCheckedChange={(checked) => setValue('is_active', checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex flex-col gap-3 pb-6 sm:flex-row sm:justify-end">
-          <Button type="button" variant="outline" onClick={() => navigate('/products')}>
-            Cancel
-          </Button>
-          {!isEditing && (
-            <Button
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-150"
+        onClick={handleBackdropClick}
+      >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="product-modal-title"
+          className="flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl animate-in zoom-in-95 duration-150 text-slate-100"
+        >
+          {/* Header (Pinned) */}
+          <div className="flex items-start justify-between border-b border-slate-800 bg-slate-900 px-6 py-4">
+            <div className="space-y-0.5">
+              <h2 id="product-modal-title" className="text-base font-semibold text-slate-100">
+                {isEditing ? 'Edit Product' : 'Add New Product'}
+              </h2>
+              <p className="text-xs text-slate-400">
+                {isEditing
+                  ? 'Update item specifications in your inventory catalog.'
+                  : 'Quickly register an item to your inventory catalog.'}
+              </p>
+            </div>
+            <button
               type="button"
-              variant="secondary"
-              onClick={handleSubmit(onSubmitAndAddAnother)}
-              disabled={isSubmitting || loading}
-              className="gap-2"
+              onClick={handleClose}
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-100"
+              aria-label="Close dialog"
             >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              Save &amp; Add Another
-            </Button>
-          )}
-          <Button type="submit" disabled={isSubmitting || loading} className="gap-2">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            {isEditing ? 'Update Product' : 'Save Product'}
-          </Button>
-        </div>
-      </form>
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-      {/* ------------------------------------- Quick-create dialogs */}
+          {/* Form Body */}
+          <form onSubmit={handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              {initialLoading ? (
+                <div className="flex min-h-[300px] items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+                </div>
+              ) : (
+                <>
+                  {/* Row 1 & 2: Identification */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                          Product Name <span className="text-rose-400">*</span>
+                        </label>
+                        <input
+                          {...register('name')}
+                          placeholder="e.g., Wireless Mechanical Keyboard"
+                          className={`h-9 w-full rounded-md border bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 ${
+                            errors.name ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500' : 'border-slate-700'
+                          }`}
+                        />
+                        {errors.name && (
+                          <p className="mt-1 text-[11px] text-rose-400">{errors.name.message}</p>
+                        )}
+                      </div>
+
+                      <div className="sm:col-span-1">
+                        <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                          Product Code / SKU <span className="text-rose-400">*</span>
+                        </label>
+                        <div className="flex gap-1.5">
+                          <input
+                            {...register('code')}
+                            placeholder="PRD-001"
+                            className={`h-9 min-w-0 flex-1 rounded-md border bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 ${
+                              errors.code ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500' : 'border-slate-700'
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={generateCode}
+                            title="Auto-generate SKU"
+                            className="inline-flex h-9 shrink-0 items-center gap-1 rounded-md border border-slate-700 bg-slate-800/80 px-2.5 text-[11px] font-medium text-slate-300 transition-colors hover:bg-slate-700 hover:text-slate-100"
+                          >
+                            <Sparkles className="h-3 w-3 text-cyan-400" />
+                            Auto
+                          </button>
+                        </div>
+                        {errors.code && (
+                          <p className="mt-1 text-[11px] text-rose-400">{errors.code.message}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                            Category
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => openQuickCreate('category')}
+                            className="inline-flex items-center gap-0.5 text-[10px] font-medium text-cyan-400 hover:text-cyan-300"
+                            title="Add category"
+                          >
+                            <Plus className="h-3 w-3" /> New
+                          </button>
+                        </div>
+                        <Select
+                          value={watch('category_id') || 'none'}
+                          onValueChange={(v) => setValue('category_id', v === 'none' ? null : v)}
+                        >
+                          <SelectTrigger className="h-9 border-slate-700 bg-slate-950/60 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent className="border-slate-700 bg-slate-900 text-slate-100">
+                            <SelectItem value="none">No Category</SelectItem>
+                            {categories.map((cat) => (
+                              <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                            Unit of Measure
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => openQuickCreate('unit')}
+                            className="inline-flex items-center gap-0.5 text-[10px] font-medium text-cyan-400 hover:text-cyan-300"
+                            title="Add unit"
+                          >
+                            <Plus className="h-3 w-3" /> New
+                          </button>
+                        </div>
+                        <Select
+                          value={watch('unit_id') || 'none'}
+                          onValueChange={(v) => setValue('unit_id', v === 'none' ? null : v)}
+                        >
+                          <SelectTrigger className="h-9 border-slate-700 bg-slate-950/60 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+                            <SelectValue placeholder="Select unit" />
+                          </SelectTrigger>
+                          <SelectContent className="border-slate-700 bg-slate-900 text-slate-100">
+                            <SelectItem value="none">No Unit</SelectItem>
+                            {units.map((u) => (
+                              <SelectItem key={u.id} value={u.id}>{u.name} ({u.short_name})</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                            Brand
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => openQuickCreate('brand')}
+                            className="inline-flex items-center gap-0.5 text-[10px] font-medium text-cyan-400 hover:text-cyan-300"
+                            title="Add brand"
+                          >
+                            <Plus className="h-3 w-3" /> New
+                          </button>
+                        </div>
+                        <Select
+                          value={watch('brand_id') || 'none'}
+                          onValueChange={(v) => setValue('brand_id', v === 'none' ? null : v)}
+                        >
+                          <SelectTrigger className="h-9 border-slate-700 bg-slate-950/60 text-xs text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500">
+                            <SelectValue placeholder="Select brand" />
+                          </SelectTrigger>
+                          <SelectContent className="border-slate-700 bg-slate-900 text-slate-100">
+                            <SelectItem value="none">No Brand</SelectItem>
+                            {brands.map((br) => (
+                              <SelectItem key={br.id} value={br.id}>{br.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Row 3: Pricing & Tax */}
+                  <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-3.5 space-y-2.5">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                          Purchase Price <span className="text-rose-400">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">
+                            ₹
+                          </span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            {...register('purchase_price', { valueAsNumber: true })}
+                            placeholder="0.00"
+                            className={`h-9 w-full rounded-md border bg-slate-950/60 pl-6 pr-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 ${
+                              errors.purchase_price ? 'border-rose-500' : 'border-slate-700'
+                            }`}
+                          />
+                        </div>
+                        {errors.purchase_price && (
+                          <p className="mt-1 text-[11px] text-rose-400">{errors.purchase_price.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                          Selling Price <span className="text-rose-400">*</span>
+                        </label>
+                        <div className="relative">
+                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">
+                            ₹
+                          </span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            {...register('selling_price', { valueAsNumber: true })}
+                            placeholder="0.00"
+                            className={`h-9 w-full rounded-md border bg-slate-950/60 pl-6 pr-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 ${
+                              errors.selling_price ? 'border-rose-500' : 'border-slate-700'
+                            }`}
+                          />
+                        </div>
+                        {errors.selling_price && (
+                          <p className="mt-1 text-[11px] text-rose-400">{errors.selling_price.message}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                          GST / Tax Rate (%)
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            step="0.01"
+                            {...register('gst_rate', { valueAsNumber: true })}
+                            placeholder="18"
+                            className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 pr-7 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                          />
+                          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500">
+                            %
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Inline badges for margin & GST summary */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/90 px-2.5 py-0.5 text-[11px]">
+                        <span className="text-slate-400">Margin:</span>
+                        <span
+                          className={`font-semibold ${
+                            marginPercent < 0
+                              ? 'text-rose-400'
+                              : marginPercent > 20
+                              ? 'text-emerald-400'
+                              : 'text-cyan-400'
+                          }`}
+                        >
+                          {marginPercent.toFixed(1)}%
+                        </span>
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/90 px-2.5 py-0.5 text-[11px]">
+                        <span className="text-slate-400">GST Amt:</span>
+                        <span className="font-semibold text-slate-200">{formatCurrency(gstAmount)}</span>
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900/90 px-2.5 py-0.5 text-[11px]">
+                        <span className="text-slate-400">Incl. Tax:</span>
+                        <span className="font-semibold text-slate-100">{formatCurrency(priceWithTax)}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Row 4: Stock & Compliance */}
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                        Barcode / EAN
+                      </label>
+                      <input
+                        {...register('barcode')}
+                        placeholder="Scan or enter barcode"
+                        className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                        HSN / SAC Code
+                      </label>
+                      <input
+                        {...register('hsn_sac')}
+                        placeholder="e.g., 8471"
+                        className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                        Reorder Level
+                      </label>
+                      <input
+                        type="number"
+                        {...register('reorder_level', { valueAsNumber: true })}
+                        placeholder="5"
+                        className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Active status */}
+                  <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+                    <div>
+                      <p className="text-xs font-medium text-slate-300">Active Status</p>
+                      <p className="text-[11px] text-slate-500">
+                        {watch('is_active')
+                          ? 'This product is active and visible'
+                          : 'This product is archived'}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={watch('is_active')}
+                      onCheckedChange={(checked) => setValue('is_active', checked)}
+                    />
+                  </div>
+
+                  {/* Progressive Disclosure ("Additional Details" Accordion) */}
+                  <div className="rounded-xl border border-slate-800 bg-slate-950/30 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setShowAdditional((prev) => !prev)}
+                      className="flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs font-medium text-slate-300 transition-colors hover:bg-slate-800/50 hover:text-slate-100"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <span className="text-cyan-400 font-semibold">{showAdditional ? '−' : '+'}</span>
+                        <span>{showAdditional ? 'Hide Additional Details' : 'Add Description, Variants & Image'}</span>
+                      </span>
+                      {showAdditional ? (
+                        <ChevronUp className="h-4 w-4 text-slate-400" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-slate-400" />
+                      )}
+                    </button>
+
+                    {showAdditional && (
+                      <div className="border-t border-slate-800/80 p-3.5 space-y-3 animate-in fade-in duration-150">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                          <div>
+                            <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                              Color Variant
+                            </label>
+                            <input
+                              {...register('color')}
+                              placeholder="e.g., Space Gray, Matte Black"
+                              className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                              Size / Dimension
+                            </label>
+                            <input
+                              {...register('size')}
+                              placeholder="e.g., XL, 500ml, 10x20cm"
+                              className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                            Image URL
+                          </label>
+                          <div className="flex gap-2">
+                            <div className="relative flex-1">
+                              <input
+                                {...register('image_url')}
+                                placeholder="https://example.com/product.jpg"
+                                className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                              />
+                            </div>
+                            {imageUrl && (
+                              <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md border border-slate-700 bg-slate-950">
+                                <img
+                                  src={imageUrl}
+                                  alt="Preview"
+                                  className="h-full w-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-medium text-slate-400 uppercase tracking-wider mb-1">
+                            Description
+                          </label>
+                          <textarea
+                            {...register('description')}
+                            rows={3}
+                            placeholder="Brief item specifications, packaging notes, or handling details..."
+                            className="w-full rounded-md border border-slate-700 bg-slate-950/60 p-2.5 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Footer (Pinned) */}
+            <div className="flex items-center justify-end gap-3 border-t border-slate-800 bg-slate-900/80 px-6 py-3.5">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleClose}
+                disabled={loading || isSubmitting}
+                className="h-9 border-slate-700 bg-transparent px-4 text-xs font-medium text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading || isSubmitting || initialLoading}
+                className="h-9 bg-cyan-600 px-4 text-xs font-medium text-white shadow-sm transition-all hover:bg-cyan-500 focus-visible:ring-1 focus-visible:ring-cyan-400 active:scale-[0.98] disabled:opacity-50"
+              >
+                {loading || isSubmitting ? (
+                  <span className="flex items-center gap-1.5">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Saving...</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <Save className="h-3.5 w-3.5" />
+                    <span>{isEditing ? 'Update Product' : 'Save Product'}</span>
+                  </span>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Quick Create Dialog (Modal inside portal) */}
       <Dialog
         open={quickCreate !== null}
         onOpenChange={(open) => { if (!open) setQuickCreate(null); }}
       >
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="border-slate-700 bg-slate-900 text-slate-100 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-slate-100">
               {quickCreate === 'category' && 'New Category'}
               {quickCreate === 'brand' && 'New Brand'}
               {quickCreate === 'unit' && 'New Unit'}
             </DialogTitle>
-            <DialogDescription>
-              Created instantly and selected in this product. You can edit it later
-              from the {quickCreate} tab in Product Management.
+            <DialogDescription className="text-slate-400">
+              Created instantly and selected in this product.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Name *</label>
-              <Input
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                Name <span className="text-rose-400">*</span>
+              </label>
+              <input
                 value={quickName}
                 onChange={(e) => setQuickName(e.target.value)}
                 placeholder={
-                  quickCreate === 'unit' ? 'e.g. Dozen' : `Enter ${quickCreate ?? ''} name`
+                  quickCreate === 'unit' ? 'e.g., Kilogram' : `Enter ${quickCreate ?? ''} name`
                 }
                 autoFocus
+                className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
               />
             </div>
             {quickCreate === 'unit' && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Short Name *</label>
-                <Input
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                  Short Name <span className="text-rose-400">*</span>
+                </label>
+                <input
                   value={quickShortName}
                   onChange={(e) => setQuickShortName(e.target.value)}
-                  placeholder="e.g. dz"
+                  placeholder="e.g., kg, pcs, box"
+                  className="h-9 w-full rounded-md border border-slate-700 bg-slate-950/60 px-3 text-xs text-slate-100 placeholder:text-slate-500 transition-colors focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
                 />
               </div>
             )}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setQuickCreate(null)} disabled={quickSaving}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setQuickCreate(null)}
+              disabled={quickSaving}
+              className="border-slate-700 bg-transparent text-xs text-slate-300 hover:bg-slate-800 hover:text-slate-100"
+            >
               Cancel
             </Button>
-            <Button onClick={handleQuickCreate} disabled={quickSaving}>
-              {quickSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button
+              type="button"
+              onClick={handleQuickCreate}
+              disabled={quickSaving}
+              className="bg-cyan-600 text-xs text-white hover:bg-cyan-500"
+            >
+              {quickSaving && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
               Create &amp; Select
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
